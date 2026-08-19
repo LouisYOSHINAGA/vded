@@ -1,0 +1,145 @@
+/* ---------------- Knob ---------------- */
+
+.knob {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  --knob-accent: var(--c-accent);
+}
+
+.knob__dial {
+  position: relative;
+  cursor: ns-resize;
+  touch-action: none;
+  border-radius: 50%;
+}
+
+.knob__dial svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.knob__track {
+  fill: none;
+  stroke: #2c3036;
+  stroke-width: 7;
+  stroke-linecap: round;
+}
+
+.knob__fill {
+  fill: none;
+  stroke: var(--knob-accent);
+  stroke-width: 7;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--knob-accent) 45%, transparent));
+}
+
+.knob__cap {
+  fill: #16181b;
+  stroke: #3a3f46;
+  stroke-width: 2;
+}
+
+.knob__pointer {
+  stroke: var(--c-ink);
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+.knob--dragging .knob__pointer,
+.knob__dial:hover .knob__pointer {
+  stroke: #fff;
+}
+
+.knob--disabled {
+  opacity: 0.35;
+}
+
+.knob--disabled .knob__dial {
+  cursor: not-allowed;
+}
+
+.knob__label {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-align: center;
+  max-width: 76px;
+}
+
+.knob__value {
+  font-size: 10px;
+  color: var(--knob-accent);
+}
+
+.knob--sm .knob__label {
+  font-size: 8px;
+}
+
+/* ---------------- Segmented picker ---------------- */
+
+.segmented {
+  display: inline-flex;
+  padding: 2px;
+  gap: 2px;
+  border-radius: var(--r-md);
+  background: var(--c-void);
+  box-shadow: inset 0 0 0 1px var(--c-line-soft);
+}
+
+.segmented__item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 22px;
+  padding: 0 8px;
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--c-ink-faint);
+  transition: background 0.12s, color 0.12s;
+}
+
+.segmented__item:hover:not(:disabled) {
+  color: var(--c-ink);
+  background: var(--c-panel-2);
+}
+
+.segmented__item[aria-pressed='true'] {
+  background: linear-gradient(180deg, var(--seg-accent, var(--c-accent-hot)), color-mix(in srgb, var(--seg-accent, var(--c-accent)) 80%, black));
+  color: #170904;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset;
+}
+
+.segmented--stack {
+  display: grid;
+  grid-auto-flow: row;
+}
+
+.segmented__item:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ---------------- Fader (horizontal value bar) ---------------- */
+
+.bar-value {
+  position: relative;
+  height: 6px;
+  border-radius: var(--r-pill);
+  background: var(--c-void);
+  box-shadow: inset 0 0 0 1px var(--c-line-soft);
+  overflow: hidden;
+}
+
+.bar-value__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: linear-gradient(90deg, var(--bar-accent, var(--c-accent)), color-mix(in srgb, var(--bar-accent, var(--c-accent)) 60%, #fff));
+  border-radius: inherit;
+}

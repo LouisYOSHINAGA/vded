@@ -1,0 +1,66 @@
+/*
+ * Palette and metrics lifted from the volca drum front panel: a warm near-black
+ * anodised face, hot orange indicators, pale silkscreen legends and a small
+ * grey-green LCD.
+ */
+:root {
+  color-scheme: dark;
+
+  /* Chassis */
+  --c-void: #0a0b0c;
+  --c-body: #121315;
+  --c-panel: #191b1e;
+  --c-panel-2: #202327;
+  --c-raise: #2a2e33;
+  --c-raise-2: #343940;
+  --c-line: #34383e;
+  --c-line-soft: #26292e;
+
+  /* Silkscreen */
+  --c-ink: #e7e3dc;
+  --c-ink-dim: #9c988f;
+  --c-ink-faint: #6d6a64;
+
+  /* Indicators */
+  --c-accent: #e8552f;
+  --c-accent-hot: #ff7a3d;
+  --c-accent-deep: #a5341a;
+  --c-accent-glow: rgba(232, 85, 47, 0.45);
+  --c-amber: #f2a33c;
+  --c-green: #79b46a;
+  --c-cyan: #52b7c4;
+  --c-violet: #9a7bd0;
+
+  /* Layer identity — layer 1 is the machine's primary, layer 2 the shadow */
+  --c-layer1: #e8552f;
+  --c-layer2: #52b7c4;
+
+  /* LCD */
+  --c-lcd: #9fb08c;
+  --c-lcd-dark: #8ba077;
+  --c-lcd-ink: #14180f;
+
+  /* State */
+  --c-danger: #e0464a;
+  --c-warn: #e0a13a;
+  --c-ok: #6fbf73;
+
+  /* Metrics */
+  --r-sm: 3px;
+  --r-md: 5px;
+  --r-lg: 8px;
+  --r-pill: 999px;
+
+  --gap-xs: 4px;
+  --gap-sm: 8px;
+  --gap-md: 14px;
+  --gap-lg: 22px;
+
+  --font-ui: "Barlow Semi Condensed", "Roboto Condensed", "Helvetica Neue", Arial,
+    "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+  --font-mono: "SFMono-Regular", "JetBrains Mono", "Roboto Mono", ui-monospace, Menlo, monospace;
+
+  --shadow-panel: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 10px 24px rgba(0, 0, 0, 0.45);
+  --shadow-raise: 0 1px 0 rgba(255, 255, 255, 0.07) inset, 0 2px 4px rgba(0, 0, 0, 0.5);
+  --shadow-press: 0 1px 3px rgba(0, 0, 0, 0.6) inset;
+}
