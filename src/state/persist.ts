@@ -70,10 +70,38 @@ function serialize(state: AppState): string {
   return JSON.stringify(payload)
 }
 
+/**
+ * Anything the sequencer touches every step — the playhead, the playing flag —
+ * is not persisted, so a running transport must not trigger a save. Compare the
+ * slices that do get written before doing any work.
+ */
+function persistedSlices(state: AppState): unknown[] {
+  return [
+    state.patch,
+    state.pattern,
+    state.presets,
+    state.settings,
+    state.mixer,
+    state.ui.selectedPart,
+    state.ui.selectedLayer,
+    state.ui.layerLink,
+    state.ui.editorTab,
+    state.ui.showMonitor,
+    state.transport.bpm,
+    state.transport.swing,
+    state.transport.gateMs,
+    state.transport.sendClock,
+  ]
+}
+
 /** Debounced autosave; safe to call before the store has any data. */
 export function startAutosave(): () => void {
   let timer: number | undefined
+  let previous = persistedSlices(store.get())
   return store.subscribe(() => {
+    const next = persistedSlices(store.get())
+    if (next.every((value, i) => value === previous[i])) return
+    previous = next
     if (timer !== undefined) window.clearTimeout(timer)
     timer = window.setTimeout(() => {
       try {

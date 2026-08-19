@@ -1,4 +1,5 @@
 import { ConnectionBanner } from './components/ConnectionBanner'
+import { Footer } from './components/Footer'
 import { FuncPanel } from './components/FuncPanel'
 import { LayerMatrix } from './components/LayerMatrix'
 import { MidiMapPanel } from './components/MidiMapPanel'
@@ -56,6 +57,7 @@ export function App() {
           <MonitorPanel />
         </aside>
       </main>
+      <Footer />
       <Toast />
     </div>
   )

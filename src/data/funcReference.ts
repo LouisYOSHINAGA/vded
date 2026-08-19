@@ -94,6 +94,10 @@ export const GLOBAL_SETTINGS: GlobalSetting[] = [
     body: 'Internal のときは外部クロックを受信しません。VDED の MIDI CLOCK を使うときは Auto にしてください。',
   },
   {
+    title: 'MIDI で操作できないパネル操作',
+    body: 'VOLUME は完全なアナログ回路で、MIDI からは操作できません。TEMPO / SWING も実機のシーケンサ用で、VDED から変更することはできません（MIDI CLOCK を送ればテンポには追従します）。',
+  },
+  {
     title: 'ファームウェア v1.11 以降',
     body: 'v1.10 以前は BIT の CC が効かず、他のパラメータが誤って変化する不具合があります。',
   },
