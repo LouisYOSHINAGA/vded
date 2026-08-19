@@ -109,8 +109,13 @@
   .content {
     grid-template-columns: minmax(0, 1fr);
   }
+  /* Below the main column the rail has the full width, so lay its panels out
+     side by side instead of stretching each one across the page. */
   .content__rail {
     position: static;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    align-items: start;
   }
 }
 
