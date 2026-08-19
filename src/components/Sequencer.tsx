@@ -16,6 +16,7 @@ import {
 import { sequencer } from '../sequencer/engine'
 import { store, useAppState } from '../state/store'
 import { MAX_STEPS, PART_COUNT } from '../state/types'
+import { NumberField } from './NumberField'
 
 /** Warm ramp across the six rows: still the machine's palette, but scannable. */
 const PART_TINTS = ['#e8552f', '#ea6633', '#ed7836', '#ef8b3a', '#f19d3e', '#f3af42']
@@ -76,48 +77,44 @@ export function Sequencer() {
           >
             {transport.playing ? '■ Stop' : '▶ Play'}
           </button>
-          <label className="transport__field" title="テンポ">
+          <label className="transport__field" title="テンポ（上下ドラッグ / クリックして入力）">
             <span className="cluster__label">BPM</span>
-            <input
-              className="number-input"
-              type="number"
+            <NumberField
+              ariaLabel="テンポ BPM"
+              value={transport.bpm}
               min={20}
               max={300}
-              value={transport.bpm}
-              onChange={(e) => setTransport({ bpm: Math.max(20, Math.min(300, Number(e.target.value) || 120)) })}
+              onChange={(bpm) => setTransport({ bpm })}
             />
           </label>
           <label className="transport__field" title="偶数ステップを後ろにずらす量 (%)">
             <span className="cluster__label">Swing</span>
-            <input
-              className="number-input"
-              type="number"
+            <NumberField
+              ariaLabel="スイング (%)"
+              value={transport.swing}
               min={0}
               max={75}
-              value={transport.swing}
-              onChange={(e) => setTransport({ swing: Math.max(0, Math.min(75, Number(e.target.value) || 0)) })}
+              onChange={(swing) => setTransport({ swing })}
             />
           </label>
           <label className="transport__field" title="ノートの長さ (ms)">
             <span className="cluster__label">Gate</span>
-            <input
-              className="number-input"
-              type="number"
+            <NumberField
+              ariaLabel="ゲートタイム (ms)"
+              value={transport.gateMs}
               min={1}
               max={500}
-              value={transport.gateMs}
-              onChange={(e) => setTransport({ gateMs: Math.max(1, Math.min(500, Number(e.target.value) || 20)) })}
+              onChange={(gateMs) => setTransport({ gateMs })}
             />
           </label>
           <label className="transport__field" title="パターンの長さ（ステップ数）">
             <span className="cluster__label">Len</span>
-            <input
-              className="number-input"
-              type="number"
+            <NumberField
+              ariaLabel="パターン長（ステップ数）"
+              value={pattern.length}
               min={1}
               max={MAX_STEPS}
-              value={pattern.length}
-              onChange={(e) => setPatternLength(Number(e.target.value) || MAX_STEPS)}
+              onChange={setPatternLength}
             />
           </label>
           <button

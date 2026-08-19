@@ -12,6 +12,7 @@ import {
 } from '../state/actions'
 import { useAppState } from '../state/store'
 import { PART_COUNT } from '../state/types'
+import { NumberField } from './NumberField'
 
 const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 
@@ -96,14 +97,12 @@ export function FuncPanel() {
             {Array.from({ length: PART_COUNT }, (_, part) => (
               <label key={part} className="func__note">
                 <span className="legend">Part {part + 1}</span>
-                <input
-                  className="number-input"
-                  type="number"
+                <NumberField
+                  ariaLabel={`PART ${part + 1} トリガーノート番号`}
+                  value={notes[part]}
                   min={0}
                   max={127}
-                  value={notes[part]}
-                  onChange={(e) => setPartNote(part, Number(e.target.value))}
-                  aria-label={`part ${part + 1} note number`}
+                  onChange={(note) => setPartNote(part, note)}
                 />
                 <span className="hint">{noteName(notes[part])}</span>
                 <button type="button" className="micro-btn" onPointerDown={() => triggerPart(part)} title="試聴">

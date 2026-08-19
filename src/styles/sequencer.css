@@ -21,10 +21,8 @@
   gap: 5px;
 }
 
-.transport__field .number-input {
-  width: 52px;
-  min-height: 23px;
-  text-align: right;
+.transport__field .number-field {
+  min-height: 24px;
 }
 
 /* ---------------- grid ---------------- */

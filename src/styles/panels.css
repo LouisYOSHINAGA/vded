@@ -738,9 +738,7 @@
 }
 
 .ccmap__input {
-  width: 54px;
-  min-height: 22px;
-  text-align: center;
+  min-height: 23px;
 }
 
 .ccmap__input--changed {

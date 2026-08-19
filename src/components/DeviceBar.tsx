@@ -3,6 +3,7 @@ import { useMidiSnapshot } from '../hooks/useMidiSnapshot'
 import { setSettings, setUi } from '../state/actions'
 import { useAppState } from '../state/store'
 import { PART_COUNT } from '../state/types'
+import { NumberField } from './NumberField'
 import { Segmented } from './Segmented'
 
 const STATUS_TEXT: Record<string, string> = {
@@ -106,19 +107,12 @@ export function DeviceBar() {
         />
         <label className="row" style={{ gap: 4 }}>
           <span className="cluster__label">CH</span>
-          <input
-            className="number-input"
-            style={{ width: 46 }}
-            type="number"
+          <NumberField
+            ariaLabel="ベース MIDI チャンネル"
+            value={baseChannel}
             min={1}
             max={maxBase}
-            value={baseChannel}
-            onChange={(e) =>
-              setSettings({
-                baseChannel: Math.max(1, Math.min(maxBase, Number(e.target.value) || 1)),
-              })
-            }
-            aria-label="ベース MIDI チャンネル"
+            onChange={(channel) => setSettings({ baseChannel: channel })}
           />
         </label>
         <span className="hint device__hint">{channelHint}</span>

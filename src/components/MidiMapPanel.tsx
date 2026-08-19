@@ -3,6 +3,7 @@ import { setSettings } from '../state/actions'
 import { store, toast, useAppState } from '../state/store'
 import type { LayerParamKey, PartParamKey } from '../state/types'
 import { LAYER_PARAM_LABELS, PART_PARAM_LABELS, PART_COUNT } from '../state/types'
+import { NumberField } from './NumberField'
 
 const SPLIT_LAYER_ROWS: LayerParamKey[] = [
   'select',
@@ -52,14 +53,14 @@ function CcInput({
   isDefault: boolean
 }) {
   return (
-    <input
-      className={`number-input ccmap__input${isDefault ? '' : ' ccmap__input--changed'}`}
-      type="number"
+    <NumberField
+      className={`ccmap__input${isDefault ? '' : ' ccmap__input--changed'}`}
+      value={value}
       min={0}
       max={127}
-      value={value}
-      aria-label={ariaLabel}
-      onChange={(e) => onChange(Math.max(0, Math.min(127, Number(e.target.value) || 0)))}
+      chars={3}
+      ariaLabel={ariaLabel}
+      onChange={onChange}
     />
   )
 }
@@ -113,27 +114,27 @@ export function MidiMapPanel() {
           </label>
           <label className="row" style={{ gap: 5 }} title="ノブ操作時の CC 送出間隔">
             <span className="legend">CC 間隔</span>
-            <input
-              className="number-input"
-              type="number"
+            <NumberField
+              ariaLabel="CC 送出間隔 (ms)"
+              value={ccInterval}
               min={0}
               max={20}
               step={0.2}
-              value={ccInterval}
-              onChange={(e) => setSettings({ ccIntervalMs: Math.max(0, Number(e.target.value) || 0) })}
+              precision={1}
+              onChange={(ccIntervalMs) => setSettings({ ccIntervalMs })}
             />
             <span className="hint">ms</span>
           </label>
           <label className="row" style={{ gap: 5 }} title="SEND ALL の送出間隔。取りこぼすときは大きくしてください">
             <span className="legend">一括送信 間隔</span>
-            <input
-              className="number-input"
-              type="number"
+            <NumberField
+              ariaLabel="一括送信の送出間隔 (ms)"
+              value={dumpInterval}
               min={0}
               max={40}
               step={0.5}
-              value={dumpInterval}
-              onChange={(e) => setSettings({ dumpIntervalMs: Math.max(0, Number(e.target.value) || 0) })}
+              precision={1}
+              onChange={(dumpIntervalMs) => setSettings({ dumpIntervalMs })}
             />
             <span className="hint">ms</span>
           </label>

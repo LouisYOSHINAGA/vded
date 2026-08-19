@@ -241,6 +241,42 @@ button {
   font-variant-numeric: tabular-nums;
 }
 
+/* Drag-or-type numeric field. */
+.number-field {
+  min-height: 26px;
+  padding: 0 9px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-md);
+  background: var(--c-void);
+  color: var(--c-ink);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  cursor: ns-resize;
+  touch-action: none;
+}
+
+.number-field:hover:not(:disabled) {
+  border-color: var(--c-accent);
+}
+
+.number-field:focus {
+  cursor: text;
+  border-color: var(--c-accent);
+  background: var(--c-body);
+}
+
+.number-field--dragging {
+  border-color: var(--c-accent-hot);
+  color: var(--c-accent-hot);
+}
+
+.number-field:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .checkbox {
   display: inline-flex;
   align-items: center;
