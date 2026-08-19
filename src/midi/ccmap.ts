@@ -124,10 +124,16 @@ export function areLayersIndependent(mode: ChannelMode): boolean {
 
 export const SELECT_COMBINATIONS = 45 // 5 waves x 3 mod types x 3 eg types
 
-/** wave/mod/eg -> the single 0..127 value CC SELECT expects. */
+/**
+ * wave/mod/eg -> the single 0..127 value CC SELECT expects.
+ *
+ * Rounding up rather than to nearest is deliberate: it lands on the first value
+ * of each combination's bucket, which is what a working volca drum editor
+ * sends, and it makes the value survive the device's floor-based decode.
+ */
 export function encodeSelect(wave: number, modType: number, egType: number): number {
   const index = wave * 9 + modType * 3 + egType
-  return clamp7(Math.round((index * 128) / SELECT_COMBINATIONS))
+  return clamp7(Math.ceil((index * 128) / SELECT_COMBINATIONS))
 }
 
 export function encodeSelectFromLayer(layer: Layer): number {
