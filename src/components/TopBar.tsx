@@ -1,6 +1,7 @@
 import { useMidiSnapshot } from '../hooks/useMidiSnapshot'
 import { panic, sendAll } from '../state/actions'
 import { useAppState } from '../state/store'
+import { AppearanceMenu } from './AppearanceMenu'
 import { DeviceBar } from './DeviceBar'
 
 export function TopBar() {
@@ -46,10 +47,10 @@ export function TopBar() {
             </span>
           )}
         </button>
+        <AppearanceMenu />
         <button
           type="button"
           className="btn btn--danger"
-          disabled={!connected}
           onClick={panic}
           title="全チャンネルにノートオフを送信"
         >

@@ -35,6 +35,7 @@ export function loadWorkspace(): Partial<AppState> | null {
         ...data.settings,
         // A stale table from an older build must not shadow new defaults.
         ccTable: data.settings?.ccTable ?? DEFAULT_CC_TABLE,
+        appearance: { ...base.settings.appearance, ...data.settings?.appearance },
       },
       mixer: { ...base.mixer, ...data.mixer },
       ui: { ...base.ui, ...data.ui, sendAllProgress: null },

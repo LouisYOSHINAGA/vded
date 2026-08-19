@@ -10,6 +10,7 @@ import { Sequencer } from './components/Sequencer'
 import { Toast } from './components/Toast'
 import { TopBar } from './components/TopBar'
 import { WaveGuidePanel } from './components/WaveGuidePanel'
+import { useAppearance } from './hooks/useAppearance'
 import { useShortcuts } from './hooks/useShortcuts'
 import { setUi } from './state/actions'
 import { useAppState, type EditorTab } from './state/store'
@@ -23,6 +24,7 @@ const TABS: { id: EditorTab; label: string }[] = [
 
 export function App() {
   useShortcuts()
+  useAppearance()
   const tab = useAppState((s) => s.ui.editorTab)
 
   return (

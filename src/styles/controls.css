@@ -24,7 +24,7 @@
 
 .knob__track {
   fill: none;
-  stroke: #2c3036;
+  stroke: var(--c-track);
   stroke-width: 7;
   stroke-linecap: round;
 }
@@ -38,8 +38,8 @@
 }
 
 .knob__cap {
-  fill: #16181b;
-  stroke: #3a3f46;
+  fill: var(--c-knob-cap);
+  stroke: var(--c-knob-ring);
   stroke-width: 2;
 }
 
@@ -51,7 +51,7 @@
 
 .knob--dragging .knob__pointer,
 .knob__dial:hover .knob__pointer {
-  stroke: #fff;
+  stroke: var(--c-ink-bright);
 }
 
 .knob--disabled {
@@ -63,14 +63,14 @@
 }
 
 .knob__label {
-  font-size: 9px;
-  letter-spacing: 0.1em;
+  font-size: 9.5px;
+  letter-spacing: var(--track-legend);
   text-align: center;
   max-width: 76px;
 }
 
 .knob__value {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--knob-accent);
 }
 
@@ -94,12 +94,12 @@
   align-items: center;
   justify-content: center;
   gap: 4px;
-  min-height: 22px;
+  min-height: 23px;
   padding: 0 8px;
   border-radius: 3px;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: var(--track-legend);
   text-transform: uppercase;
   color: var(--c-ink-faint);
   transition: background 0.12s, color 0.12s;
@@ -112,7 +112,7 @@
 
 .segmented__item[aria-pressed='true'] {
   background: linear-gradient(180deg, var(--seg-accent, var(--c-accent-hot)), color-mix(in srgb, var(--seg-accent, var(--c-accent)) 80%, black));
-  color: #170904;
+  color: var(--c-on-accent);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset;
 }
 
@@ -140,6 +140,6 @@
 .bar-value__fill {
   position: absolute;
   inset: 0 auto 0 0;
-  background: linear-gradient(90deg, var(--bar-accent, var(--c-accent)), color-mix(in srgb, var(--bar-accent, var(--c-accent)) 60%, #fff));
+  background: linear-gradient(90deg, var(--bar-accent, var(--c-accent)), color-mix(in srgb, var(--bar-accent, var(--c-accent)) 60%, var(--c-ink-bright)));
   border-radius: inherit;
 }

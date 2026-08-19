@@ -1,4 +1,6 @@
 import { useSyncExternalStore } from 'react'
+import type { Appearance } from '../data/appearance'
+import { DEFAULT_APPEARANCE } from '../data/appearance'
 import type { CcTable, ChannelMode } from '../midi/ccmap'
 import { DEFAULT_CC_TABLE } from '../midi/ccmap'
 import { makeEmptyPattern, makeInitPatch } from './defaults'
@@ -37,6 +39,8 @@ export interface SettingsState {
   liveSend: boolean
   ccIntervalMs: number
   dumpIntervalMs: number
+  /** Theme, font and UI scale. Persisted with the rest of the settings. */
+  appearance: Appearance
 }
 
 export interface UiState {
@@ -87,6 +91,7 @@ export function makeInitialState(): AppState {
       liveSend: true,
       ccIntervalMs: 1.6,
       dumpIntervalMs: 4,
+      appearance: DEFAULT_APPEARANCE,
     },
     ui: {
       selectedPart: 0,

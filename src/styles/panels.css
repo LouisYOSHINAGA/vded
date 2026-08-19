@@ -27,8 +27,8 @@
 
 .part-tabs__item[aria-pressed='true'] {
   background: var(--c-accent);
-  color: #190a05;
-  box-shadow: 0 0 8px var(--c-accent-glow);
+  color: var(--c-on-accent);
+  box-shadow: 0 0 calc(8px * var(--glow-strength)) var(--c-accent-glow);
 }
 
 .part-editor__name {
@@ -36,14 +36,14 @@
   min-height: 24px;
   font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: calc(var(--track-legend) * 0.8);
   text-transform: uppercase;
 }
 
 .part-editor__copy {
   min-height: 26px;
   font-size: 10px;
-  letter-spacing: 0.1em;
+  letter-spacing: var(--track-legend);
   text-transform: uppercase;
   width: 96px;
 }
@@ -95,7 +95,7 @@
   height: 17px;
   border-radius: 3px;
   background: var(--layer-accent);
-  color: #10161a;
+  color: var(--c-on-accent);
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 700;
@@ -104,7 +104,7 @@
 .layer-panel__title {
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: var(--track-title);
   text-transform: uppercase;
   color: var(--c-ink);
 }
@@ -124,8 +124,9 @@
 }
 
 .select-axis > .legend {
-  width: 66px;
+  width: 84px;
   flex: none;
+  line-height: 1.15;
 }
 
 .select-axis .segmented {
@@ -140,7 +141,7 @@
   align-items: baseline;
   gap: 8px;
   margin: 0;
-  padding-left: 76px;
+  padding-left: 94px;
 }
 
 .layer-panel__selecthint .value-readout {
@@ -150,7 +151,7 @@
 .layer-panel__combo {
   margin-left: auto;
   color: var(--c-ink-dim);
-  letter-spacing: 0.06em;
+  letter-spacing: calc(var(--track-legend) * 0.6);
 }
 
 .layer-panel__knobs {
@@ -213,10 +214,10 @@
 }
 
 .matrix__th {
-  padding: 4px 6px;
-  font-size: 9px;
+  padding: 5px 6px;
+  font-size: 9.5px;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: var(--track-legend);
   text-transform: uppercase;
   color: var(--c-ink-faint);
   text-align: left;
@@ -229,7 +230,7 @@
 }
 
 .matrix__th--part-col {
-  color: var(--c-amber);
+  color: var(--c-layer2);
 }
 
 .matrix__th--part {
@@ -245,7 +246,7 @@
 }
 
 .matrix__row--selected .matrix__partbtn {
-  background: rgba(232, 85, 47, 0.14);
+  background: color-mix(in srgb, var(--c-accent) 15%, transparent);
 }
 
 .matrix__row--shadowed td:not(.matrix__partcell):not(.matrix__tools) {
@@ -288,13 +289,13 @@
 
 .matrix__row--selected .matrix__partnum {
   background: var(--c-accent);
-  color: #190a05;
+  color: var(--c-on-accent);
 }
 
 .matrix__partname {
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: calc(var(--track-legend) * 0.6);
   text-transform: uppercase;
   white-space: nowrap;
   overflow: hidden;
@@ -324,7 +325,7 @@
 
 .matrix__partcell {
   vertical-align: middle;
-  background: rgba(242, 163, 60, 0.04);
+  background: color-mix(in srgb, var(--c-layer2) 6%, transparent);
 }
 
 .matrix__tools {
@@ -401,7 +402,7 @@
   color: var(--c-ink);
   font-size: 10px;
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: calc(var(--track-legend) * 0.6);
 }
 
 .mini-select:hover {
@@ -502,7 +503,7 @@
 .preset__name {
   font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: calc(var(--track-legend) * 0.6);
   text-transform: uppercase;
   color: var(--c-ink);
   overflow: hidden;
@@ -583,7 +584,7 @@
 }
 
 .monitor__row--in .monitor__dir {
-  color: var(--c-cyan);
+  color: var(--c-info);
 }
 
 .monitor__text {
@@ -619,7 +620,7 @@
   margin: 0;
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: calc(var(--track-title) * 1.15);
   text-transform: uppercase;
   color: var(--c-ink-dim);
   padding-bottom: 5px;
@@ -667,11 +668,11 @@
 
 .func__table th,
 .ccmap__table th {
-  padding: 5px 8px;
+  padding: 6px 8px;
   text-align: left;
-  font-size: 9px;
+  font-size: 9.5px;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: var(--track-legend);
   text-transform: uppercase;
   color: var(--c-ink-faint);
   border-bottom: 1px solid var(--c-line-soft);
@@ -679,7 +680,8 @@
 
 .func__table td,
 .ccmap__table td {
-  padding: 6px 8px;
+  padding: 7px 8px;
+  font-size: 11.5px;
   border-bottom: 1px solid var(--c-line-soft);
   vertical-align: top;
   color: var(--c-ink-dim);
@@ -688,7 +690,7 @@
 .func__key {
   white-space: nowrap;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: calc(var(--track-legend) * 0.8);
   text-transform: uppercase;
   color: var(--c-ink);
 }
@@ -733,7 +735,7 @@
 .ccmap__name {
   color: var(--c-ink) !important;
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: calc(var(--track-legend) * 0.6);
   white-space: nowrap;
 }
 

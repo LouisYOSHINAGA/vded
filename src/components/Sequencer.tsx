@@ -19,8 +19,12 @@ import { store, useAppState } from '../state/store'
 import { MAX_STEPS, PART_COUNT } from '../state/types'
 import { NumberField } from './NumberField'
 
-/** Warm ramp across the six rows: still the machine's palette, but scannable. */
-const PART_TINTS = ['#e8552f', '#ea6633', '#ed7836', '#ef8b3a', '#f19d3e', '#f3af42']
+/**
+ * Every part uses the theme accent, the way the machine's LEDs all share one
+ * colour. Rows are told apart by the numbered chip, the alternating stripe and
+ * the backlight on the selected row — not by six competing hues.
+ */
+const PART_TINT = 'var(--c-accent)'
 
 function velocityClass(velocity: number): string {
   if (velocity >= 118) return 'step--accent'
@@ -206,12 +210,14 @@ function PartRow({ part, selected, currentStep, onCellDown, onCellEnter }: PartR
   const solo = useAppState((s) => s.mixer.solos[part])
   const anySolo = useAppState((s) => s.mixer.solos.some(Boolean))
   const audible = anySolo ? solo : !muted
-  const tint = PART_TINTS[part]
+  const tint = PART_TINT
 
   return (
     <>
       <div
-        className={`seq-rail${selected ? ' seq-rail--selected' : ''}${audible ? '' : ' seq-rail--silent'}`}
+        className={`seq-rail${selected ? ' seq-rail--selected' : ''}${audible ? '' : ' seq-rail--silent'}${
+          part % 2 === 1 ? ' seq-rail--alt' : ''
+        }`}
         style={{ ['--tint' as string]: tint }}
       >
         <button
@@ -250,7 +256,11 @@ function PartRow({ part, selected, currentStep, onCellDown, onCellEnter }: PartR
           </button>
         </div>
       </div>
-      <div className="seq-row">
+      <div
+        className={`seq-row${part % 2 === 1 ? ' seq-row--alt' : ''}${
+          selected ? ' seq-row--selected' : ''
+        }`}
+      >
         {steps.map((step, i) => (
           <button
             key={i}
@@ -288,30 +298,73 @@ function VelocityLane({ part }: { part: number }) {
   const steps = useAppState((s) => s.pattern.steps[part])
   const length = useAppState((s) => s.pattern.length)
   const name = useAppState((s) => s.patch.parts[part].name)
-  const tint = PART_TINTS[part]
+  const drag = useRef<{ step: number; startY: number; startValue: number } | null>(null)
+
+  const apply = (step: number, velocity: number) => {
+    const clamped = Math.max(1, Math.min(127, Math.round(velocity)))
+    const current = store.get().pattern.steps[part][step]
+    if (!current.on) setStep(part, step, true, clamped)
+    else setStepVelocity(part, step, clamped)
+  }
 
   return (
-    <div className="vel-lane" style={{ ['--tint' as string]: tint }}>
-      <div className="vel-lane__label legend">
-        Velocity<span className="vel-lane__part">{name}</span>
+    <div className="vel-lane" style={{ ['--tint' as string]: PART_TINT }}>
+      <div className="vel-lane__label">
+        <span className="legend">Velocity</span>
+        <span className="vel-lane__part">{name}</span>
+        <span className="hint">上下ドラッグ · W クリックで 96</span>
       </div>
       <div className="vel-lane__row">
         {steps.map((step, i) => (
-          <label
+          <div
             key={i}
-            className={`vel-cell${step.on ? '' : ' vel-cell--off'}${i >= length ? ' vel-cell--outside' : ''}`}
-            title={`step ${i + 1} — velocity ${step.velocity}`}
+            className={`vel-fader${step.on ? '' : ' vel-fader--off'}${
+              i >= length ? ' vel-fader--outside' : ''
+            }${i % 4 === 0 ? ' vel-fader--beat' : ''}`}
+            role="slider"
+            tabIndex={0}
+            aria-label={`PART ${part + 1} step ${i + 1} velocity`}
+            aria-valuemin={1}
+            aria-valuemax={127}
+            aria-valuenow={step.velocity}
+            title={`step ${i + 1} — velocity ${step.velocity}${step.on ? '' : '（オフ／ドラッグでオンになります）'}`}
+            onPointerDown={(e) => {
+              if (e.button !== 0) return
+              e.preventDefault()
+              e.currentTarget.setPointerCapture(e.pointerId)
+              drag.current = { step: i, startY: e.clientY, startValue: step.velocity }
+            }}
+            onPointerMove={(e) => {
+              const state = drag.current
+              if (!state) return
+              const perUnit = e.shiftKey ? 2.5 : 0.7
+              apply(state.step, state.startValue + (state.startY - e.clientY) / perUnit)
+            }}
+            onPointerUp={() => {
+              drag.current = null
+            }}
+            onPointerCancel={() => {
+              drag.current = null
+            }}
+            onDoubleClick={() => apply(i, 96)}
+            onKeyDown={(e) => {
+              const delta = e.shiftKey ? 1 : 8
+              if (e.key === 'ArrowUp') {
+                e.preventDefault()
+                apply(i, step.velocity + delta)
+              } else if (e.key === 'ArrowDown') {
+                e.preventDefault()
+                apply(i, step.velocity - delta)
+              }
+            }}
           >
-            <span className="vel-cell__bar" style={{ height: `${(step.velocity / 127) * 100}%` }} />
-            <input
-              type="range"
-              min={1}
-              max={127}
-              value={step.velocity}
-              onChange={(e) => setStepVelocity(part, i, Number(e.target.value))}
-              aria-label={`step ${i + 1} velocity`}
-            />
-          </label>
+            <div className="vel-fader__track">
+              <span className="vel-fader__fill" style={{ height: `${(step.velocity / 127) * 100}%` }}>
+                <i className="vel-fader__cap" />
+              </span>
+            </div>
+            <span className="vel-fader__value">{step.on ? step.velocity : '–'}</span>
+          </div>
         ))}
       </div>
     </div>

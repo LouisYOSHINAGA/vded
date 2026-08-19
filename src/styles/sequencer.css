@@ -45,6 +45,27 @@
   gap: 4px;
 }
 
+/* Alternating stripe replaces per-part hues: rows stay tellable apart while
+   every indicator keeps the theme's single accent colour. */
+.seq-row,
+.seq-rail {
+  padding-block: 3px;
+  border-radius: var(--r-md);
+}
+
+.seq-row--alt {
+  background: color-mix(in srgb, var(--c-ink) 5%, transparent);
+}
+
+.seq-rail.seq-rail--alt {
+  background: color-mix(in srgb, var(--c-ink) 5%, var(--c-void));
+}
+
+.seq-row--selected {
+  background: color-mix(in srgb, var(--c-accent) 9%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c-accent) 22%, transparent);
+}
+
 .seq-ruler__tick {
   text-align: center;
   font-family: var(--font-mono);
@@ -78,12 +99,13 @@
   border-radius: var(--r-md);
   background: var(--c-void);
   box-shadow: inset 0 0 0 1px var(--c-line-soft);
-  border-left: 3px solid var(--tint, var(--c-accent));
+  border-left: 3px solid color-mix(in srgb, var(--tint) 55%, transparent);
 }
 
 .seq-rail--selected {
-  background: #232629;
+  background: var(--c-rail-sel);
   box-shadow: inset 0 0 0 1px var(--tint);
+  border-left-color: var(--tint);
 }
 
 .seq-rail--silent {
@@ -104,21 +126,28 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 17px;
-  height: 17px;
+  width: 18px;
+  height: 18px;
   flex: none;
   border-radius: 3px;
-  background: var(--tint);
-  color: #180a05;
+  background: color-mix(in srgb, var(--tint) 28%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tint) 55%, transparent);
+  color: var(--c-accent-hot);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
+}
+
+.seq-rail--selected .seq-rail__num {
+  background: var(--tint);
+  box-shadow: none;
+  color: var(--c-on-accent);
 }
 
 .seq-rail__name {
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: calc(var(--track-legend) * 0.6);
   text-transform: uppercase;
   color: var(--c-ink);
   overflow: hidden;
@@ -154,12 +183,12 @@
 
 .micro-btn--mute {
   background: var(--c-danger);
-  color: #200;
+  color: var(--c-on-accent);
 }
 
 .micro-btn--solo {
-  background: var(--c-amber);
-  color: #201400;
+  background: var(--c-ink);
+  color: var(--c-void);
 }
 
 /* ---------------- steps ---------------- */
@@ -168,17 +197,17 @@
   position: relative;
   height: 30px;
   border-radius: 4px;
-  background: linear-gradient(180deg, #23262a, #1a1d20);
-  box-shadow: inset 0 0 0 1px #2f343a, 0 1px 0 rgba(255, 255, 255, 0.03) inset;
+  background: linear-gradient(180deg, var(--c-step-off), var(--c-step-off-2));
+  box-shadow: inset 0 0 0 1px var(--c-step-line), 0 1px 0 rgba(255, 255, 255, 0.03) inset;
   transition: background 0.08s, box-shadow 0.08s;
 }
 
 .step--beat {
-  box-shadow: inset 0 0 0 1px #3b4149;
+  box-shadow: inset 0 0 0 1px var(--c-step-line-beat);
 }
 
 .step:hover {
-  background: linear-gradient(180deg, #2c3035, #212428);
+  background: linear-gradient(180deg, var(--c-step-hover), var(--c-step-hover-2));
 }
 
 .step--outside {
@@ -187,17 +216,25 @@
 
 .step--on {
   background: linear-gradient(180deg, color-mix(in srgb, var(--tint) 88%, white), var(--tint));
-  box-shadow: 0 0 10px color-mix(in srgb, var(--tint) 40%, transparent),
+  box-shadow: 0 0 calc(10px * var(--glow-strength)) color-mix(in srgb, var(--tint) 40%, transparent),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .step--soft {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--tint) 40%, #1a1d20), color-mix(in srgb, var(--tint) 28%, #1a1d20));
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tint) 50%, transparent);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--tint) 62%, var(--c-step-off-2)),
+    color-mix(in srgb, var(--tint) 48%, var(--c-step-off-2))
+  );
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tint) 55%, transparent);
 }
 
 .step--full {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--tint) 80%, #1a1d20), var(--tint));
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--tint) 88%, var(--c-step-off-2)),
+    var(--tint)
+  );
 }
 
 .step--accent::after {
@@ -214,7 +251,7 @@
 }
 
 .step--now:not(.step--on) {
-  background: #34383e;
+  background: var(--c-step-now);
 }
 
 .seq-row__tools {
@@ -241,9 +278,15 @@
 }
 
 .vel-lane__part {
-  font-size: 11px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: calc(var(--track-legend) * 0.6);
+  text-transform: uppercase;
   color: var(--tint);
-  letter-spacing: 0.06em;
+}
+
+.vel-lane__label .hint {
+  font-size: 10px;
 }
 
 .vel-lane__row {
@@ -252,51 +295,96 @@
   gap: 4px;
 }
 
-.vel-cell {
+/*
+ * Deliberately not shaped like a step pad: a slim inset fader with a cap line
+ * and a printed value, so the two rows never read as the same control.
+ */
+.vel-fader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 4px 0 2px;
+  border-radius: var(--r-md);
+  cursor: ns-resize;
+  touch-action: none;
+}
+
+.vel-fader--beat {
+  background: color-mix(in srgb, var(--c-ink) 3%, transparent);
+}
+
+.vel-fader:hover,
+.vel-fader:focus-visible {
+  background: color-mix(in srgb, var(--tint) 10%, transparent);
+}
+
+.vel-fader__track {
   position: relative;
-  display: block;
-  height: 34px;
-  border-radius: 4px;
+  width: 12px;
+  height: 62px;
+  border-radius: var(--r-pill);
   background: var(--c-void);
   box-shadow: inset 0 0 0 1px var(--c-line-soft);
   overflow: hidden;
-  cursor: ns-resize;
 }
 
-.vel-cell__bar {
+.vel-fader__fill {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--tint) 85%, white), var(--tint));
-  opacity: 0.9;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--tint) 85%, white),
+    color-mix(in srgb, var(--tint) 70%, transparent)
+  );
 }
 
-.vel-cell--off .vel-cell__bar {
-  opacity: 0.12;
-}
-
-.vel-cell--outside {
-  opacity: 0.3;
-}
-
-/* The range input is the hit target; the bar is the visual. */
-.vel-cell input {
+.vel-fader__cap {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  opacity: 0;
-  cursor: ns-resize;
-  writing-mode: vertical-lr;
-  direction: rtl;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--c-ink-bright);
+  opacity: 0.85;
+}
+
+.vel-fader__value {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--c-ink-dim);
+}
+
+.vel-fader--off .vel-fader__track {
+  box-shadow: inset 0 0 0 1px var(--c-line-soft);
+}
+
+.vel-fader--off .vel-fader__fill {
+  opacity: 0.09;
+}
+
+.vel-fader--off .vel-fader__cap {
+  display: none;
+}
+
+.vel-fader--off .vel-fader__value {
+  color: var(--c-ink-faint);
+}
+
+.vel-fader--outside {
+  opacity: 0.3;
 }
 
 @media (max-width: 900px) {
   .seq-grid,
   .vel-lane {
     grid-template-columns: 138px minmax(0, 1fr) auto;
+  }
+  .vel-fader__track {
+    height: 50px;
   }
   .step {
     height: 26px;
