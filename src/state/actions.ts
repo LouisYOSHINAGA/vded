@@ -380,7 +380,7 @@ export function panic(): void {
     config.mode === 'single'
       ? [config.baseChannel]
       : Array.from({ length: PART_COUNT }, (_, i) => ((config.baseChannel - 1 + i) % 16) + 1)
-  midiEngine.panic(channels)
+  midiEngine.panic(channels, state.mixer.notes)
 }
 
 // ---------------------------------------------------------------------------

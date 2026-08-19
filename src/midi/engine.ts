@@ -222,14 +222,19 @@ export class MidiEngine {
     this.sendRaw([byte], timestamp)
   }
 
-  /** Best-effort panic: note-offs across the channels we might have used. */
-  panic(channels: number[]): void {
+  /**
+   * Note-offs for the notes we actually send, on every channel we address.
+   * The volca drum ignores CC123 (All Notes Off) and flooding it with 128
+   * note-offs per channel would just overrun its input buffer.
+   */
+  panic(channels: number[], notes: number[]): void {
+    const unique = Array.from(new Set(notes))
     for (const channel of channels) {
-      for (let note = 0; note < 128; note++) {
-        this.sendRaw([0x80 | ((channel - 1) & 0x0f), note, 0])
+      for (const note of unique) {
+        this.sendRaw([0x80 | ((channel - 1) & 0x0f), note & 0x7f, 0])
       }
     }
-    this.log('out', 'PANIC — all note off', `ch ${channels.join(', ')}`)
+    this.log('out', 'PANIC — note off', `ch ${channels.join(', ')} · note ${unique.join(', ')}`)
   }
 
   // -------------------------------------------------------------------------

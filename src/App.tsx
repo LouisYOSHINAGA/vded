@@ -1,3 +1,4 @@
+import { ConnectionBanner } from './components/ConnectionBanner'
 import { FuncPanel } from './components/FuncPanel'
 import { LayerMatrix } from './components/LayerMatrix'
 import { MidiMapPanel } from './components/MidiMapPanel'
@@ -28,6 +29,7 @@ export function App() {
       <TopBar />
       <main className="content">
         <div className="content__main">
+          <ConnectionBanner />
           <Sequencer />
           <div className="tabs" role="tablist" aria-label="エディタ">
             {TABS.map((item) => (

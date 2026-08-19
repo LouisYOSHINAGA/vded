@@ -151,6 +151,7 @@ export function PartEditor() {
 function LayerPanel({ partIndex, layerIndex }: { partIndex: number; layerIndex: 0 | 1 }) {
   const layer = useAppState((s) => s.patch.parts[partIndex].layers[layerIndex])
   const layerLink = useAppState((s) => s.ui.layerLink)
+  const selectedLayer = useAppState((s) => s.ui.selectedLayer)
   const mode = useAppState((s) => s.settings.mode)
   const accent = LAYER_ACCENT[layerIndex]
   const shadowed = mode === 'single' && layerIndex === 1
@@ -160,12 +161,22 @@ function LayerPanel({ partIndex, layerIndex }: { partIndex: number; layerIndex: 
 
   return (
     <div
-      className={`layer-panel${shadowed ? ' layer-panel--shadowed' : ''}`}
+      className={`layer-panel${shadowed ? ' layer-panel--shadowed' : ''}${
+        selectedLayer === layerIndex ? ' layer-panel--active' : ''
+      }`}
       style={{ ['--layer-accent' as string]: accent }}
     >
       <header className="layer-panel__head">
-        <span className="layer-panel__badge">L{layerIndex + 1}</span>
-        <span className="layer-panel__title">Layer {layerIndex + 1}</span>
+        <button
+          type="button"
+          className="layer-panel__pick"
+          aria-pressed={selectedLayer === layerIndex}
+          onClick={() => setUi({ selectedLayer: layerIndex })}
+          title="FUNC タブのランダマイズ対象にする"
+        >
+          <span className="layer-panel__badge">L{layerIndex + 1}</span>
+          <span className="layer-panel__title">Layer {layerIndex + 1}</span>
+        </button>
         {layerLink && <span className="tag tag--accent">Linked</span>}
         {shadowed && <span className="tag tag--warn">送信されません</span>}
         <div className="panel__spacer" />
