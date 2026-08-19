@@ -198,3 +198,212 @@
   background: var(--c-void);
   box-shadow: inset 0 0 0 1px var(--c-line-soft);
 }
+
+/* ---------------- All-layer matrix ---------------- */
+
+.matrix__body {
+  padding: 8px 10px 12px;
+  overflow-x: auto;
+}
+
+.matrix {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 2px;
+}
+
+.matrix__th {
+  padding: 4px 6px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-ink-faint);
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--c-line-soft);
+}
+
+.matrix__th--num {
+  text-align: center;
+}
+
+.matrix__th--part-col {
+  color: var(--c-amber);
+}
+
+.matrix__th--part {
+  min-width: 108px;
+}
+
+.matrix__th--wide {
+  min-width: 88px;
+}
+
+.matrix__row--first > * {
+  border-top: 1px solid var(--c-line-soft);
+}
+
+.matrix__row--selected .matrix__partbtn {
+  background: rgba(232, 85, 47, 0.14);
+}
+
+.matrix__row--shadowed td:not(.matrix__partcell):not(.matrix__tools) {
+  opacity: 0.45;
+}
+
+.matrix__part {
+  padding: 0;
+  vertical-align: middle;
+}
+
+.matrix__partbtn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  padding: 5px 7px;
+  border-radius: var(--r-sm);
+  text-align: left;
+}
+
+.matrix__partbtn:hover {
+  background: var(--c-panel-2);
+}
+
+.matrix__partnum {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 17px;
+  flex: none;
+  border-radius: 3px;
+  background: var(--c-raise-2);
+  color: var(--c-ink);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.matrix__row--selected .matrix__partnum {
+  background: var(--c-accent);
+  color: #190a05;
+}
+
+.matrix__partname {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.matrix__layer {
+  width: 30px;
+}
+
+.matrix__layerbtn {
+  display: block;
+  width: 26px;
+  padding: 3px 0;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--cell-accent) 22%, transparent);
+  color: var(--cell-accent);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.matrix__layerbtn:hover {
+  background: color-mix(in srgb, var(--cell-accent) 40%, transparent);
+}
+
+.matrix__partcell {
+  vertical-align: middle;
+  background: rgba(242, 163, 60, 0.04);
+}
+
+.matrix__tools {
+  vertical-align: middle;
+  white-space: nowrap;
+  padding-left: 4px;
+}
+
+.matrix__tools .micro-btn + .micro-btn {
+  margin-left: 2px;
+}
+
+/* ---------------- Cells ---------------- */
+
+.num-cell {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: 46px;
+  padding: 4px 6px;
+  border-radius: var(--r-sm);
+  background: var(--c-void);
+  box-shadow: inset 0 0 0 1px var(--c-line-soft);
+  cursor: ns-resize;
+  overflow: hidden;
+  --cell-accent: var(--c-accent);
+}
+
+.num-cell:hover:not(.num-cell--disabled) {
+  box-shadow: inset 0 0 0 1px var(--cell-accent);
+}
+
+.num-cell__bar {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: color-mix(in srgb, var(--cell-accent) 24%, transparent);
+}
+
+.num-cell__text {
+  position: relative;
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  color: var(--c-ink);
+}
+
+.num-cell--disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.num-cell--editing {
+  width: 100%;
+  min-width: 46px;
+  padding: 3px 4px;
+  border: 1px solid var(--c-accent);
+  border-radius: var(--r-sm);
+  background: var(--c-void);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-align: center;
+}
+
+.mini-select {
+  width: 100%;
+  min-width: 76px;
+  padding: 3px 4px;
+  border: none;
+  border-radius: var(--r-sm);
+  background: color-mix(in srgb, var(--cell-accent) 14%, var(--c-void));
+  box-shadow: inset 0 0 0 1px var(--c-line-soft);
+  color: var(--c-ink);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.mini-select:hover {
+  box-shadow: inset 0 0 0 1px var(--cell-accent);
+}
