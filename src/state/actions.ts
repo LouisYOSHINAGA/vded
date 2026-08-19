@@ -281,6 +281,28 @@ export function toggleMute(partIndex: number): void {
   }))
 }
 
+/**
+ * Mutes everything, or unmutes everything if it is already all muted.
+ * Solos are cleared on the way in, otherwise a soloed part would keep
+ * sounding through an "all mute".
+ */
+export function toggleMuteAll(): void {
+  const state = store.get()
+  const allMuted = state.mixer.mutes.every(Boolean)
+  store.set((s) => ({
+    ...s,
+    mixer: {
+      ...s.mixer,
+      mutes: s.mixer.mutes.map(() => !allMuted),
+      solos: allMuted ? s.mixer.solos : s.mixer.solos.map(() => false),
+    },
+  }))
+}
+
+export function clearSolos(): void {
+  store.set((s) => ({ ...s, mixer: { ...s.mixer, solos: s.mixer.solos.map(() => false) } }))
+}
+
 export function toggleSolo(partIndex: number): void {
   store.set((s) => ({
     ...s,
@@ -373,6 +395,10 @@ function trackProgress(total: number): void {
   window.setTimeout(tick, 60)
 }
 
+/**
+ * Stops the sequencer first — that is what actually silences a runaway
+ * pattern — then sends note-offs for every note/channel pair VDED uses.
+ */
 export function panic(): void {
   const state = store.get()
   const config = midiConfig(state)
@@ -380,7 +406,27 @@ export function panic(): void {
     config.mode === 'single'
       ? [config.baseChannel]
       : Array.from({ length: PART_COUNT }, (_, i) => ((config.baseChannel - 1 + i) % 16) + 1)
-  midiEngine.panic(channels, state.mixer.notes)
+  const wasPlaying = state.transport.playing
+  onPanic?.()
+  if (!midiEngine.isConnected) {
+    toast('MIDI 出力が選択されていないため、シーケンサの停止のみ行いました', 'warn')
+    return
+  }
+  const notes = Array.from(new Set(state.mixer.notes))
+  midiEngine.panic(channels, notes)
+  toast(
+    `PANIC: ${channels.length * notes.length} 件のノートオフを送信${wasPlaying ? '／シーケンサ停止' : ''}`,
+  )
+}
+
+/**
+ * Set by the sequencer module. Actions cannot import the sequencer directly —
+ * the sequencer already imports actions — so it registers itself here.
+ */
+let onPanic: (() => void) | null = null
+
+export function registerPanicHandler(handler: () => void): void {
+  onPanic = handler
 }
 
 // ---------------------------------------------------------------------------

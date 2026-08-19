@@ -199,6 +199,21 @@ button {
   font-size: 9px;
 }
 
+.btn--mute-on {
+  background: linear-gradient(180deg, #f0575b, var(--c-danger));
+  color: #200a0b;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.22) inset, 0 0 10px rgba(224, 70, 74, 0.4);
+}
+
+/* Marks "some parts are silenced" without shouting about it. */
+.btn__dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--c-danger);
+  box-shadow: 0 0 6px rgba(224, 70, 74, 0.6);
+}
+
 .btn--on {
   background: linear-gradient(180deg, var(--c-accent-hot), var(--c-accent));
   color: #1a0b06;

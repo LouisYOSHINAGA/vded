@@ -10,6 +10,7 @@ import {
   setUi,
   shiftPart,
   toggleMute,
+  toggleMuteAll,
   toggleSolo,
   triggerPart,
 } from '../state/actions'
@@ -125,6 +126,7 @@ export function Sequencer() {
           >
             MIDI Clock
           </button>
+          <MuteAllButton />
           <button type="button" className="btn btn--ghost btn--sm" onClick={clearAllSteps} title="全パートのステップを消去">
             Clear
           </button>
@@ -163,6 +165,28 @@ export function Sequencer() {
         <VelocityLane part={selectedPart} />
       </div>
     </section>
+  )
+}
+
+function MuteAllButton() {
+  const allMuted = useAppState((s) => s.mixer.mutes.every(Boolean))
+  const anyMuted = useAppState((s) => s.mixer.mutes.some(Boolean))
+  const anySolo = useAppState((s) => s.mixer.solos.some(Boolean))
+
+  return (
+    <button
+      type="button"
+      className={`btn btn--sm${allMuted ? ' btn--mute-on' : ' btn--ghost'}`}
+      onClick={toggleMuteAll}
+      title={
+        allMuted
+          ? '全パートのミュートを解除します'
+          : '全パートをミュートします（ソロも解除されます）'
+      }
+    >
+      {allMuted ? 'Unmute all' : 'Mute all'}
+      {!allMuted && (anyMuted || anySolo) && <span className="btn__dot" aria-hidden="true" />}
+    </button>
   )
 }
 

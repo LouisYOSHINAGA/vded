@@ -6,7 +6,7 @@
  * an explicit timestamp so jitter in the timer never reaches the wire.
  */
 import { midiEngine } from '../midi/engine'
-import { isAudible, midiConfig } from '../state/actions'
+import { isAudible, midiConfig, registerPanicHandler } from '../state/actions'
 import { store } from '../state/store'
 import { PART_COUNT } from '../state/types'
 
@@ -54,14 +54,14 @@ class Sequencer {
   }
 
   stop(): void {
-    if (this.timer !== undefined) {
+    const wasRunning = this.timer !== undefined
+    if (wasRunning) {
       window.clearInterval(this.timer)
       this.timer = undefined
     }
     this.uiTimers.forEach((id) => window.clearTimeout(id))
     this.uiTimers = []
-    const { transport } = store.get()
-    if (transport.sendClock) midiEngine.realtime(STOP)
+    if (wasRunning && store.get().transport.sendClock) midiEngine.realtime(STOP)
     store.patchSlice('transport', { playing: false, currentStep: -1 })
   }
 
@@ -119,3 +119,5 @@ class Sequencer {
 }
 
 export const sequencer = new Sequencer()
+
+registerPanicHandler(() => sequencer.stop())
