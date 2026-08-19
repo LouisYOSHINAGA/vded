@@ -99,6 +99,20 @@ export function MidiMapPanel() {
       </div>
 
       <div className="panel__body ccmap">
+        <div className="banner banner--info">
+          <div>
+            <strong>split / single とは</strong>
+            <div>
+              split channel は「6 つのパートを 6 本の MIDI チャンネルに分割する」モードです
+              （パート n → CH {baseChannel + '–' + (baseChannel + PART_COUNT - 1)}）。CC 番号は全パート共通で、
+              どのパートに効くかはチャンネルで決まります。single channel はその逆で、1 本の
+              チャンネルにすべてを載せ、パートは CC 番号で区別します。チャンネルを 1 本しか
+              持てない送信側や、1 本の MIDI ケーブルに複数の volca を数珠つなぎしていて
+              チャンネルを節約したい場合のためのモードです。その代償として、レイヤ別制御と
+              BIT / FOLD / DRIVE / DRY GAIN が使えません。
+            </div>
+          </div>
+        </div>
         <div className="ccmap__options">
           <label className="checkbox">
             <input type="checkbox" checked={liveSend} onChange={(e) => setSettings({ liveSend: e.target.checked })} />
