@@ -17,6 +17,8 @@ import {
 import { sequencer } from '../sequencer/engine'
 import { store, useAppState } from '../state/store'
 import { MAX_STEPS, PART_COUNT } from '../state/types'
+import { Icon } from './Icon'
+import { InfoTip } from './InfoTip'
 import { Knob } from './Knob'
 import { NumberField } from './NumberField'
 
@@ -90,20 +92,23 @@ export function Sequencer() {
   return (
     <section className="panel sequencer" onPointerUp={endPaint} onPointerLeave={endPaint}>
       <div className="panel__head">
+        <button
+          type="button"
+          className={`transport__play${transport.playing ? ' transport__play--on' : ''}`}
+          onClick={() => sequencer.toggle()}
+          title="再生 / 停止 (Space)"
+          aria-label={transport.playing ? '停止' : '再生'}
+        >
+          <Icon name={transport.playing ? 'stop' : 'play'} size={19} />
+          {transport.playing ? 'Stop' : 'Play'}
+        </button>
         <h2 className="panel__title">Step Sequencer</h2>
         <div className="panel__spacer" />
         <div className="transport">
-          <button
-            type="button"
-            className={`btn transport__play${transport.playing ? ' btn--on' : ''}`}
-            onClick={() => sequencer.toggle()}
-            title="再生 / 停止 (Space)"
-          >
-            {transport.playing ? '■ Stop' : '▶ Play'}
-          </button>
           <Knob
             label="Tempo"
             size="sm"
+            layout="inline"
             editable
             value={transport.bpm}
             min={20}
@@ -115,6 +120,7 @@ export function Sequencer() {
           <Knob
             label="Swing"
             size="sm"
+            layout="inline"
             editable
             value={transport.swing}
             min={0}
@@ -262,24 +268,29 @@ function PartRow({ part, selected, currentStep, onCellDown, onCellEnter }: PartR
             className={`micro-btn${muted ? ' micro-btn--mute' : ''}`}
             onClick={() => toggleMute(part)}
             title="ミュート（エディタ内蔵シーケンサのみ）"
+            aria-label="ミュート"
+            aria-pressed={muted}
           >
-            M
+            <Icon name="mute" />
           </button>
           <button
             type="button"
             className={`micro-btn${solo ? ' micro-btn--solo' : ''}`}
             onClick={() => toggleSolo(part)}
             title="ソロ"
+            aria-label="ソロ"
+            aria-pressed={solo}
           >
-            S
+            <Icon name="solo" />
           </button>
           <button
             type="button"
             className="micro-btn"
             onPointerDown={() => triggerPart(part)}
             title="試聴（ノートを 1 発送信）"
+            aria-label="試聴"
           >
-            ▸
+            <Icon name="trigger" />
           </button>
         </div>
       </div>
@@ -304,27 +315,41 @@ function PartRow({ part, selected, currentStep, onCellDown, onCellEnter }: PartR
         ))}
       </div>
       <div className="seq-row__tools">
-        <button type="button" className="micro-btn" title="パターンを 1 ステップ左へ" onClick={() => shiftPart(part, -1)}>
-          ◀
+        <button
+          type="button"
+          className="micro-btn"
+          title="パターンを 1 ステップ左へ"
+          aria-label="1 ステップ左へ"
+          onClick={() => shiftPart(part, -1)}
+        >
+          <Icon name="shiftLeft" />
         </button>
-        <button type="button" className="micro-btn" title="パターンを 1 ステップ右へ" onClick={() => shiftPart(part, 1)}>
-          ▶
+        <button
+          type="button"
+          className="micro-btn"
+          title="パターンを 1 ステップ右へ"
+          aria-label="1 ステップ右へ"
+          onClick={() => shiftPart(part, 1)}
+        >
+          <Icon name="shiftRight" />
         </button>
         <button
           type="button"
           className="micro-btn"
           title="このパートのステップをランダマイズ（FUNC+10 相当）"
+          aria-label="ランダマイズ"
           onClick={() => randomizePattern(part)}
         >
-          ⚄
+          <Icon name="random" />
         </button>
         <button
           type="button"
           className="micro-btn"
           title="このパートのステップを消去"
+          aria-label="ステップを消去"
           onClick={() => clearPartSteps(part)}
         >
-          ✕
+          <Icon name="clear" />
         </button>
       </div>
     </>
@@ -389,9 +414,14 @@ function VelocityLane({ part, railWidth }: { part: number; railWidth: number }) 
       }}
     >
       <div className="vel-lane__label">
-        <span className="legend">Velocity</span>
+        <span className="legend">
+          Velocity
+          <InfoTip label="ベロシティの操作方法">
+            上下ドラッグで値を変更、ダブルクリックで {DEFAULT_VELOCITY}。
+            OFF のステップをドラッグすると、その値で ON になります。
+          </InfoTip>
+        </span>
         <span className="vel-lane__part">{name}</span>
-        <span className="hint">上下ドラッグ · W クリックで {DEFAULT_VELOCITY}</span>
       </div>
       <div className="vel-lane__row">
         {steps.map((step, i) => (

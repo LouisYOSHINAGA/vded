@@ -103,6 +103,7 @@ button {
 
 .panel__title {
   font-size: 12.5px;
+  white-space: nowrap;
   font-weight: 700;
   letter-spacing: calc(var(--track-title) * 1.15);
   text-transform: uppercase;
@@ -199,7 +200,8 @@ button {
   font-size: 10.5px;
 }
 
-.btn--mute-on {
+.btn--mute-on,
+.btn--mute-on:hover:not(:disabled) {
   background: linear-gradient(180deg, color-mix(in srgb, var(--c-danger) 82%, white), var(--c-danger));
   color: var(--c-on-accent);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.22) inset,
@@ -215,7 +217,8 @@ button {
   box-shadow: 0 0 6px color-mix(in srgb, var(--c-danger) 60%, transparent);
 }
 
-.btn--on {
+.btn--on,
+.btn--on:hover:not(:disabled) {
   background: linear-gradient(180deg, var(--c-accent-hot), var(--c-accent));
   color: var(--c-on-accent);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset,
@@ -372,4 +375,60 @@ button {
 
 .row--wrap {
   flex-wrap: wrap;
+}
+
+/* ---------------- Info tooltip ---------------- */
+
+.infotip {
+  position: relative;
+  display: inline-flex;
+}
+
+.infotip__trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  color: var(--c-ink-faint);
+  transition: color 0.12s, background 0.12s;
+}
+
+.infotip__trigger:hover,
+.infotip__trigger[aria-expanded='true'] {
+  color: var(--c-accent);
+  background: color-mix(in srgb, var(--c-accent) 14%, transparent);
+}
+
+.infotip__bubble {
+  position: absolute;
+  top: calc(100% + 7px);
+  z-index: 60;
+  width: max-content;
+  max-width: 340px;
+  padding: 9px 12px;
+  border-radius: var(--r-md);
+  background: var(--c-panel-2);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3), inset 0 0 0 1px var(--c-line);
+  color: var(--c-ink-dim);
+  font-size: 12.5px;
+  line-height: 1.55;
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 400;
+  white-space: normal;
+  pointer-events: none;
+}
+
+.infotip__bubble--left {
+  left: -6px;
+}
+
+.infotip__bubble--right {
+  right: -6px;
+}
+
+.infotip__bubble strong {
+  color: var(--c-ink);
 }

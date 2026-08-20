@@ -37,7 +37,7 @@ export function makeWaveGuide(overrides: Partial<WaveGuide> = {}): WaveGuide {
 
 export function makeInitPatch(): Patch {
   return {
-    name: 'INIT KIT',
+    name: 'INIT',
     parts: Array.from({ length: PART_COUNT }, (_, i) => makePart(`PART ${i + 1}`)),
     waveGuide: makeWaveGuide(),
   }

@@ -3,6 +3,7 @@ import { setSettings } from '../state/actions'
 import { store, toast, useAppState } from '../state/store'
 import type { LayerParamKey, PartParamKey } from '../state/types'
 import { LAYER_PARAM_LABELS, PART_PARAM_LABELS, PART_COUNT } from '../state/types'
+import { InfoTip } from './InfoTip'
 import { NumberField } from './NumberField'
 
 const SPLIT_LAYER_ROWS: LayerParamKey[] = [
@@ -85,6 +86,14 @@ export function MidiMapPanel() {
       <div className="panel__head">
         <h2 className="panel__title">MIDI map</h2>
         <span className="tag">{mode === 'split' ? 'split channel' : 'single channel'}</span>
+        <InfoTip label="split / single とは">
+          <strong>split channel</strong> は 6 つのパートを 6 本の MIDI チャンネルに分割するモードです
+          （パート n → CH {channelRange}）。CC 番号は全パート共通で、どのパートに効くかはチャンネルが決めます。
+          <strong> single channel</strong> はその逆で、1 本のチャンネルにすべてを載せ、パートは CC 番号で
+          区別します。送信側がチャンネルを 1 本しか持てない場合や、1 本のケーブルに複数の volca を
+          数珠つなぎしていてチャンネルを節約したい場合のためのモードで、代償としてレイヤ別制御と
+          BIT / FOLD / DRIVE / DRY GAIN が使えません。
+        </InfoTip>
         <div className="panel__spacer" />
         <button
           type="button"
@@ -99,20 +108,6 @@ export function MidiMapPanel() {
       </div>
 
       <div className="panel__body ccmap">
-        <div className="banner banner--info">
-          <div>
-            <strong>split / single とは</strong>
-            <div>
-              split channel は「6 つのパートを 6 本の MIDI チャンネルに分割する」モードです
-              （パート n → CH {baseChannel + '–' + (baseChannel + PART_COUNT - 1)}）。CC 番号は全パート共通で、
-              どのパートに効くかはチャンネルで決まります。single channel はその逆で、1 本の
-              チャンネルにすべてを載せ、パートは CC 番号で区別します。チャンネルを 1 本しか
-              持てない送信側や、1 本の MIDI ケーブルに複数の volca を数珠つなぎしていて
-              チャンネルを節約したい場合のためのモードです。その代償として、レイヤ別制御と
-              BIT / FOLD / DRIVE / DRY GAIN が使えません。
-            </div>
-          </div>
-        </div>
         <div className="ccmap__options">
           <label className="checkbox">
             <input type="checkbox" checked={liveSend} onChange={(e) => setSettings({ liveSend: e.target.checked })} />
@@ -270,10 +265,7 @@ export function MidiMapPanel() {
                 ))}
               </tbody>
             </table>
-            <div className="banner banner--warn">
-              single channel mode では BIT REDUCTION / FOLD / DRIVE / DRY GAIN が公式チャートに存在せず、
-              制御できません。またレイヤ 1 / 2 を独立に設定することもできません。
-            </div>
+
           </>
         )}
 
@@ -301,9 +293,8 @@ export function MidiMapPanel() {
           </tbody>
         </table>
 
-        <p className="hint">
-          既定値は KORG 公式の MIDI インプリメンテーション・チャートに基づいています。詳細と出典は
-          リポジトリの <code>docs/midi-implementation.md</code> を参照してください。値を変更するとオレンジ色で表示されます。
+        <p className="hint ccmap__source">
+          既定値の出典は <code>docs/midi-implementation.md</code>。変更した値はアクセント色で表示されます。
         </p>
       </div>
     </section>

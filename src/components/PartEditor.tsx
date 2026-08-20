@@ -21,6 +21,9 @@ import {
 import { store, useAppState } from '../state/store'
 import type { Layer, LayerParamKey, PartParamKey } from '../state/types'
 import { EG_TYPE_NAMES, MOD_TYPE_NAMES, PART_COUNT, WAVE_NAMES } from '../state/types'
+import { InfoTip } from './InfoTip'
+import type { IconName } from './Icon'
+import { EG_ICONS, Icon, MOD_ICONS, WAVE_ICONS } from './Icon'
 import { Knob } from './Knob'
 import { Segmented } from './Segmented'
 
@@ -56,6 +59,16 @@ export function PartEditor() {
     <section className="panel part-editor">
       <div className="panel__head">
         <h2 className="panel__title">Part Edit</h2>
+        {singleMode && (
+          <span className="tag tag--warn">
+            Single ch
+            <InfoTip label="single channel mode の制約">
+              1 つの CC がレイヤ 1 / 2 の両方に効くため、レイヤ別の値を実機へ送ることはできません。
+              画面上ではレイヤ 2 も編集できますが、送信されるのはレイヤ 1 の値です。
+              BIT / FOLD / DRIVE / DRY GAIN も single では制御できません。
+            </InfoTip>
+          </span>
+        )}
         <div className="part-tabs">
           {Array.from({ length: PART_COUNT }, (_, i) => (
             <button
@@ -120,22 +133,12 @@ export function PartEditor() {
           onClick={() => sendPart(partIndex)}
           title="このパートのパラメータだけを実機に再送信"
         >
+          <Icon name="send" size={14} />
           Send part
         </button>
       </div>
 
       <div className="panel__body part-editor__body">
-        {singleMode && (
-          <div className="banner banner--warn">
-            <strong>SINGLE CHANNEL MODE</strong>
-            <span>
-              1 つの CC がレイヤ 1 / 2 の両方に効くため、レイヤ別の値を実機へ送ることはできません。
-              画面上ではレイヤ 2 も編集できますが、送信されるのはレイヤ 1 の値です。
-              BIT / FOLD / DRIVE / DRY GAIN も single では制御できません。
-            </span>
-          </div>
-        )}
-
         <div className="layer-grid">
           {[0, 1].map((index) => (
             <LayerPanel key={index} partIndex={partIndex} layerIndex={index as 0 | 1} />
@@ -197,6 +200,7 @@ function LayerPanel({ partIndex, layerIndex }: { partIndex: number; layerIndex: 
         <SelectAxis
           label="Source"
           names={WAVE_NAMES}
+          icons={WAVE_ICONS}
           value={layer.wave}
           accent={accent}
           onChange={(v) => setLayerSelect(partIndex, layerIndex, 'wave', v)}
@@ -204,6 +208,7 @@ function LayerPanel({ partIndex, layerIndex }: { partIndex: number; layerIndex: 
         <SelectAxis
           label="Mod type"
           names={MOD_TYPE_NAMES}
+          icons={MOD_ICONS}
           value={layer.modType}
           accent={accent}
           onChange={(v) => setLayerSelect(partIndex, layerIndex, 'modType', v)}
@@ -211,6 +216,7 @@ function LayerPanel({ partIndex, layerIndex }: { partIndex: number; layerIndex: 
         <SelectAxis
           label="Amp EG"
           names={EG_TYPE_NAMES}
+          icons={EG_ICONS}
           value={layer.egType}
           accent={accent}
           onChange={(v) => setLayerSelect(partIndex, layerIndex, 'egType', v)}
@@ -244,12 +250,14 @@ function LayerPanel({ partIndex, layerIndex }: { partIndex: number; layerIndex: 
 function SelectAxis({
   label,
   names,
+  icons,
   value,
   accent,
   onChange,
 }: {
   label: string
   names: readonly string[]
+  icons: IconName[]
   value: number
   accent: string
   onChange: (value: number) => void
@@ -260,7 +268,8 @@ function SelectAxis({
       <Segmented
         ariaLabel={label}
         accent={accent}
-        options={names.map((name, i) => ({ value: i, label: name }))}
+        className="segmented--icons"
+        options={names.map((name, i) => ({ value: i, label: name, icon: icons[i] }))}
         value={value}
         onChange={onChange}
       />
@@ -285,9 +294,11 @@ function PartProcessing({ partIndex }: { partIndex: number }) {
   return (
     <div className="processing">
       <header className="processing__head">
-        <span className="legend">Part processing</span>
-        <span className="hint">
-          レイヤ 1 / 2 共通。実機では EDIT ページの隠しパラメータです。
+        <span className="legend">
+          Part processing
+          <InfoTip label="パート処理について">
+            レイヤ 1 / 2 共通のパラメータです。実機では EDIT ページの隠しパラメータにあたります。
+          </InfoTip>
         </span>
       </header>
       <div className="processing__knobs">

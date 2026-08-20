@@ -154,7 +154,7 @@ export function FuncPanel() {
           </table>
           <p className="hint">
             SysEx とプログラムチェンジに非対応のため、実機メモリの保存／呼び出しとモーションシーケンスは
-            MIDI から操作できません。キットの管理は右側の <strong>PRESETS</strong> パネルで行ってください。
+            MIDI から操作できません。音色の管理は <strong>PRESETS</strong> タブで行ってください。
           </p>
         </div>
       </div>

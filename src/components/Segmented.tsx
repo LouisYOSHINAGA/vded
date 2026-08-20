@@ -1,8 +1,13 @@
+import type { IconName } from './Icon'
+import { Icon } from './Icon'
+
 export interface SegmentedOption<T extends string | number> {
   value: T
   label: string
   title?: string
   disabled?: boolean
+  /** Drawn above the label — the machine shows the same shapes on its LCD. */
+  icon?: IconName
 }
 
 export interface SegmentedProps<T extends string | number> {
@@ -42,7 +47,8 @@ export function Segmented<T extends string | number>({
           title={option.title ?? option.label}
           onClick={() => onChange(option.value)}
         >
-          {option.label}
+          {option.icon && <Icon name={option.icon} size={26} className="segmented__icon" />}
+          <span className="segmented__text">{option.label}</span>
         </button>
       ))}
     </div>

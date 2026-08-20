@@ -743,6 +743,10 @@
   min-height: 23px;
 }
 
+.ccmap__source {
+  margin: 0;
+}
+
 .ccmap__input--changed {
   border-color: var(--c-accent);
   color: var(--c-accent-hot);
@@ -786,7 +790,7 @@ code {
 
 .dials {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(430px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(560px, 1fr));
   gap: var(--gap-md);
 }
 
@@ -803,6 +807,11 @@ code {
 .dial-part--selected {
   box-shadow: inset 0 0 0 1px var(--tint);
   border-top-color: var(--tint);
+}
+
+.dial-part__transport {
+  display: flex;
+  gap: 3px;
 }
 
 .dial-part__head {
@@ -870,31 +879,79 @@ code {
 .dial-row__id {
   display: flex;
   align-items: center;
-  gap: 7px;
-  width: 116px;
+  gap: 8px;
+  width: 222px;
   flex: none;
   padding: 3px 4px;
   border-radius: var(--r-sm);
   text-align: left;
 }
 
-.dial-row__id:not(.dial-row__id--static):hover {
-  background: color-mix(in srgb, var(--layer-accent) 14%, transparent);
-}
-
 .dial-row__badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 18px;
+  width: 24px;
+  height: 22px;
   flex: none;
   border-radius: 3px;
   background: var(--layer-accent);
   color: var(--layer-ink, var(--c-void));
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
+}
+
+button.dial-row__badge:hover {
+  filter: brightness(1.12);
+}
+
+.dial-row__selects {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+}
+
+.dial-row__selectpair {
+  display: flex;
+  gap: 3px;
+}
+
+.dial-row__selectpair .axis-select {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Native select with the current shape drawn beside it. */
+.axis-select {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 3px;
+  border-radius: var(--r-sm);
+  background: var(--c-void);
+  box-shadow: inset 0 0 0 1px var(--c-line-soft);
+  color: var(--layer-accent, var(--c-ink));
+}
+
+.axis-select:hover,
+.axis-select:focus-within {
+  box-shadow: inset 0 0 0 1px var(--layer-accent, var(--c-accent));
+}
+
+.axis-select__native {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: none;
+  color: var(--c-ink);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: calc(var(--track-legend) * 0.5);
+  cursor: pointer;
 }
 
 .dial-row__badge--part {

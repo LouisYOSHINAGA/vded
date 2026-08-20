@@ -59,12 +59,12 @@ export const FUNC_ENTRIES: FuncEntry[] = [
   {
     label: 'SAVE KIT / LOAD KIT',
     description: 'キット（6 パートの音色）をメモリに保存・呼び出し。ステップボタン 1–16 が保存先。',
-    mirrored: 'PRESETS パネル。実機メモリとは別に、ブラウザ側へ無制限に保存できます。',
+    mirrored: 'PRESETS タブ。実機メモリとは別に、ブラウザ側へ無制限に保存できます。',
   },
   {
     label: 'SAVE PRG / LOAD PRG',
     description: 'プログラム（キット＋シーケンス）を保存・呼び出し。ステップボタン 1–16 が保存先。',
-    mirrored: 'PRESETS パネルの「パターンも含める」を ON にして保存。',
+    mirrored: 'PRESETS タブの「パターンも含める」を ON にして保存。',
   },
   {
     label: 'STEP JUMP',

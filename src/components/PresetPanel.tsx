@@ -11,6 +11,7 @@ import {
   savePreset,
 } from '../state/actions'
 import { store, toast, useAppState } from '../state/store'
+import { InfoTip } from './InfoTip'
 import type { Preset } from '../state/types'
 
 function download(filename: string, text: string): void {
@@ -95,7 +96,7 @@ export function PresetPanel() {
         <div className="presets__save">
           <input
             className="text-input"
-            placeholder={patchName || 'キット名'}
+            placeholder={patchName || 'プリセット名'}
             value={name}
             maxLength={28}
             onChange={(e) => setName(e.target.value)}
@@ -155,12 +156,13 @@ export function PresetPanel() {
         </ul>
 
         <div className="presets__footer">
-          <button type="button" className="btn btn--ghost btn--sm" onClick={resetPatch} title="INIT KIT に戻す">
-            Init kit
+          <button type="button" className="btn btn--ghost btn--sm" onClick={resetPatch} title="初期状態に戻す">
+            Init
           </button>
-          <span className="hint">
-            volca drum は音色を送り返せないため、プリセットはエディタ側にのみ保存されます。
-          </span>
+          <InfoTip label="プリセットの保存先">
+            volca drum は音色を送り返せないため、プリセットはブラウザ側にのみ保存されます
+            （EXPORT / IMPORT で JSON としてやり取りできます）。
+          </InfoTip>
         </div>
       </div>
     </section>

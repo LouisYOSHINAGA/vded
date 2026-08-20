@@ -540,7 +540,7 @@ export function importPresets(presets: Preset[]): number {
 
 export function resetPatch(): void {
   store.set((s) => ({ ...s, patch: makeInitPatch() }))
-  toast('INIT KIT を読み込みました')
+  toast('初期状態に戻しました')
 }
 
 export interface PresetFile {

@@ -2,10 +2,34 @@
 
 .knob {
   display: flex;
-  flex-direction: column;
   align-items: center;
   gap: 2px;
   --knob-accent: var(--c-accent);
+}
+
+.knob--stack {
+  flex-direction: column;
+}
+
+.knob--stack .knob__readout {
+  display: contents;
+}
+
+/* Label beside the dial keeps a transport row short. */
+.knob--inline {
+  flex-direction: row;
+  gap: 8px;
+}
+
+.knob--inline .knob__readout {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+}
+
+.knob--inline .knob__label {
+  text-align: left;
 }
 
 .knob__dial {
@@ -166,4 +190,33 @@
   inset: 0 auto 0 0;
   background: linear-gradient(90deg, var(--bar-accent, var(--c-accent)), color-mix(in srgb, var(--bar-accent, var(--c-accent)) 60%, var(--c-ink-bright)));
   border-radius: inherit;
+}
+
+/* ---------------- Icons ---------------- */
+
+.icon {
+  display: block;
+  flex: none;
+}
+
+/* Icon-led options: the shape reads before the word does. */
+.segmented--icons .segmented__item {
+  flex-direction: column;
+  gap: 0;
+  min-height: 50px;
+  padding: 5px 6px 4px;
+}
+
+.segmented--icons .segmented__text {
+  font-size: 9.5px;
+  letter-spacing: calc(var(--track-legend) * 0.6);
+}
+
+.segmented__icon {
+  opacity: 0.9;
+  stroke-width: 2.1;
+}
+
+.segmented__item[aria-pressed='true'] .segmented__icon {
+  opacity: 1;
 }

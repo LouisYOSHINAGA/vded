@@ -3,13 +3,19 @@ import {
   midiConfig,
   sendPart,
   setLayerParam,
+  setLayerSelect,
   setPartParam,
   setUi,
+  toggleMute,
+  toggleSolo,
   triggerPart,
 } from '../state/actions'
 import { useAppState } from '../state/store'
 import type { LayerParamKey, PartParamKey } from '../state/types'
 import { EG_TYPE_NAMES, MOD_TYPE_NAMES, PART_COUNT, WAVE_NAMES } from '../state/types'
+import type { IconName } from './Icon'
+import { EG_ICONS, Icon, MOD_ICONS, WAVE_ICONS } from './Icon'
+import { InfoTip } from './InfoTip'
 import { Knob } from './Knob'
 
 const LAYER_KNOBS: { key: Exclude<LayerParamKey, 'select'>; label: string; def: number; bipolar?: boolean }[] = [
@@ -44,9 +50,10 @@ export function LayerDials() {
     <section className="panel">
       <div className="panel__head">
         <h2 className="panel__title">All layers · dials</h2>
-        <span className="hint">
-          6 パート × 2 レイヤをダイヤルで一覧。数値で追うときは ALL LAYERS タブへ。
-        </span>
+        <InfoTip label="このタブの使い方">
+          6 パート × 2 レイヤをダイヤルで一覧します。正確な数値を読み比べるときは
+          ALL LAYERS タブへ。L1 / L2 のバッジを押すと、そのレイヤを PART EDIT で開きます。
+        </InfoTip>
       </div>
       <div className="panel__body dials">
         {Array.from({ length: PART_COUNT }, (_, part) => (
@@ -79,12 +86,7 @@ function DialPart({ part }: { part: number }) {
           <span className="dial-part__name">{data.name}</span>
         </button>
         <div className="panel__spacer" />
-        <button type="button" className="micro-btn" title="試聴" onPointerDown={() => triggerPart(part)}>
-          ▸
-        </button>
-        <button type="button" className="micro-btn" title="このパートを再送信" onClick={() => sendPart(part)}>
-          ↑
-        </button>
+        <PartTransport part={part} />
       </header>
 
       {[0, 1].map((layerIndex) => {
@@ -100,20 +102,47 @@ function DialPart({ part }: { part: number }) {
               ['--layer-ink' as string]: layerIndex === 0 ? 'var(--c-on-layer1)' : 'var(--c-on-layer2)',
             }}
           >
-            <button
-              type="button"
-              className="dial-row__id"
-              onClick={() => setUi({ selectedPart: part, selectedLayer: layerIndex as 0 | 1 })}
-              title="PART EDIT でこのレイヤを開く"
-            >
-              <span className="dial-row__badge">L{layerIndex + 1}</span>
-              <span className="dial-row__source">
-                {WAVE_NAMES[layer.wave]}
-                <em>
-                  {MOD_TYPE_NAMES[layer.modType]} · {EG_TYPE_NAMES[layer.egType]}
-                </em>
-              </span>
-            </button>
+            <div className="dial-row__id">
+              <button
+                type="button"
+                className="dial-row__badge"
+                onClick={() =>
+                  setUi({
+                    selectedPart: part,
+                    selectedLayer: layerIndex as 0 | 1,
+                    editorTab: 'part',
+                  })
+                }
+                title="PART EDIT でこのレイヤを開く"
+              >
+                L{layerIndex + 1}
+              </button>
+              <div className="dial-row__selects">
+                <AxisSelect
+                  names={WAVE_NAMES}
+                  icons={WAVE_ICONS}
+                  value={layer.wave}
+                  ariaLabel={`PART ${part + 1} LAYER ${layerIndex + 1} 音源`}
+                  onChange={(v) => setLayerSelect(part, layerIndex as 0 | 1, 'wave', v)}
+                />
+                <div className="dial-row__selectpair">
+                  <AxisSelect
+                    names={MOD_TYPE_NAMES}
+                    icons={MOD_ICONS}
+                    value={layer.modType}
+                    ariaLabel={`PART ${part + 1} LAYER ${layerIndex + 1} MOD タイプ`}
+                    onChange={(v) => setLayerSelect(part, layerIndex as 0 | 1, 'modType', v)}
+                  />
+                  <AxisSelect
+                    names={EG_TYPE_NAMES}
+                    icons={EG_ICONS}
+                    value={layer.egType}
+                    ariaLabel={`PART ${part + 1} LAYER ${layerIndex + 1} AMP EG`}
+                    onChange={(v) => setLayerSelect(part, layerIndex as 0 | 1, 'egType', v)}
+                  />
+                </div>
+              </div>
+            </div>
             <div className="dial-row__knobs">
               {LAYER_KNOBS.map((knob) => (
                 <Knob
@@ -166,5 +195,88 @@ function DialPart({ part }: { part: number }) {
         </div>
       </div>
     </article>
+  )
+}
+
+
+/** Mute / solo / audition / send, in the same order as the sequencer rail. */
+function PartTransport({ part }: { part: number }) {
+  const muted = useAppState((s) => s.mixer.mutes[part])
+  const solo = useAppState((s) => s.mixer.solos[part])
+
+  return (
+    <div className="dial-part__transport">
+      <button
+        type="button"
+        className={`micro-btn${muted ? ' micro-btn--mute' : ''}`}
+        onClick={() => toggleMute(part)}
+        title="ミュート"
+        aria-label="ミュート"
+        aria-pressed={muted}
+      >
+        <Icon name="mute" />
+      </button>
+      <button
+        type="button"
+        className={`micro-btn${solo ? ' micro-btn--solo' : ''}`}
+        onClick={() => toggleSolo(part)}
+        title="ソロ"
+        aria-label="ソロ"
+        aria-pressed={solo}
+      >
+        <Icon name="solo" />
+      </button>
+      <button
+        type="button"
+        className="micro-btn"
+        onPointerDown={() => triggerPart(part)}
+        title="試聴"
+        aria-label="試聴"
+      >
+        <Icon name="trigger" />
+      </button>
+      <button
+        type="button"
+        className="micro-btn"
+        onClick={() => sendPart(part)}
+        title="このパートを再送信"
+        aria-label="このパートを再送信"
+      >
+        <Icon name="send" />
+      </button>
+    </div>
+  )
+}
+
+/** Compact picker showing the current shape as an icon. */
+function AxisSelect({
+  names,
+  icons,
+  value,
+  ariaLabel,
+  onChange,
+}: {
+  names: readonly string[]
+  icons: IconName[]
+  value: number
+  ariaLabel: string
+  onChange: (value: number) => void
+}) {
+  return (
+    <span className="axis-select">
+      <Icon name={icons[value]} size={16} />
+      <select
+        className="axis-select__native"
+        value={value}
+        aria-label={ariaLabel}
+        onChange={(event) => onChange(Number(event.target.value))}
+      >
+        {names.map((name, i) => (
+          <option key={name} value={i}>
+            {name}
+          </option>
+        ))}
+      </select>
+    </span>
   )
 }

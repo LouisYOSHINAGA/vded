@@ -21,6 +21,8 @@ export interface KnobProps {
   editable?: boolean
   /** Shown next to an editable readout, e.g. a unit. */
   unit?: string
+  /** 'stack' puts the label under the dial; 'inline' puts it beside. */
+  layout?: 'stack' | 'inline'
 }
 
 const ARC = 270
@@ -56,6 +58,7 @@ export function Knob({
   title,
   editable = false,
   unit,
+  layout = 'stack',
 }: KnobProps) {
   const px = SIZES[size]
   const [dragging, setDragging] = useState(false)
@@ -136,7 +139,9 @@ export function Knob({
 
   return (
     <div
-      className={`knob knob--${size}${disabled ? ' knob--disabled' : ''}${dragging ? ' knob--dragging' : ''}`}
+      className={`knob knob--${size} knob--${layout}${disabled ? ' knob--disabled' : ''}${
+        dragging ? ' knob--dragging' : ''
+      }`}
       style={accent ? ({ ['--knob-accent' as string]: accent } as React.CSSProperties) : undefined}
       title={title ?? `${label}: ${readout}`}
     >
@@ -170,6 +175,7 @@ export function Knob({
           <line className="knob__pointer" x1={px1} y1={py1} x2={px2} y2={py2} />
         </svg>
       </div>
+      <span className="knob__readout">
       <span className="knob__label legend" id={`${id}-label`}>
         {label}
       </span>
@@ -189,6 +195,7 @@ export function Knob({
       ) : (
         <span className="knob__value value-readout">{readout}</span>
       )}
+      </span>
     </div>
   )
 }

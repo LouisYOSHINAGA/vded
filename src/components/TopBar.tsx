@@ -3,6 +3,7 @@ import { panic, sendAll } from '../state/actions'
 import { useAppState } from '../state/store'
 import { AppearanceMenu } from './AppearanceMenu'
 import { DeviceBar } from './DeviceBar'
+import { Icon } from './Icon'
 import { ShortcutsMenu } from './ShortcutsMenu'
 
 export function TopBar() {
@@ -24,8 +25,8 @@ export function TopBar() {
 
       <div className="topbar__spacer" />
 
-      <div className="cluster" title="編集中のキット名">
-        <span className="cluster__label">Kit</span>
+      <div className="cluster" title="編集中のプリセット名">
+        <span className="cluster__label">Preset</span>
         <span className="value-readout" style={{ fontSize: 12 }}>
           {patchName || 'UNTITLED'}
         </span>
@@ -39,6 +40,7 @@ export function TopBar() {
           onClick={sendAll}
           title="現在のすべてのパラメータを CC で実機に送信します（volca drum は音色を送り返せないため、実機を画面に合わせる唯一の手段です）"
         >
+          <Icon name="send" size={15} />
           Send all parameters
           {progress != null && (
             <span className="send-all__progress">

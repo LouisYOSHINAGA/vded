@@ -10,6 +10,8 @@ import {
 import { useAppState } from '../state/store'
 import type { LayerParamKey, PartParamKey } from '../state/types'
 import { EG_TYPE_NAMES, MOD_TYPE_NAMES, PART_COUNT, WAVE_NAMES } from '../state/types'
+import { Icon } from './Icon'
+import { InfoTip } from './InfoTip'
 import { NumCell } from './NumCell'
 
 const LAYER_ACCENT = ['var(--c-layer1)', 'var(--c-layer2)'] as const
@@ -48,9 +50,10 @@ export function LayerMatrix() {
     <section className="panel">
       <div className="panel__head">
         <h2 className="panel__title">All layers</h2>
-        <span className="hint">
-          6 パート × 2 レイヤをまとめて表示。セルは上下ドラッグ、ダブルクリックで直接入力。
-        </span>
+        <InfoTip label="この表の使い方">
+          6 パート × 2 レイヤをまとめて表示します。セルは上下ドラッグ、ダブルクリックで直接入力。
+          L1 / L2 のバッジを押すと、そのレイヤを PART EDIT で開きます。
+        </InfoTip>
       </div>
       <div className="panel__body matrix__body">
         <table className="matrix">
@@ -115,8 +118,14 @@ function MatrixPart({ part, mode }: { part: number; mode: 'split' | 'single' }) 
               <button
                 type="button"
                 className="matrix__layerbtn"
-                onClick={() => setUi({ selectedPart: part, selectedLayer: layerIndex as 0 | 1 })}
-                title={`PART ${part + 1} LAYER ${layerIndex + 1} を編集`}
+                onClick={() =>
+                  setUi({
+                    selectedPart: part,
+                    selectedLayer: layerIndex as 0 | 1,
+                    editorTab: 'part',
+                  })
+                }
+                title={`PART ${part + 1} LAYER ${layerIndex + 1} を PART EDIT で開く`}
               >
                 L{layerIndex + 1}
               </button>
@@ -180,11 +189,23 @@ function MatrixPart({ part, mode }: { part: number; mode: 'split' | 'single' }) 
               })}
             {first && (
               <td rowSpan={2} className="matrix__tools">
-                <button type="button" className="micro-btn" title="試聴" onPointerDown={() => triggerPart(part)}>
-                  ▸
+                <button
+                  type="button"
+                  className="micro-btn"
+                  title="試聴"
+                  aria-label="試聴"
+                  onPointerDown={() => triggerPart(part)}
+                >
+                  <Icon name="trigger" />
                 </button>
-                <button type="button" className="micro-btn" title="このパートを再送信" onClick={() => sendPart(part)}>
-                  ↑
+                <button
+                  type="button"
+                  className="micro-btn"
+                  title="このパートを再送信"
+                  aria-label="このパートを再送信"
+                  onClick={() => sendPart(part)}
+                >
+                  <Icon name="send" />
                 </button>
               </td>
             )}
