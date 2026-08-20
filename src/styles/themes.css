@@ -1,248 +1,32 @@
 /*
- * Skins. Every colour the UI uses is declared here, so a theme only needs to
- * redefine this block — no component knows a hex value.
- *
- * Layer 1 and layer 2 always come from the same family as the theme accent:
- * two hues that fight each other made the editor read as two different apps.
+ * Skins are generated, not written: src/theme/palette.ts derives every token
+ * from a handful of seed colours and writes them onto the document element.
+ * What remains here is the small amount of styling that depends on whether the
+ * skin is light or dark rather than on any particular colour.
  */
 
-/* ---------------- VERMILION — the volca drum panel ---------------- */
-:root,
-[data-theme='vermilion'] {
-  color-scheme: dark;
-
-  --c-void: #0a0b0c;
-  --c-body: #121315;
-  --c-panel: #191b1e;
-  --c-panel-2: #202327;
-  --c-raise: #2a2e33;
-  --c-raise-2: #343940;
-  --c-btn-hover: #3d434b;
-  --c-btn-hover-2: #31363c;
-  --c-line: #34383e;
-  --c-line-soft: #26292e;
-  --c-topbar: #1d2024;
-  --c-topbar-2: #131518;
-  --c-rail-sel: #232629;
-  --c-toast: #23262a;
-
-  --c-ink: #e7e3dc;
-  --c-ink-bright: #ffffff;
-  --c-ink-dim: #a5a099;
-  --c-ink-faint: #77736c;
-  --c-on-accent: #190a05;
-
-  --c-accent: #e8552f;
-  --c-accent-hot: #ff7a3d;
-  --c-accent-deep: #a5341a;
-  --c-accent-glow: rgba(232, 85, 47, 0.45);
-
-  /* Layer identity: the accent, then a warm ochre one notch down the wheel. */
-  --c-layer1: #e8552f;
-  --c-layer2: #d8952f;
-
-  --c-danger: #e0464a;
-  --c-warn: #e0a13a;
-  --c-ok: #6fbf73;
-  --c-info: #6fa8bd;
-
-  --c-step-off: #23262a;
-  --c-step-off-2: #1a1d20;
-  --c-step-hover: #2c3035;
-  --c-step-hover-2: #212428;
-  --c-step-line: #2f343a;
-  --c-step-line-beat: #3f454d;
-  --c-step-now: #3a4048;
-
-  --c-track: #2c3036;
-  --c-knob-cap: #16181b;
-  --c-knob-ring: #3a3f46;
-  --c-led-off: #2b2f34;
-
-  --shadow-panel: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 10px 24px rgba(0, 0, 0, 0.45);
-  --shadow-raise: 0 1px 0 rgba(255, 255, 255, 0.07) inset, 0 2px 4px rgba(0, 0, 0, 0.5);
-  --shadow-press: 0 1px 3px rgba(0, 0, 0, 0.6) inset;
-  --glow-strength: 1;
-}
-
-/* ---------------- CARBON — graphite, one amber indicator ---------------- */
-[data-theme='carbon'] {
-  color-scheme: dark;
-
-  --c-void: #08090a;
-  --c-body: #101113;
-  --c-panel: #16181a;
-  --c-panel-2: #1c1f22;
-  --c-raise: #262a2e;
-  --c-raise-2: #31363b;
-  --c-btn-hover: #3b4147;
-  --c-btn-hover-2: #2e3338;
-  --c-line: #333940;
-  --c-line-soft: #23272b;
-  --c-topbar: #1a1d20;
-  --c-topbar-2: #101214;
-  --c-rail-sel: #22262a;
-  --c-toast: #1f2225;
-
-  --c-ink: #e6e6e4;
-  --c-ink-bright: #ffffff;
-  --c-ink-dim: #a2a29e;
-  --c-ink-faint: #74746f;
-  --c-on-accent: #16130a;
-
-  --c-accent: #eda12a;
-  --c-accent-hot: #ffbe4f;
-  --c-accent-deep: #a86c14;
-  --c-accent-glow: rgba(237, 161, 42, 0.4);
-
-  --c-layer1: #eda12a;
-  --c-layer2: #9aa6ad;
-
-  --c-danger: #dc5a54;
-  --c-warn: #d9a63f;
-  --c-ok: #74b47b;
-  --c-info: #7fa3b5;
-
-  --c-step-off: #212528;
-  --c-step-off-2: #17191c;
-  --c-step-hover: #2a2f33;
-  --c-step-hover-2: #1e2124;
-  --c-step-line: #2d3237;
-  --c-step-line-beat: #3d444b;
-  --c-step-now: #383e45;
-
-  --c-track: #2a2e33;
-  --c-knob-cap: #131517;
-  --c-knob-ring: #383d43;
-  --c-led-off: #292d31;
-
-  --shadow-panel: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 10px 24px rgba(0, 0, 0, 0.5);
-  --shadow-raise: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 2px 4px rgba(0, 0, 0, 0.55);
-  --shadow-press: 0 1px 3px rgba(0, 0, 0, 0.65) inset;
-  --glow-strength: 0.7;
-}
-
-/* ---------------- BLUEPRINT — deep navy, ice indicators ---------------- */
-[data-theme='blueprint'] {
-  color-scheme: dark;
-
-  --c-void: #070a10;
-  --c-body: #0d121a;
-  --c-panel: #121924;
-  --c-panel-2: #17202c;
-  --c-raise: #1f2b3a;
-  --c-raise-2: #293748;
-  --c-btn-hover: #334255;
-  --c-btn-hover-2: #263344;
-  --c-line: #2c3a4b;
-  --c-line-soft: #1c2634;
-  --c-topbar: #15202d;
-  --c-topbar-2: #0c121a;
-  --c-rail-sel: #1b2632;
-  --c-toast: #1a2431;
-
-  --c-ink: #dfe9f4;
-  --c-ink-bright: #ffffff;
-  --c-ink-dim: #9aacbf;
-  --c-ink-faint: #6b7d90;
-  --c-on-accent: #06131c;
-
-  --c-accent: #3fb6e6;
-  --c-accent-hot: #6ad2f7;
-  --c-accent-deep: #23718f;
-  --c-accent-glow: rgba(63, 182, 230, 0.4);
-
-  --c-layer1: #3fb6e6;
-  --c-layer2: #7d92e0;
-
-  --c-danger: #e2686a;
-  --c-warn: #e0ab48;
-  --c-ok: #62c08f;
-  --c-info: #6fa8bd;
-
-  --c-step-off: #1a2432;
-  --c-step-off-2: #111927;
-  --c-step-hover: #223044;
-  --c-step-hover-2: #17202e;
-  --c-step-line: #263447;
-  --c-step-line-beat: #35485f;
-  --c-step-now: #31445b;
-
-  --c-track: #22303f;
-  --c-knob-cap: #0e1520;
-  --c-knob-ring: #2f3f52;
-  --c-led-off: #22303f;
-
-  --shadow-panel: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 10px 26px rgba(0, 0, 0, 0.5);
-  --shadow-raise: 0 1px 0 rgba(255, 255, 255, 0.07) inset, 0 2px 4px rgba(0, 0, 0, 0.5);
-  --shadow-press: 0 1px 3px rgba(0, 0, 0, 0.6) inset;
-  --glow-strength: 1.1;
-}
-
-/* ---------------- PAPER — light, for bright rooms ---------------- */
-[data-theme='paper'] {
-  color-scheme: light;
-
-  --c-void: #ddd9d1;
+/* Fallback so the first paint is not unstyled if scripting is delayed. */
+:root {
+  --c-void: #eceae4;
   --c-body: #eceae4;
   --c-panel: #f6f4ef;
-  --c-panel-2: #fdfcfa;
-  --c-raise: #e4e0d8;
-  --c-raise-2: #f0ede6;
-  --c-btn-hover: #ffffff;
-  --c-btn-hover-2: #e8e4dc;
-  --c-line: #c2bcaf;
-  --c-line-soft: #d6d1c6;
-  --c-topbar: #f4f1ea;
-  --c-topbar-2: #e6e2da;
-  --c-rail-sel: #fbf7ee;
-  --c-toast: #2b2926;
-
   --c-ink: #23211d;
-  --c-ink-bright: #000000;
-  --c-ink-dim: #5c574f;
-  --c-ink-faint: #8b857a;
-  --c-on-accent: #fff6f2;
-
-  --c-accent: #cf421c;
-  --c-accent-hot: #e85a2f;
-  --c-accent-deep: #93290e;
-  --c-accent-glow: rgba(207, 66, 28, 0.25);
-
-  --c-layer1: #cf421c;
-  --c-layer2: #a9761a;
-
-  --c-danger: #c23a3e;
-  --c-warn: #a97514;
-  --c-ok: #3f8a4d;
-  --c-info: #3d7590;
-
-  --c-step-off: #e7e3da;
-  --c-step-off-2: #dcd7cc;
-  --c-step-hover: #f0ece3;
-  --c-step-hover-2: #e3ded4;
-  --c-step-line: #cac4b6;
-  --c-step-line-beat: #a8a091;
-  --c-step-now: #c9c2b3;
-
-  --c-track: #d3cec2;
-  --c-knob-cap: #f7f5f0;
-  --c-knob-ring: #b8b2a4;
-  --c-led-off: #cbc5b8;
-
-  --shadow-panel: 0 1px 0 rgba(255, 255, 255, 0.8) inset, 0 2px 8px rgba(60, 50, 35, 0.1);
-  --shadow-raise: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 1px 2px rgba(60, 50, 35, 0.16);
-  --shadow-press: 0 1px 3px rgba(60, 50, 35, 0.25) inset;
-  --glow-strength: 0;
+  --glow-strength: 0.15;
 }
 
-/* The light theme has no glass to glow through; drop the halos. */
-[data-theme='paper'] .step--on,
-[data-theme='paper'] .btn--accent,
-[data-theme='paper'] .led--on {
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.45) inset, 0 1px 3px rgba(60, 50, 35, 0.25);
+/* A light skin has no glass for indicators to glow through. */
+[data-mode='light'] .step--on,
+[data-mode='light'] .btn--accent,
+[data-mode='light'] .led--on {
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.45) inset, 0 1px 3px rgba(60, 50, 35, 0.22);
 }
 
-[data-theme='paper'] .knob__cap {
+[data-mode='light'] .knob__cap {
   stroke-width: 1.5;
+}
+
+/* Panels sit on a slightly darker chassis in light skins, so the halo that
+   lifts them in the dark ones would only muddy things. */
+[data-mode='light'] .app {
+  background-image: none;
 }

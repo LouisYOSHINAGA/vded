@@ -62,8 +62,8 @@
 }
 
 .seq-row--selected {
-  background: color-mix(in srgb, var(--c-accent) 9%, transparent);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c-accent) 22%, transparent);
+  background: color-mix(in srgb, var(--tint) 9%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tint) 22%, transparent);
 }
 
 .seq-ruler__tick {
@@ -130,9 +130,9 @@
   height: 18px;
   flex: none;
   border-radius: 3px;
-  background: color-mix(in srgb, var(--tint) 28%, transparent);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tint) 55%, transparent);
-  color: var(--c-accent-hot);
+  background: color-mix(in srgb, var(--tint) 26%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tint) 65%, transparent);
+  color: var(--tint);
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 700;
@@ -141,7 +141,7 @@
 .seq-rail--selected .seq-rail__num {
   background: var(--tint);
   box-shadow: none;
-  color: var(--c-on-accent);
+  color: var(--c-void);
 }
 
 .seq-rail__name {
@@ -157,7 +157,7 @@
 
 .seq-rail__buttons {
   display: flex;
-  gap: 2px;
+  gap: 3px;
   flex: none;
 }
 
@@ -165,12 +165,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 19px;
-  height: 19px;
-  border-radius: 3px;
+  width: 25px;
+  height: 25px;
+  border-radius: var(--r-sm);
   background: var(--c-raise);
+  box-shadow: var(--shadow-raise);
   color: var(--c-ink-dim);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   line-height: 1;
   transition: background 0.1s, color 0.1s;
@@ -256,7 +257,7 @@
 
 .seq-row__tools {
   display: flex;
-  gap: 2px;
+  gap: 3px;
 }
 
 /* ---------------- velocity lane ---------------- */
@@ -321,9 +322,9 @@
 
 .vel-fader__track {
   position: relative;
-  width: 12px;
-  height: 62px;
-  border-radius: var(--r-pill);
+  width: 14px;
+  height: 96px;
+  border-radius: 2px;
   background: var(--c-void);
   box-shadow: inset 0 0 0 1px var(--c-line-soft);
   overflow: hidden;
@@ -384,7 +385,7 @@
     grid-template-columns: 138px minmax(0, 1fr) auto;
   }
   .vel-fader__track {
-    height: 50px;
+    height: 76px;
   }
   .step {
     height: 26px;

@@ -20,11 +20,11 @@ import { MAX_STEPS, PART_COUNT } from '../state/types'
 import { NumberField } from './NumberField'
 
 /**
- * Every part uses the theme accent, the way the machine's LEDs all share one
- * colour. Rows are told apart by the numbered chip, the alternating stripe and
- * the backlight on the selected row — not by six competing hues.
+ * Each part carries its own tint. The six values come from the active skin, so
+ * they stay within one family instead of being an arbitrary rainbow — and the
+ * skin editor lets them be reassigned outright.
  */
-const PART_TINT = 'var(--c-accent)'
+const partTint = (part: number) => `var(--c-part-${part + 1})`
 
 function velocityClass(velocity: number): string {
   if (velocity >= 118) return 'step--accent'
@@ -210,7 +210,7 @@ function PartRow({ part, selected, currentStep, onCellDown, onCellEnter }: PartR
   const solo = useAppState((s) => s.mixer.solos[part])
   const anySolo = useAppState((s) => s.mixer.solos.some(Boolean))
   const audible = anySolo ? solo : !muted
-  const tint = PART_TINT
+  const tint = partTint(part)
 
   return (
     <>
@@ -308,7 +308,7 @@ function VelocityLane({ part }: { part: number }) {
   }
 
   return (
-    <div className="vel-lane" style={{ ['--tint' as string]: PART_TINT }}>
+    <div className="vel-lane" style={{ ['--tint' as string]: partTint(part) }}>
       <div className="vel-lane__label">
         <span className="legend">Velocity</span>
         <span className="vel-lane__part">{name}</span>

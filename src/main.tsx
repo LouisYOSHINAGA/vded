@@ -11,6 +11,7 @@ import { App } from './App'
 import { loadWorkspace, startAutosave } from './state/persist'
 import { store } from './state/store'
 import { FACTORY_PRESETS } from './data/factoryPresets'
+import { applyAppearance } from './theme/apply'
 
 const restored = loadWorkspace()
 if (restored) {
@@ -18,6 +19,8 @@ if (restored) {
 } else {
   store.set((state) => ({ ...state, presets: FACTORY_PRESETS }))
 }
+// Paint the skin before the first render so a dark skin never flashes white.
+applyAppearance(store.get().settings.appearance)
 startAutosave()
 
 createRoot(document.getElementById('root')!).render(

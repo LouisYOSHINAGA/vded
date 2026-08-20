@@ -34,6 +34,7 @@ export function PresetPanel() {
   const patchName = useAppState((s) => s.patch.name)
   const [name, setName] = useState('')
   const [withPattern, setWithPattern] = useState(true)
+  const [withAppearance, setWithAppearance] = useState(false)
   const [sendOnLoad, setSendOnLoad] = useState(true)
   const [query, setQuery] = useState('')
   const fileInput = useRef<HTMLInputElement>(null)
@@ -44,7 +45,7 @@ export function PresetPanel() {
 
   const onSave = () => {
     const finalName = name.trim() || patchName || 'UNTITLED'
-    savePreset(finalName, withPattern)
+    savePreset(finalName, { pattern: withPattern, appearance: withAppearance })
     store.set((s) => ({ ...s, patch: { ...s.patch, name: finalName } }))
     setName('')
   }
@@ -113,6 +114,14 @@ export function PresetPanel() {
             <span className="legend">パターンも含める</span>
           </label>
           <label className="checkbox">
+            <input
+              type="checkbox"
+              checked={withAppearance}
+              onChange={(e) => setWithAppearance(e.target.checked)}
+            />
+            <span className="legend">スキン／フォントも含める</span>
+          </label>
+          <label className="checkbox">
             <input type="checkbox" checked={sendOnLoad} onChange={(e) => setSendOnLoad(e.target.checked)} />
             <span className="legend">読込時に実機へ送信</span>
           </label>
@@ -134,6 +143,7 @@ export function PresetPanel() {
               key={preset.id}
               preset={preset}
               withPattern={withPattern}
+              withAppearance={withAppearance}
               sendOnLoad={sendOnLoad}
             />
           ))}
@@ -160,10 +170,12 @@ export function PresetPanel() {
 function PresetRow({
   preset,
   withPattern,
+  withAppearance,
   sendOnLoad,
 }: {
   preset: Preset
   withPattern: boolean
+  withAppearance: boolean
   sendOnLoad: boolean
 }) {
   const [renaming, setRenaming] = useState(false)
@@ -191,18 +203,19 @@ function PresetRow({
         <button
           type="button"
           className="preset__main"
-          onClick={() => loadPreset(preset, { withPattern, send: sendOnLoad })}
+          onClick={() => loadPreset(preset, { withPattern, withAppearance, send: sendOnLoad })}
           title="クリックで読み込み"
         >
           <span className="preset__name">{preset.name}</span>
           <span className="preset__meta">
             {preset.pattern && <span className="tag">PTN</span>}
+            {preset.appearance && <span className="tag">SKIN</span>}
             <span className="hint">{formatDate(preset.updatedAt)}</span>
           </span>
         </button>
       )}
       <div className="preset__actions">
-        <button type="button" className="micro-btn" title="現在の状態で上書き" onClick={() => overwritePreset(preset.id, withPattern)}>
+        <button type="button" className="micro-btn" title="現在の状態で上書き" onClick={() => overwritePreset(preset.id, { pattern: withPattern, appearance: withAppearance })}>
           ⤓
         </button>
         <button type="button" className="micro-btn" title="名前を変更" onClick={() => setRenaming(true)}>

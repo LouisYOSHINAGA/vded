@@ -1,4 +1,5 @@
 /** Domain model for a volca drum kit + editor-side sequence data. */
+import type { Appearance } from '../data/appearance'
 
 export const PART_COUNT = 6
 export const LAYER_COUNT = 2
@@ -94,7 +95,7 @@ export interface Pattern {
   steps: Step[][]
 }
 
-/** A saved preset bundles the kit and (optionally) the pattern. */
+/** A saved preset bundles the kit and, optionally, the pattern and the skin. */
 export interface Preset {
   id: string
   name: string
@@ -102,6 +103,8 @@ export interface Preset {
   updatedAt: number
   patch: Patch
   pattern: Pattern | null
+  /** Skin, font and UI scale captured with the preset. */
+  appearance?: Appearance | null
   /** Free-form user note. */
   note?: string
 }

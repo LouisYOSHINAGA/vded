@@ -1,13 +1,17 @@
 import { useEffect, useRef, useState } from 'react'
-import { FONTS, THEMES, ZOOM_STEPS } from '../data/appearance'
-import type { FontId, ThemeId } from '../data/appearance'
+import type { Appearance, ThemeId } from '../data/appearance'
+import { FONTS, SEED_FIELDS, THEMES, THEME_SEEDS, ZOOM_STEPS, seedFor } from '../data/appearance'
 import { setSettings } from '../state/actions'
 import { useAppState } from '../state/store'
+import { isHex } from '../theme/color'
+import type { ThemeSeed } from '../theme/palette'
+import { seedWarnings } from '../theme/palette'
 
-/** Theme / font / scale picker. The choice is stored with the workspace. */
+/** Skin / font / scale picker, including a full editor for a custom palette. */
 export function AppearanceMenu() {
   const appearance = useAppState((s) => s.settings.appearance)
   const [open, setOpen] = useState(false)
+  const [editing, setEditing] = useState(false)
   const root = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -26,11 +30,16 @@ export function AppearanceMenu() {
     }
   }, [open])
 
-  const update = (patch: Partial<typeof appearance>) => {
+  const update = (patch: Partial<Appearance>) => {
     setSettings({ appearance: { ...appearance, ...patch } })
   }
 
-  const current = THEMES.find((theme) => theme.id === appearance.theme) ?? THEMES[0]
+  const updateSeed = (patch: Partial<ThemeSeed>) => {
+    update({ theme: 'custom', custom: { ...appearance.custom, ...patch } })
+  }
+
+  const activeSeed = seedFor(appearance)
+  const swatch = [activeSeed.panel, activeSeed.accent, activeSeed.layer2]
 
   return (
     <div className="appearance" ref={root}>
@@ -43,38 +52,76 @@ export function AppearanceMenu() {
         title="スキン・フォント・表示倍率"
       >
         <span className="appearance__swatch" aria-hidden="true">
-          {current.swatch.map((color) => (
-            <i key={color} style={{ background: color }} />
+          {swatch.map((color, i) => (
+            <i key={i} style={{ background: color }} />
           ))}
         </span>
         Skin
       </button>
 
       {open && (
-        <div className="appearance__pop panel" role="dialog" aria-label="外観設定">
+        <div className={`appearance__pop panel${editing ? ' appearance__pop--wide' : ''}`} role="dialog" aria-label="外観設定">
           <section className="appearance__group">
-            <h3 className="legend">Theme</h3>
-            <div className="appearance__themes">
-              {THEMES.map((theme) => (
-                <button
-                  key={theme.id}
-                  type="button"
-                  className="theme-card"
-                  aria-pressed={theme.id === appearance.theme}
-                  onClick={() => update({ theme: theme.id as ThemeId })}
-                  title={theme.note}
-                >
-                  <span className="theme-card__swatch" aria-hidden="true">
-                    {theme.swatch.map((color) => (
-                      <i key={color} style={{ background: color }} />
-                    ))}
-                  </span>
-                  <span className="theme-card__name">{theme.name}</span>
-                  <span className="theme-card__note hint">{theme.note}</span>
-                </button>
-              ))}
+            <div className="appearance__grouphead">
+              <h3 className="legend">Theme</h3>
+              <button
+                type="button"
+                className={`btn btn--sm${editing ? ' btn--on' : ' btn--ghost'}`}
+                onClick={() => setEditing((value) => !value)}
+              >
+                {editing ? '編集を閉じる' : 'カスタム編集'}
+              </button>
             </div>
+
+            {(['light', 'dark'] as const).map((mode) => (
+              <div key={mode} className="appearance__modegroup">
+                <span className="appearance__modelabel legend">{mode}</span>
+                <div className="appearance__themes">
+                  {THEMES.filter((theme) => theme.mode === mode).map((theme) => {
+                    const seed = THEME_SEEDS[theme.id as Exclude<ThemeId, 'custom'>]
+                    return (
+                      <button
+                        key={theme.id}
+                        type="button"
+                        className="theme-card"
+                        aria-pressed={theme.id === appearance.theme}
+                        onClick={() => update({ theme: theme.id })}
+                        title={theme.note}
+                      >
+                        <span className="theme-card__swatch" aria-hidden="true">
+                          <i style={{ background: seed.panel }} />
+                          <i style={{ background: seed.accent }} />
+                          <i style={{ background: seed.layer2 }} />
+                        </span>
+                        <span className="theme-card__name">{theme.name}</span>
+                        <span className="theme-card__note hint">{theme.note}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
+
+            <button
+              type="button"
+              className="theme-card theme-card--custom"
+              aria-pressed={appearance.theme === 'custom'}
+              onClick={() => {
+                update({ theme: 'custom' })
+                setEditing(true)
+              }}
+            >
+              <span className="theme-card__swatch" aria-hidden="true">
+                <i style={{ background: appearance.custom.panel }} />
+                <i style={{ background: appearance.custom.accent }} />
+                <i style={{ background: appearance.custom.layer2 }} />
+              </span>
+              <span className="theme-card__name">Custom</span>
+              <span className="theme-card__note hint">自分で配色を指定する</span>
+            </button>
           </section>
+
+          {editing && <SkinEditor appearance={appearance} onSeed={updateSeed} onCopyFrom={(seed) => update({ theme: 'custom', custom: seed })} />}
 
           <section className="appearance__group">
             <h3 className="legend">Font</h3>
@@ -86,7 +133,7 @@ export function AppearanceMenu() {
                   className="font-card"
                   data-font-preview={font.id}
                   aria-pressed={font.id === appearance.font}
-                  onClick={() => update({ font: font.id as FontId })}
+                  onClick={() => update({ font: font.id })}
                   title={font.note}
                 >
                   <span className="font-card__name">{font.name}</span>
@@ -115,5 +162,140 @@ export function AppearanceMenu() {
         </div>
       )}
     </div>
+  )
+}
+
+function SkinEditor({
+  appearance,
+  onSeed,
+  onCopyFrom,
+}: {
+  appearance: Appearance
+  onSeed: (patch: Partial<ThemeSeed>) => void
+  onCopyFrom: (seed: ThemeSeed) => void
+}) {
+  const seed = appearance.custom
+  const warnings = seedWarnings(seed)
+
+  return (
+    <section className="appearance__group skin-editor">
+      <div className="appearance__grouphead">
+        <h3 className="legend">Custom palette</h3>
+        <select
+          className="select skin-editor__copy"
+          value=""
+          onChange={(event) => {
+            const id = event.target.value as Exclude<ThemeId, 'custom'>
+            if (id) onCopyFrom({ ...THEME_SEEDS[id], parts: [...THEME_SEEDS[id].parts] })
+            event.currentTarget.value = ''
+          }}
+          title="既存スキンの配色をカスタムに複製します"
+        >
+          <option value="">複製元…</option>
+          {THEMES.map((theme) => (
+            <option key={theme.id} value={theme.id}>
+              {theme.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="segmented skin-editor__mode">
+        {(['light', 'dark'] as const).map((mode) => (
+          <button
+            key={mode}
+            type="button"
+            className="segmented__item"
+            aria-pressed={seed.mode === mode}
+            onClick={() => onSeed({ mode })}
+            title="陰影やホバーの向きが変わります"
+          >
+            {mode}
+          </button>
+        ))}
+      </div>
+
+      <div className="skin-editor__grid">
+        {SEED_FIELDS.map((field) => (
+          <ColorField
+            key={field.key}
+            label={field.label}
+            value={seed[field.key] as string}
+            onChange={(value) => onSeed({ [field.key]: value } as Partial<ThemeSeed>)}
+          />
+        ))}
+      </div>
+
+      <h4 className="legend">Part colours</h4>
+      <div className="skin-editor__grid">
+        {seed.parts.map((color, i) => (
+          <ColorField
+            key={i}
+            label={`Part ${i + 1}`}
+            value={color}
+            onChange={(value) => {
+              const parts = [...seed.parts]
+              parts[i] = value
+              onSeed({ parts })
+            }}
+          />
+        ))}
+      </div>
+
+      {warnings.length > 0 && (
+        <div className="banner banner--warn">
+          <div>
+            {warnings.map((warning) => (
+              <div key={warning}>{warning}</div>
+            ))}
+          </div>
+        </div>
+      )}
+      <p className="hint">
+        ここで指定するのは基準色だけです。ホバーや段差、アクセント上の文字色などは自動で導出されます。
+      </p>
+    </section>
+  )
+}
+
+function ColorField({
+  label,
+  value,
+  onChange,
+}: {
+  label: string
+  value: string
+  onChange: (value: string) => void
+}) {
+  const [draft, setDraft] = useState<string | null>(null)
+
+  return (
+    <label className="color-field">
+      <span className="color-field__label legend">{label}</span>
+      <span className="color-field__controls">
+        <input
+          type="color"
+          className="color-field__swatch"
+          value={value}
+          aria-label={`${label} の色`}
+          onChange={(event) => onChange(event.target.value)}
+        />
+        <input
+          type="text"
+          className="color-field__hex"
+          value={draft ?? value}
+          aria-label={`${label} のカラーコード`}
+          spellCheck={false}
+          onChange={(event) => {
+            setDraft(event.target.value)
+            if (isHex(event.target.value)) {
+              const next = event.target.value.trim()
+              onChange(next.startsWith('#') ? next : `#${next}`)
+            }
+          }}
+          onBlur={() => setDraft(null)}
+        />
+      </span>
+    </label>
   )
 }

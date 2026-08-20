@@ -458,7 +458,12 @@ function newId(): string {
   return `p-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`
 }
 
-export function savePreset(name: string, includePattern: boolean, note = ''): void {
+export interface PresetScope {
+  pattern: boolean
+  appearance: boolean
+}
+
+export function savePreset(name: string, scope: PresetScope, note = ''): void {
   const state = store.get()
   const preset: Preset = {
     id: newId(),
@@ -467,13 +472,14 @@ export function savePreset(name: string, includePattern: boolean, note = ''): vo
     createdAt: Date.now(),
     updatedAt: Date.now(),
     patch: structuredClone(state.patch),
-    pattern: includePattern ? structuredClone(state.pattern) : null,
+    pattern: scope.pattern ? structuredClone(state.pattern) : null,
+    appearance: scope.appearance ? structuredClone(state.settings.appearance) : null,
   }
   store.set((s) => ({ ...s, presets: [preset, ...s.presets] }))
   toast(`プリセット「${preset.name}」を保存しました`)
 }
 
-export function overwritePreset(id: string, includePattern: boolean): void {
+export function overwritePreset(id: string, scope: PresetScope): void {
   const state = store.get()
   store.set((s) => ({
     ...s,
@@ -483,7 +489,10 @@ export function overwritePreset(id: string, includePattern: boolean): void {
             ...preset,
             updatedAt: Date.now(),
             patch: structuredClone(state.patch),
-            pattern: includePattern ? structuredClone(state.pattern) : preset.pattern,
+            pattern: scope.pattern ? structuredClone(state.pattern) : preset.pattern,
+            appearance: scope.appearance
+              ? structuredClone(state.settings.appearance)
+              : preset.appearance,
           }
         : preset,
     ),
@@ -491,12 +500,19 @@ export function overwritePreset(id: string, includePattern: boolean): void {
   toast('プリセットを上書きしました')
 }
 
-export function loadPreset(preset: Preset, options: { withPattern: boolean; send: boolean }): void {
+export function loadPreset(
+  preset: Preset,
+  options: { withPattern: boolean; withAppearance: boolean; send: boolean },
+): void {
   store.set((s) => ({
     ...s,
     patch: structuredClone(preset.patch),
     pattern:
       options.withPattern && preset.pattern ? structuredClone(preset.pattern) : s.pattern,
+    settings:
+      options.withAppearance && preset.appearance
+        ? { ...s.settings, appearance: structuredClone(preset.appearance) }
+        : s.settings,
   }))
   if (options.send) sendAll()
   else toast(`「${preset.name}」を読み込みました（SEND ALL で実機に反映）`, 'warn')
