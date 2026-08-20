@@ -109,6 +109,8 @@ export function buildThemeVars(seed: ThemeSeed): ThemeVars {
     '--c-accent-glow': rgba(accent, dark ? 0.45 : 0.24),
     '--c-layer1': seed.layer1,
     '--c-layer2': seed.layer2,
+    '--c-on-layer1': readableOn(seed.layer1),
+    '--c-on-layer2': readableOn(seed.layer2),
     '--c-danger': seed.danger,
     '--c-warn': seed.warn,
     '--c-ok': seed.ok,

@@ -3,6 +3,7 @@ import { panic, sendAll } from '../state/actions'
 import { useAppState } from '../state/store'
 import { AppearanceMenu } from './AppearanceMenu'
 import { DeviceBar } from './DeviceBar'
+import { ShortcutsMenu } from './ShortcutsMenu'
 
 export function TopBar() {
   const midi = useMidiSnapshot()
@@ -48,6 +49,7 @@ export function TopBar() {
           )}
         </button>
         <AppearanceMenu />
+        <ShortcutsMenu />
         <button
           type="button"
           className="btn btn--danger"

@@ -25,6 +25,7 @@ import { NumberField } from './NumberField'
  * skin editor lets them be reassigned outright.
  */
 const partTint = (part: number) => `var(--c-part-${part + 1})`
+const partInk = (part: number) => `var(--c-on-part-${part + 1})`
 
 function velocityClass(velocity: number): string {
   if (velocity >= 118) return 'step--accent'
@@ -218,7 +219,7 @@ function PartRow({ part, selected, currentStep, onCellDown, onCellEnter }: PartR
         className={`seq-rail${selected ? ' seq-rail--selected' : ''}${audible ? '' : ' seq-rail--silent'}${
           part % 2 === 1 ? ' seq-rail--alt' : ''
         }`}
-        style={{ ['--tint' as string]: tint }}
+        style={{ ['--tint' as string]: tint, ['--tint-ink' as string]: partInk(part) }}
       >
         <button
           type="button"
@@ -268,7 +269,7 @@ function PartRow({ part, selected, currentStep, onCellDown, onCellEnter }: PartR
             className={`step${step.on ? ` step--on ${velocityClass(step.velocity)}` : ''}${
               i % 4 === 0 ? ' step--beat' : ''
             }${i >= length ? ' step--outside' : ''}${i === currentStep ? ' step--now' : ''}`}
-            style={{ ['--tint' as string]: tint }}
+            style={{ ['--tint' as string]: tint, ['--tint-ink' as string]: partInk(part) }}
             aria-label={`PART ${part + 1} step ${i + 1}${step.on ? ` velocity ${step.velocity}` : ' off'}`}
             aria-pressed={step.on}
             onPointerDown={(e) => onCellDown(part, i, e)}
@@ -308,7 +309,7 @@ function VelocityLane({ part }: { part: number }) {
   }
 
   return (
-    <div className="vel-lane" style={{ ['--tint' as string]: partTint(part) }}>
+    <div className="vel-lane" style={{ ['--tint' as string]: partTint(part), ['--tint-ink' as string]: partInk(part) }}>
       <div className="vel-lane__label">
         <span className="legend">Velocity</span>
         <span className="vel-lane__part">{name}</span>

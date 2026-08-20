@@ -1,6 +1,6 @@
 import { ConnectionBanner } from './components/ConnectionBanner'
-import { Footer } from './components/Footer'
 import { FuncPanel } from './components/FuncPanel'
+import { LayerDials } from './components/LayerDials'
 import { LayerMatrix } from './components/LayerMatrix'
 import { MidiMapPanel } from './components/MidiMapPanel'
 import { MonitorPanel } from './components/MonitorPanel'
@@ -18,6 +18,7 @@ import { useAppState, type EditorTab } from './state/store'
 const TABS: { id: EditorTab; label: string }[] = [
   { id: 'part', label: 'Part edit' },
   { id: 'matrix', label: 'All layers' },
+  { id: 'dials', label: 'Dials' },
   { id: 'func', label: 'Func' },
   { id: 'map', label: 'MIDI map' },
 ]
@@ -50,16 +51,18 @@ export function App() {
           </div>
           {tab === 'part' && <PartEditor />}
           {tab === 'matrix' && <LayerMatrix />}
+          {tab === 'dials' && <LayerDials />}
           {tab === 'func' && <FuncPanel />}
           {tab === 'map' && <MidiMapPanel />}
+          {/* Global, and relevant whichever tab is open — so it stays with the
+              sound editors rather than in the library rail. */}
+          <WaveGuidePanel />
         </div>
         <aside className="content__rail">
-          <WaveGuidePanel />
           <PresetPanel />
           <MonitorPanel />
         </aside>
       </main>
-      <Footer />
       <Toast />
     </div>
   )

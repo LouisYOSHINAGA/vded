@@ -7,7 +7,7 @@ import { makeEmptyPattern, makeInitPatch } from './defaults'
 import type { Pattern, Patch, Preset } from './types'
 import { PART_COUNT } from './types'
 
-export type EditorTab = 'part' | 'matrix' | 'func' | 'map'
+export type EditorTab = 'part' | 'matrix' | 'dials' | 'func' | 'map'
 
 export interface TransportState {
   playing: boolean

@@ -95,7 +95,7 @@
   height: 17px;
   border-radius: 3px;
   background: var(--layer-accent);
-  color: var(--c-on-accent);
+  color: var(--layer-ink, var(--c-on-accent));
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 700;
@@ -413,28 +413,33 @@
 
 .waveguide {
   display: flex;
-  flex-direction: column;
-  gap: var(--gap-md);
+  align-items: center;
+  gap: var(--gap-lg);
+  flex-wrap: wrap;
+  padding: 12px 14px;
 }
 
 .waveguide__model {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .waveguide__model .segmented {
-  flex: 1;
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: 1fr;
+  grid-auto-columns: minmax(72px, 1fr);
 }
 
 .waveguide__knobs {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  max-width: 320px;
+  display: flex;
+  gap: 22px;
+}
+
+.waveguide .hint {
+  flex: 1;
+  min-width: 200px;
+  max-width: 460px;
 }
 
 /* ---------------- Presets ---------------- */
@@ -780,4 +785,150 @@ code {
 
 .layer-panel--active {
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--layer-accent) 55%, transparent);
+}
+
+/* ---------------- All layers · dials ---------------- */
+
+.dials {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(430px, 1fr));
+  gap: var(--gap-md);
+}
+
+.dial-part {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--r-md);
+  background: var(--c-body);
+  box-shadow: inset 0 0 0 1px var(--c-line-soft);
+  border-top: 2px solid color-mix(in srgb, var(--tint) 70%, transparent);
+  overflow: hidden;
+}
+
+.dial-part--selected {
+  box-shadow: inset 0 0 0 1px var(--tint);
+  border-top-color: var(--tint);
+}
+
+.dial-part__head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 9px;
+  background: color-mix(in srgb, var(--tint) 8%, transparent);
+  border-bottom: 1px solid var(--c-line-soft);
+}
+
+.dial-part__pick {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 4px;
+  border-radius: var(--r-sm);
+}
+
+.dial-part__pick:hover {
+  background: color-mix(in srgb, var(--tint) 14%, transparent);
+}
+
+.dial-part__num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 19px;
+  height: 19px;
+  border-radius: 3px;
+  background: var(--tint);
+  color: var(--tint-ink);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.dial-part__name {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: calc(var(--track-legend) * 0.6);
+  text-transform: uppercase;
+  color: var(--c-ink);
+}
+
+.dial-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+}
+
+.dial-row + .dial-row {
+  border-top: 1px solid var(--c-line-soft);
+}
+
+.dial-row--part {
+  background: color-mix(in srgb, var(--c-ink) 3%, transparent);
+}
+
+.dial-row--shadowed {
+  opacity: 0.5;
+}
+
+.dial-row__id {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 116px;
+  flex: none;
+  padding: 3px 4px;
+  border-radius: var(--r-sm);
+  text-align: left;
+}
+
+.dial-row__id:not(.dial-row__id--static):hover {
+  background: color-mix(in srgb, var(--layer-accent) 14%, transparent);
+}
+
+.dial-row__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 18px;
+  flex: none;
+  border-radius: 3px;
+  background: var(--layer-accent);
+  color: var(--layer-ink, var(--c-void));
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.dial-row__badge--part {
+  background: var(--c-raise-2);
+  color: var(--c-ink-dim);
+}
+
+.dial-row__source {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: calc(var(--track-legend) * 0.6);
+  text-transform: uppercase;
+  color: var(--c-ink);
+}
+
+.dial-row__source em {
+  font-style: normal;
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--c-ink-faint);
+}
+
+.dial-row__knobs {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
 }

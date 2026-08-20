@@ -164,7 +164,10 @@ function LayerPanel({ partIndex, layerIndex }: { partIndex: number; layerIndex: 
       className={`layer-panel${shadowed ? ' layer-panel--shadowed' : ''}${
         selectedLayer === layerIndex ? ' layer-panel--active' : ''
       }`}
-      style={{ ['--layer-accent' as string]: accent }}
+      style={{
+        ['--layer-accent' as string]: accent,
+        ['--layer-ink' as string]: layerIndex === 0 ? 'var(--c-on-layer1)' : 'var(--c-on-layer2)',
+      }}
     >
       <header className="layer-panel__head">
         <button
