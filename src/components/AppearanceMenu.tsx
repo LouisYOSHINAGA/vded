@@ -123,7 +123,12 @@ export function AppearanceMenu() {
                 type="button"
                 className="theme-card__pick"
                 aria-pressed={appearance.theme === 'custom'}
-                onClick={() => update({ theme: 'custom' })}
+                onClick={() => {
+                  // Selecting Custom on its own would look like nothing
+                  // happened, so open the editor with it.
+                  update({ theme: 'custom' })
+                  setEditing(true)
+                }}
               >
                 <span className="theme-card__swatch" aria-hidden="true">
                   <i style={{ background: appearance.custom.panel }} />
