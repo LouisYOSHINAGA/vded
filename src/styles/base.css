@@ -15,8 +15,8 @@ body {
   background: var(--c-void);
   color: var(--c-ink);
   font-family: var(--font-ui);
-  font-size: 13px;
-  line-height: 1.45;
+  font-size: 14px;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   overscroll-behavior: none;
 }
@@ -60,7 +60,7 @@ button {
 /* ---- shared silkscreen typography ---- */
 
 .legend {
-  font-size: 10.5px;
+  font-size: 11.5px;
   font-weight: 600;
   letter-spacing: var(--track-title);
   text-transform: uppercase;
@@ -73,13 +73,13 @@ button {
 
 .value-readout {
   font-family: var(--font-mono);
-  font-size: 11.5px;
+  font-size: 12.5px;
   font-variant-numeric: tabular-nums;
   color: var(--c-ink);
 }
 
 .hint {
-  font-size: 11.5px;
+  font-size: 12.5px;
   line-height: 1.5;
   color: var(--c-ink-faint);
 }
@@ -102,7 +102,7 @@ button {
 }
 
 .panel__title {
-  font-size: 11.5px;
+  font-size: 12.5px;
   font-weight: 700;
   letter-spacing: calc(var(--track-title) * 1.15);
   text-transform: uppercase;
@@ -141,7 +141,7 @@ button {
   background: linear-gradient(180deg, var(--c-raise-2), var(--c-raise));
   box-shadow: var(--shadow-raise);
   color: var(--c-ink);
-  font-size: 10.5px;
+  font-size: 11.5px;
   font-weight: 700;
   letter-spacing: var(--track-legend);
   text-transform: uppercase;
@@ -194,9 +194,9 @@ button {
 }
 
 .btn--sm {
-  min-height: 21px;
-  padding: 0 7px;
-  font-size: 9px;
+  min-height: 23px;
+  padding: 0 8px;
+  font-size: 10.5px;
 }
 
 .btn--mute-on {
@@ -233,13 +233,13 @@ button {
 .select,
 .text-input,
 .number-input {
-  min-height: 26px;
+  min-height: 27px;
   padding: 0 8px;
   border: 1px solid var(--c-line);
   border-radius: var(--r-md);
   background: var(--c-void);
   color: var(--c-ink);
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .select {
@@ -267,7 +267,7 @@ button {
   background: var(--c-void);
   color: var(--c-ink);
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 13px;
   font-variant-numeric: tabular-nums;
   text-align: center;
   cursor: ns-resize;
@@ -304,8 +304,8 @@ button {
 
 .checkbox input {
   accent-color: var(--c-accent);
-  width: 13px;
-  height: 13px;
+  width: 14px;
+  height: 14px;
 }
 
 /* ---- misc ---- */
@@ -341,7 +341,7 @@ button {
   padding: 2px 6px;
   border-radius: var(--r-sm);
   background: var(--c-raise);
-  font-size: 9.5px;
+  font-size: 10.5px;
   font-weight: 700;
   letter-spacing: var(--track-legend);
   text-transform: uppercase;

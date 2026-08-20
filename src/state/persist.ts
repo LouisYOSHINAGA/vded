@@ -15,7 +15,10 @@ interface Persisted {
   presets: Preset[]
   settings: AppState['settings']
   mixer: AppState['mixer']
-  ui: Pick<AppState['ui'], 'selectedPart' | 'selectedLayer' | 'layerLink' | 'editorTab' | 'showMonitor'>
+  ui: Pick<
+    AppState['ui'],
+    'selectedPart' | 'selectedLayer' | 'layerLink' | 'editorTab' | 'showMonitor' | 'seqRailWidth'
+  >
   transport: Pick<AppState['transport'], 'bpm' | 'swing' | 'gateMs' | 'sendClock'>
 }
 
@@ -60,6 +63,7 @@ function serialize(state: AppState): string {
       layerLink: state.ui.layerLink,
       editorTab: state.ui.editorTab,
       showMonitor: state.ui.showMonitor,
+      seqRailWidth: state.ui.seqRailWidth,
     },
     transport: {
       bpm: state.transport.bpm,
@@ -88,6 +92,7 @@ function persistedSlices(state: AppState): unknown[] {
     state.ui.layerLink,
     state.ui.editorTab,
     state.ui.showMonitor,
+    state.ui.seqRailWidth,
     state.transport.bpm,
     state.transport.swing,
     state.transport.gateMs,

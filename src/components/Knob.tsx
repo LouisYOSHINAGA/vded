@@ -1,4 +1,5 @@
 import { useCallback, useId, useRef, useState } from 'react'
+import { NumberField } from './NumberField'
 
 export interface KnobProps {
   label: string
@@ -16,6 +17,10 @@ export interface KnobProps {
   accent?: string
   disabled?: boolean
   title?: string
+  /** Replace the readout with a field that can also be typed into. */
+  editable?: boolean
+  /** Shown next to an editable readout, e.g. a unit. */
+  unit?: string
 }
 
 const ARC = 270
@@ -49,6 +54,8 @@ export function Knob({
   accent,
   disabled = false,
   title,
+  editable = false,
+  unit,
 }: KnobProps) {
   const px = SIZES[size]
   const [dragging, setDragging] = useState(false)
@@ -166,7 +173,22 @@ export function Knob({
       <span className="knob__label legend" id={`${id}-label`}>
         {label}
       </span>
-      <span className="knob__value value-readout">{readout}</span>
+      {editable ? (
+        <span className="knob__field">
+          <NumberField
+            ariaLabel={label}
+            value={value}
+            min={min}
+            max={max}
+            onChange={onChange}
+            disabled={disabled}
+            className="number-field--knob"
+          />
+          {unit && <span className="knob__unit">{unit}</span>}
+        </span>
+      ) : (
+        <span className="knob__value value-readout">{readout}</span>
+      )}
     </div>
   )
 }

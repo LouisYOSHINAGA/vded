@@ -15,10 +15,16 @@ import { useShortcuts } from './hooks/useShortcuts'
 import { setUi } from './state/actions'
 import { useAppState, type EditorTab } from './state/store'
 
+/*
+ * Tab order follows how often a tab is opened while working: the two sound
+ * editors first, then the overviews, then the things you visit between
+ * sessions (presets) or once during setup (func, MIDI map).
+ */
 const TABS: { id: EditorTab; label: string }[] = [
   { id: 'part', label: 'Part edit' },
   { id: 'matrix', label: 'All layers' },
   { id: 'dials', label: 'Dials' },
+  { id: 'presets', label: 'Presets' },
   { id: 'func', label: 'Func' },
   { id: 'map', label: 'MIDI map' },
 ]
@@ -52,14 +58,16 @@ export function App() {
           {tab === 'part' && <PartEditor />}
           {tab === 'matrix' && <LayerMatrix />}
           {tab === 'dials' && <LayerDials />}
+          {tab === 'presets' && <PresetPanel />}
           {tab === 'func' && <FuncPanel />}
           {tab === 'map' && <MidiMapPanel />}
-          {/* Global, and relevant whichever tab is open — so it stays with the
-              sound editors rather than in the library rail. */}
-          <WaveGuidePanel />
         </div>
+        {/* The rail holds what must stay reachable while editing: the shared
+            resonator every part feeds, and the diagnostic log. The preset
+            library moved to a tab — it is a between-takes activity, not
+            something to keep on screen while tweaking a sound. */}
         <aside className="content__rail">
-          <PresetPanel />
+          <WaveGuidePanel />
           <MonitorPanel />
         </aside>
       </main>

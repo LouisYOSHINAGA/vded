@@ -10,13 +10,13 @@
 }
 
 .part-tabs__item {
-  width: 22px;
-  height: 20px;
+  width: 24px;
+  height: 22px;
   border-radius: 3px;
   background: var(--c-raise);
   color: var(--c-ink-dim);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -102,7 +102,7 @@
 }
 
 .layer-panel__title {
-  font-size: 11px;
+  font-size: 12.5px;
   font-weight: 700;
   letter-spacing: var(--track-title);
   text-transform: uppercase;
@@ -214,8 +214,8 @@
 }
 
 .matrix__th {
-  padding: 5px 6px;
-  font-size: 9.5px;
+  padding: 6px 6px;
+  font-size: 10.5px;
   font-weight: 700;
   letter-spacing: var(--track-legend);
   text-transform: uppercase;
@@ -293,7 +293,7 @@
 }
 
 .matrix__partname {
-  font-size: 11px;
+  font-size: 12.5px;
   font-weight: 600;
   letter-spacing: calc(var(--track-legend) * 0.6);
   text-transform: uppercase;
@@ -368,7 +368,7 @@
   position: relative;
   display: block;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   font-variant-numeric: tabular-nums;
   text-align: center;
   color: var(--c-ink);
@@ -393,14 +393,14 @@
 
 .mini-select {
   width: 100%;
-  min-width: 76px;
-  padding: 3px 4px;
+  min-width: 80px;
+  padding: 4px;
   border: none;
   border-radius: var(--r-sm);
   background: color-mix(in srgb, var(--cell-accent) 14%, var(--c-void));
   box-shadow: inset 0 0 0 1px var(--c-line-soft);
   color: var(--c-ink);
-  font-size: 10px;
+  font-size: 11.5px;
   font-weight: 600;
   letter-spacing: calc(var(--track-legend) * 0.6);
 }
@@ -413,10 +413,9 @@
 
 .waveguide {
   display: flex;
-  align-items: center;
-  gap: var(--gap-lg);
-  flex-wrap: wrap;
-  padding: 12px 14px;
+  flex-direction: column;
+  gap: var(--gap-md);
+  padding: 12px 14px 14px;
 }
 
 .waveguide__model {
@@ -426,20 +425,16 @@
 }
 
 .waveguide__model .segmented {
+  flex: 1;
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: minmax(72px, 1fr);
+  grid-auto-columns: 1fr;
 }
 
 .waveguide__knobs {
-  display: flex;
-  gap: 22px;
-}
-
-.waveguide .hint {
-  flex: 1;
-  min-width: 200px;
-  max-width: 460px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
 }
 
 /* ---------------- Presets ---------------- */
@@ -453,6 +448,7 @@
 .presets__save {
   display: flex;
   gap: 6px;
+  max-width: 460px;
 }
 
 .presets__save .text-input {
@@ -467,19 +463,18 @@
 }
 
 .presets__search {
-  min-height: 24px;
-  font-size: 11px;
+  min-height: 26px;
+  max-width: 460px;
+  font-size: 12px;
 }
 
 .presets__list {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  max-height: 330px;
-  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 5px;
 }
 
 .preset {
@@ -506,7 +501,7 @@
 }
 
 .preset__name {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: calc(var(--track-legend) * 0.6);
   text-transform: uppercase;
@@ -524,7 +519,7 @@
 
 .preset__actions {
   display: flex;
-  gap: 2px;
+  gap: 3px;
   padding-right: 5px;
   opacity: 0;
   transition: opacity 0.12s;
@@ -568,7 +563,7 @@
   max-height: 240px;
   overflow-y: auto;
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .monitor__row {
@@ -623,7 +618,7 @@
 
 .func__heading {
   margin: 0;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: calc(var(--track-title) * 1.15);
   text-transform: uppercase;
@@ -668,14 +663,14 @@
 .ccmap__table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 11px;
+  font-size: 12.5px;
 }
 
 .func__table th,
 .ccmap__table th {
-  padding: 6px 8px;
+  padding: 7px 8px;
   text-align: left;
-  font-size: 9.5px;
+  font-size: 10.5px;
   font-weight: 700;
   letter-spacing: var(--track-legend);
   text-transform: uppercase;
@@ -685,8 +680,8 @@
 
 .func__table td,
 .ccmap__table td {
-  padding: 7px 8px;
-  font-size: 11.5px;
+  padding: 8px;
+  font-size: 12.5px;
   border-bottom: 1px solid var(--c-line-soft);
   vertical-align: top;
   color: var(--c-ink-dim);
@@ -846,7 +841,7 @@ code {
 }
 
 .dial-part__name {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: calc(var(--track-legend) * 0.6);
   text-transform: uppercase;
@@ -911,7 +906,7 @@ code {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  font-size: 10.5px;
+  font-size: 11.5px;
   font-weight: 600;
   letter-spacing: calc(var(--track-legend) * 0.6);
   text-transform: uppercase;
@@ -920,7 +915,7 @@ code {
 
 .dial-row__source em {
   font-style: normal;
-  font-size: 9px;
+  font-size: 10.5px;
   font-weight: 500;
   color: var(--c-ink-faint);
 }

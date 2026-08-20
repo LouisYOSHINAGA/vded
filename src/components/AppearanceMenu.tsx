@@ -11,6 +11,7 @@ import { seedWarnings } from '../theme/palette'
 export function AppearanceMenu() {
   const appearance = useAppState((s) => s.settings.appearance)
   const [open, setOpen] = useState(false)
+  const [pane, setPane] = useState<'theme' | 'text'>('theme')
   const [editing, setEditing] = useState(false)
   const root = useRef<HTMLDivElement>(null)
 
@@ -60,19 +61,34 @@ export function AppearanceMenu() {
       </button>
 
       {open && (
-        <div className={`appearance__pop panel${editing ? ' appearance__pop--wide' : ''}`} role="dialog" aria-label="外観設定">
-          <section className="appearance__group">
-            <div className="appearance__grouphead">
-              <h3 className="legend">Theme</h3>
-              <button
-                type="button"
-                className={`btn btn--sm${editing ? ' btn--on' : ' btn--ghost'}`}
-                onClick={() => setEditing((value) => !value)}
-              >
-                {editing ? '編集を閉じる' : 'カスタム編集'}
-              </button>
-            </div>
+        <div
+          className={`appearance__pop panel${editing && pane === 'theme' ? ' appearance__pop--wide' : ''}`}
+          role="dialog"
+          aria-label="外観設定"
+        >
+          <div className="tabs appearance__tabs" role="tablist">
+            <button
+              type="button"
+              role="tab"
+              className="tabs__item"
+              aria-selected={pane === 'theme'}
+              onClick={() => setPane('theme')}
+            >
+              Theme
+            </button>
+            <button
+              type="button"
+              role="tab"
+              className="tabs__item"
+              aria-selected={pane === 'text'}
+              onClick={() => setPane('text')}
+            >
+              Text
+            </button>
+          </div>
 
+          {pane === 'theme' && (
+          <section className="appearance__group">
             {(['light', 'dark'] as const).map((mode) => (
               <div key={mode} className="appearance__modegroup">
                 <span className="appearance__modelabel legend">{mode}</span>
@@ -102,27 +118,45 @@ export function AppearanceMenu() {
               </div>
             ))}
 
-            <button
-              type="button"
-              className="theme-card theme-card--custom"
-              aria-pressed={appearance.theme === 'custom'}
-              onClick={() => {
-                update({ theme: 'custom' })
-                setEditing(true)
-              }}
-            >
-              <span className="theme-card__swatch" aria-hidden="true">
-                <i style={{ background: appearance.custom.panel }} />
-                <i style={{ background: appearance.custom.accent }} />
-                <i style={{ background: appearance.custom.layer2 }} />
-              </span>
-              <span className="theme-card__name">Custom</span>
-              <span className="theme-card__note hint">自分で配色を指定する</span>
-            </button>
+            <div className="theme-card theme-card--custom" data-active={appearance.theme === 'custom'}>
+              <button
+                type="button"
+                className="theme-card__pick"
+                aria-pressed={appearance.theme === 'custom'}
+                onClick={() => update({ theme: 'custom' })}
+              >
+                <span className="theme-card__swatch" aria-hidden="true">
+                  <i style={{ background: appearance.custom.panel }} />
+                  <i style={{ background: appearance.custom.accent }} />
+                  <i style={{ background: appearance.custom.layer2 }} />
+                </span>
+                <span className="theme-card__name">Custom</span>
+                <span className="theme-card__note hint">自分で配色を指定する</span>
+              </button>
+              <button
+                type="button"
+                className={`btn btn--sm${editing ? ' btn--on' : ' btn--ghost'}`}
+                onClick={() => {
+                  update({ theme: 'custom' })
+                  setEditing((value) => !value)
+                }}
+              >
+                {editing ? '閉じる' : '編集'}
+              </button>
+            </div>
+
+            {editing && (
+              <SkinEditor
+                appearance={appearance}
+                onSeed={updateSeed}
+                onCopyFrom={(seed) => update({ theme: 'custom', custom: seed })}
+              />
+            )}
           </section>
+          )}
 
-          {editing && <SkinEditor appearance={appearance} onSeed={updateSeed} onCopyFrom={(seed) => update({ theme: 'custom', custom: seed })} />}
-
+          {pane === 'text' && (
+          <>
           <section className="appearance__group">
             <h3 className="legend">Font</h3>
             <div className="appearance__fonts">
@@ -159,6 +193,8 @@ export function AppearanceMenu() {
               ))}
             </div>
           </section>
+          </>
+          )}
         </div>
       )}
     </div>

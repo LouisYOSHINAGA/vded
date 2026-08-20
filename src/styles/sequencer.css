@@ -28,14 +28,43 @@
 /* ---------------- grid ---------------- */
 
 .seq-grid {
+  --tools-w: 132px;
   display: grid;
-  grid-template-columns: 178px minmax(0, 1fr) auto;
+  grid-template-columns: var(--rail-w, 216px) minmax(0, 1fr) var(--tools-w);
   gap: 4px 8px;
   align-items: center;
 }
 
 .seq-grid__corner {
-  font-size: 9px;
+  position: relative;
+  font-size: 11px;
+}
+
+/* Splitter between the part rail and the steps. */
+.seq-grid__resizer {
+  position: absolute;
+  top: -5px;
+  bottom: -7px;
+  right: -8px;
+  width: 11px;
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.seq-grid__resizer::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  left: 5px;
+  width: 1px;
+  background: var(--c-line-soft);
+}
+
+.seq-grid__resizer:hover::after,
+.seq-grid__resizer:focus-visible::after {
+  background: var(--c-accent);
+  width: 2px;
 }
 
 .seq-ruler,
@@ -69,7 +98,7 @@
 .seq-ruler__tick {
   text-align: center;
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 10.5px;
   color: var(--c-ink-faint);
   padding-bottom: 2px;
   border-bottom: 1px solid var(--c-line-soft);
@@ -102,7 +131,7 @@
   border-left: 3px solid color-mix(in srgb, var(--tint) 55%, transparent);
 }
 
-.seq-rail--selected {
+.seq-rail.seq-rail--selected {
   background: var(--c-rail-sel);
   box-shadow: inset 0 0 0 1px var(--tint);
   border-left-color: var(--tint);
@@ -126,15 +155,15 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
   flex: none;
   border-radius: 3px;
   background: color-mix(in srgb, var(--tint) 26%, transparent);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tint) 65%, transparent);
   color: var(--tint);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
 }
 
@@ -145,7 +174,7 @@
 }
 
 .seq-rail__name {
-  font-size: 11px;
+  font-size: 12.5px;
   font-weight: 600;
   letter-spacing: calc(var(--track-legend) * 0.6);
   text-transform: uppercase;
@@ -165,13 +194,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 25px;
-  height: 25px;
+  width: 28px;
+  height: 28px;
   border-radius: var(--r-sm);
   background: var(--c-raise);
   box-shadow: var(--shadow-raise);
-  color: var(--c-ink-dim);
-  font-size: 12px;
+  color: var(--c-ink);
+  font-size: 15px;
   font-weight: 700;
   line-height: 1;
   transition: background 0.1s, color 0.1s;
@@ -203,12 +232,27 @@
   transition: background 0.08s, box-shadow 0.08s;
 }
 
-.step--beat {
-  box-shadow: inset 0 0 0 1px var(--c-step-line-beat);
+/*
+ * Beats are separated by a wider gutter rather than a heavier border: the
+ * outline on every fourth pad kept catching the eye as if those steps were in
+ * a different state. Applied to the ruler and the velocity lane too, so the
+ * three rows stay in step.
+ */
+.seq-ruler__tick--beat:not(:first-child),
+.step--beat:not(:first-child),
+.vel-fader--beat:not(:first-child) {
+  margin-left: 9px;
 }
 
+/* Hover marks the pad with an outline; changing its fill hid whether the step
+   was on. */
 .step:hover {
+  box-shadow: inset 0 0 0 2px var(--c-ink-dim);
+}
+
+.step:not(.step--on):hover {
   background: linear-gradient(180deg, var(--c-step-hover), var(--c-step-hover-2));
+  box-shadow: inset 0 0 0 2px var(--c-ink-faint);
 }
 
 .step--outside {
@@ -219,6 +263,10 @@
   background: linear-gradient(180deg, color-mix(in srgb, var(--tint) 88%, white), var(--tint));
   box-shadow: 0 0 calc(10px * var(--glow-strength)) color-mix(in srgb, var(--tint) 40%, transparent),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.step--on:hover {
+  box-shadow: inset 0 0 0 2px var(--tint-ink);
 }
 
 .step--soft {
@@ -265,16 +313,30 @@
 .seq-row__tools {
   display: flex;
   gap: 3px;
+  justify-content: flex-end;
+  padding-left: 7px;
+  border-left: 1px solid var(--c-line-soft);
+}
+
+/* Solid triangles read at 28px where the thin guillemets did not. */
+.seq-row__tools .micro-btn {
+  font-size: 13px;
+}
+
+/* Keeps the velocity lane aligned with the step rows above it. */
+.seq-row__tools--ghost {
+  border-left-color: transparent;
 }
 
 /* ---------------- velocity lane ---------------- */
 
 .vel-lane {
+  --tools-w: 132px;
   margin-top: 14px;
   padding-top: 12px;
   border-top: 1px solid var(--c-line-soft);
   display: grid;
-  grid-template-columns: 178px minmax(0, 1fr) auto;
+  grid-template-columns: var(--rail-w, 216px) minmax(0, 1fr) var(--tools-w);
   gap: 8px;
   align-items: center;
 }
@@ -286,7 +348,7 @@
 }
 
 .vel-lane__part {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: calc(var(--track-legend) * 0.6);
   text-transform: uppercase;
@@ -294,7 +356,7 @@
 }
 
 .vel-lane__label .hint {
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .vel-lane__row {
@@ -318,9 +380,7 @@
   touch-action: none;
 }
 
-.vel-fader--beat {
-  background: color-mix(in srgb, var(--c-ink) 3%, transparent);
-}
+
 
 .vel-fader:hover,
 .vel-fader:focus-visible {
@@ -361,7 +421,7 @@
 
 .vel-fader__value {
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: 11px;
   font-variant-numeric: tabular-nums;
   color: var(--c-ink-dim);
 }
@@ -389,7 +449,7 @@
 @media (max-width: 900px) {
   .seq-grid,
   .vel-lane {
-    grid-template-columns: 138px minmax(0, 1fr) auto;
+    --tools-w: 124px;
   }
   .vel-fader__track {
     height: 76px;

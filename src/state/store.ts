@@ -7,7 +7,7 @@ import { makeEmptyPattern, makeInitPatch } from './defaults'
 import type { Pattern, Patch, Preset } from './types'
 import { PART_COUNT } from './types'
 
-export type EditorTab = 'part' | 'matrix' | 'dials' | 'func' | 'map'
+export type EditorTab = 'part' | 'matrix' | 'dials' | 'presets' | 'func' | 'map'
 
 export interface TransportState {
   playing: boolean
@@ -50,6 +50,8 @@ export interface UiState {
   layerLink: boolean
   editorTab: EditorTab
   showMonitor: boolean
+  /** Width of the sequencer's part rail, in pixels. */
+  seqRailWidth: number
   /** Progress of a running SEND ALL, 0..1, or null when idle. */
   sendAllProgress: number | null
 }
@@ -99,6 +101,7 @@ export function makeInitialState(): AppState {
       layerLink: false,
       editorTab: 'part',
       showMonitor: false,
+      seqRailWidth: 216,
       sendAllProgress: null,
     },
     presets: [],

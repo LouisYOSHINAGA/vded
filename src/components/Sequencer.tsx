@@ -17,6 +17,7 @@ import {
 import { sequencer } from '../sequencer/engine'
 import { store, useAppState } from '../state/store'
 import { MAX_STEPS, PART_COUNT } from '../state/types'
+import { Knob } from './Knob'
 import { NumberField } from './NumberField'
 
 /**
@@ -27,9 +28,20 @@ import { NumberField } from './NumberField'
 const partTint = (part: number) => `var(--c-part-${part + 1})`
 const partInk = (part: number) => `var(--c-on-part-${part + 1})`
 
+/** Velocity a fresh step gets, and the value a double click returns to. */
+const DEFAULT_VELOCITY = 100
+const ACCENT_VELOCITY = 127
+const SOFT_VELOCITY = 70
+
+const DEFAULT_RAIL_WIDTH = 216
+
+function clampRail(width: number): number {
+  return Math.max(120, Math.min(340, Math.round(width)))
+}
+
 function velocityClass(velocity: number): string {
   if (velocity >= 118) return 'step--accent'
-  if (velocity >= 80) return 'step--full'
+  if (velocity >= 85) return 'step--full'
   return 'step--soft'
 }
 
@@ -38,6 +50,7 @@ export function Sequencer() {
   const currentStep = useAppState((s) => s.transport.currentStep)
   const selectedPart = useAppState((s) => s.ui.selectedPart)
   const transport = useAppState((s) => s.transport)
+  const railWidth = useAppState((s) => s.ui.seqRailWidth)
 
   /** Paint mode captured on pointer-down so a drag writes one consistent value. */
   const paint = useRef<{ on: boolean } | null>(null)
@@ -47,7 +60,12 @@ export function Sequencer() {
       const current = store.get().pattern.steps[part][step]
       if (event.shiftKey) {
         // Shift cycles the accent level of an existing step instead of toggling.
-        const next = current.velocity >= 118 ? 96 : current.velocity >= 80 ? 64 : 127
+        const next =
+          current.velocity >= 118
+            ? DEFAULT_VELOCITY
+            : current.velocity >= 85
+              ? SOFT_VELOCITY
+              : ACCENT_VELOCITY
         setStep(part, step, true, next)
         paint.current = null
         return
@@ -83,26 +101,28 @@ export function Sequencer() {
           >
             {transport.playing ? '■ Stop' : '▶ Play'}
           </button>
-          <label className="transport__field" title="テンポ（上下ドラッグ / クリックして入力）">
-            <span className="cluster__label">BPM</span>
-            <NumberField
-              ariaLabel="テンポ BPM"
-              value={transport.bpm}
-              min={20}
-              max={300}
-              onChange={(bpm) => setTransport({ bpm })}
-            />
-          </label>
-          <label className="transport__field" title="偶数ステップを後ろにずらす量 (%)">
-            <span className="cluster__label">Swing</span>
-            <NumberField
-              ariaLabel="スイング (%)"
-              value={transport.swing}
-              min={0}
-              max={75}
-              onChange={(swing) => setTransport({ swing })}
-            />
-          </label>
+          <Knob
+            label="Tempo"
+            size="sm"
+            editable
+            value={transport.bpm}
+            min={20}
+            max={300}
+            defaultValue={120}
+            onChange={(bpm) => setTransport({ bpm })}
+            title="テンポ — ドラッグ、または数値をクリックして入力"
+          />
+          <Knob
+            label="Swing"
+            size="sm"
+            editable
+            value={transport.swing}
+            min={0}
+            max={75}
+            defaultValue={0}
+            onChange={(swing) => setTransport({ swing })}
+            title="偶数ステップを後ろにずらす量 (%)"
+          />
           <label className="transport__field" title="ノートの長さ (ms)">
             <span className="cluster__label">Gate</span>
             <NumberField
@@ -139,8 +159,14 @@ export function Sequencer() {
       </div>
 
       <div className="panel__body sequencer__body">
-        <div className="seq-grid" style={{ ['--steps' as string]: MAX_STEPS }}>
-          <div className="seq-grid__corner legend">Part</div>
+        <div
+          className="seq-grid"
+          style={{ ['--steps' as string]: MAX_STEPS, ['--rail-w' as string]: `${railWidth}px` }}
+        >
+          <div className="seq-grid__corner legend">
+            Part
+            <RailHandle />
+          </div>
           <div className="seq-ruler">
             {Array.from({ length: MAX_STEPS }, (_, i) => (
               <div
@@ -167,7 +193,7 @@ export function Sequencer() {
           ))}
         </div>
 
-        <VelocityLane part={selectedPart} />
+        <VelocityLane part={selectedPart} railWidth={railWidth} />
       </div>
     </section>
   )
@@ -278,16 +304,26 @@ function PartRow({ part, selected, currentStep, onCellDown, onCellEnter }: PartR
         ))}
       </div>
       <div className="seq-row__tools">
-        <button type="button" className="micro-btn" title="1 ステップ左へ" onClick={() => shiftPart(part, -1)}>
-          ‹
+        <button type="button" className="micro-btn" title="パターンを 1 ステップ左へ" onClick={() => shiftPart(part, -1)}>
+          ◀
         </button>
-        <button type="button" className="micro-btn" title="1 ステップ右へ" onClick={() => shiftPart(part, 1)}>
-          ›
+        <button type="button" className="micro-btn" title="パターンを 1 ステップ右へ" onClick={() => shiftPart(part, 1)}>
+          ▶
         </button>
-        <button type="button" className="micro-btn" title="ランダマイズ（FUNC+10 相当）" onClick={() => randomizePattern(part)}>
+        <button
+          type="button"
+          className="micro-btn"
+          title="このパートのステップをランダマイズ（FUNC+10 相当）"
+          onClick={() => randomizePattern(part)}
+        >
           ⚄
         </button>
-        <button type="button" className="micro-btn" title="このパートを消去" onClick={() => clearPartSteps(part)}>
+        <button
+          type="button"
+          className="micro-btn"
+          title="このパートのステップを消去"
+          onClick={() => clearPartSteps(part)}
+        >
           ✕
         </button>
       </div>
@@ -295,7 +331,42 @@ function PartRow({ part, selected, currentStep, onCellDown, onCellEnter }: PartR
   )
 }
 
-function VelocityLane({ part }: { part: number }) {
+/** Drag handle that resizes the part rail; double click restores the default. */
+function RailHandle() {
+  const width = useAppState((s) => s.ui.seqRailWidth)
+  const drag = useRef<{ startX: number; startWidth: number } | null>(null)
+
+  return (
+    <span
+      className="seq-grid__resizer"
+      role="separator"
+      aria-label="パート名欄の幅"
+      aria-orientation="vertical"
+      tabIndex={0}
+      title="ドラッグで幅を調整（ダブルクリックで既定値）"
+      onPointerDown={(e) => {
+        e.preventDefault()
+        e.currentTarget.setPointerCapture(e.pointerId)
+        drag.current = { startX: e.clientX, startWidth: width }
+      }}
+      onPointerMove={(e) => {
+        const state = drag.current
+        if (!state) return
+        setUi({ seqRailWidth: clampRail(state.startWidth + (e.clientX - state.startX)) })
+      }}
+      onPointerUp={() => {
+        drag.current = null
+      }}
+      onDoubleClick={() => setUi({ seqRailWidth: DEFAULT_RAIL_WIDTH })}
+      onKeyDown={(e) => {
+        if (e.key === 'ArrowLeft') setUi({ seqRailWidth: clampRail(width - 8) })
+        if (e.key === 'ArrowRight') setUi({ seqRailWidth: clampRail(width + 8) })
+      }}
+    />
+  )
+}
+
+function VelocityLane({ part, railWidth }: { part: number; railWidth: number }) {
   const steps = useAppState((s) => s.pattern.steps[part])
   const length = useAppState((s) => s.pattern.length)
   const name = useAppState((s) => s.patch.parts[part].name)
@@ -309,11 +380,18 @@ function VelocityLane({ part }: { part: number }) {
   }
 
   return (
-    <div className="vel-lane" style={{ ['--tint' as string]: partTint(part), ['--tint-ink' as string]: partInk(part) }}>
+    <div
+      className="vel-lane"
+      style={{
+        ['--tint' as string]: partTint(part),
+        ['--tint-ink' as string]: partInk(part),
+        ['--rail-w' as string]: `${railWidth}px`,
+      }}
+    >
       <div className="vel-lane__label">
         <span className="legend">Velocity</span>
         <span className="vel-lane__part">{name}</span>
-        <span className="hint">上下ドラッグ · W クリックで 96</span>
+        <span className="hint">上下ドラッグ · W クリックで {DEFAULT_VELOCITY}</span>
       </div>
       <div className="vel-lane__row">
         {steps.map((step, i) => (
@@ -347,7 +425,7 @@ function VelocityLane({ part }: { part: number }) {
             onPointerCancel={() => {
               drag.current = null
             }}
-            onDoubleClick={() => apply(i, 96)}
+            onDoubleClick={() => apply(i, DEFAULT_VELOCITY)}
             onKeyDown={(e) => {
               const delta = e.shiftKey ? 1 : 8
               if (e.key === 'ArrowUp') {
@@ -368,6 +446,7 @@ function VelocityLane({ part }: { part: number }) {
           </div>
         ))}
       </div>
+      <div className="seq-row__tools seq-row__tools--ghost" aria-hidden="true" />
     </div>
   )
 }
