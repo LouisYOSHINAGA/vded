@@ -451,58 +451,60 @@ function VelocityLane({ part, railWidth }: { part: number; railWidth: number }) 
           <div className="seq-beat" key={b}>
             {beat.map((step, j) => {
               const i = b * 4 + j
+              const label = t('seq.velocityAria', { part: part + 1, step: i + 1 })
               return (
-          <div
-            key={i}
-            className={`vel-fader${step.on ? '' : ' vel-fader--off'}${
-              i >= length ? ' vel-fader--outside' : ''
-            }`}
-            role="slider"
-            tabIndex={0}
-            aria-label={t('seq.velocityAria', { part: part + 1, step: i + 1 })}
-            aria-valuemin={1}
-            aria-valuemax={127}
-            aria-valuenow={step.velocity}
-            title={`${t('seq.velocityAria', { part: part + 1, step: i + 1 })}: ${step.velocity}${
-              step.on ? '' : t('seq.velocityOffHint')
-            }`}
-            onPointerDown={(e) => {
-              if (e.button !== 0) return
-              e.preventDefault()
-              e.currentTarget.setPointerCapture(e.pointerId)
-              drag.current = { step: i, startY: e.clientY, startValue: step.velocity }
-            }}
-            onPointerMove={(e) => {
-              const state = drag.current
-              if (!state) return
-              const perUnit = e.shiftKey ? 2.5 : 0.7
-              apply(state.step, state.startValue + (state.startY - e.clientY) / perUnit)
-            }}
-            onPointerUp={() => {
-              drag.current = null
-            }}
-            onPointerCancel={() => {
-              drag.current = null
-            }}
-            onDoubleClick={() => apply(i, DEFAULT_VELOCITY)}
-            onKeyDown={(e) => {
-              const delta = e.shiftKey ? 1 : 8
-              if (e.key === 'ArrowUp') {
-                e.preventDefault()
-                apply(i, step.velocity + delta)
-              } else if (e.key === 'ArrowDown') {
-                e.preventDefault()
-                apply(i, step.velocity - delta)
-              }
-            }}
-          >
-            <div className="vel-fader__track">
-              <span className="vel-fader__fill" style={{ height: `${(step.velocity / 127) * 100}%` }}>
-                <i className="vel-fader__cap" />
-              </span>
-            </div>
-            <span className="vel-fader__value">{step.on ? step.velocity : '–'}</span>
-          </div>
+                <div
+                  key={i}
+                  className={`vel-fader${step.on ? '' : ' vel-fader--off'}${
+                    i >= length ? ' vel-fader--outside' : ''
+                  }`}
+                  role="slider"
+                  tabIndex={0}
+                  aria-label={label}
+                  aria-valuemin={1}
+                  aria-valuemax={127}
+                  aria-valuenow={step.velocity}
+                  title={`${label}: ${step.velocity}${step.on ? '' : t('seq.velocityOffHint')}`}
+                  onPointerDown={(e) => {
+                    if (e.button !== 0) return
+                    e.preventDefault()
+                    e.currentTarget.setPointerCapture(e.pointerId)
+                    drag.current = { step: i, startY: e.clientY, startValue: step.velocity }
+                  }}
+                  onPointerMove={(e) => {
+                    const state = drag.current
+                    if (!state) return
+                    const perUnit = e.shiftKey ? 2.5 : 0.7
+                    apply(state.step, state.startValue + (state.startY - e.clientY) / perUnit)
+                  }}
+                  onPointerUp={() => {
+                    drag.current = null
+                  }}
+                  onPointerCancel={() => {
+                    drag.current = null
+                  }}
+                  onDoubleClick={() => apply(i, DEFAULT_VELOCITY)}
+                  onKeyDown={(e) => {
+                    const delta = e.shiftKey ? 1 : 8
+                    if (e.key === 'ArrowUp') {
+                      e.preventDefault()
+                      apply(i, step.velocity + delta)
+                    } else if (e.key === 'ArrowDown') {
+                      e.preventDefault()
+                      apply(i, step.velocity - delta)
+                    }
+                  }}
+                >
+                  <div className="vel-fader__track">
+                    <span
+                      className="vel-fader__fill"
+                      style={{ height: `${(step.velocity / 127) * 100}%` }}
+                    >
+                      <i className="vel-fader__cap" />
+                    </span>
+                  </div>
+                  <span className="vel-fader__value">{step.on ? step.velocity : '–'}</span>
+                </div>
               )
             })}
           </div>
@@ -524,27 +526,31 @@ function VelocityScaler({ part }: { part: number }) {
   return (
     <div className="vel-scaler">
       <span className="legend">{t('seq.scale')}</span>
-      <input
-        className="vel-scaler__range"
-        type="range"
-        min={0}
-        max={2}
-        step={0.05}
-        value={factor}
-        aria-label={t('seq.scaleAria')}
-        onChange={(e) => setFactor(Number(e.target.value))}
-        onDoubleClick={() => setFactor(1)}
-      />
-      <div className="vel-scaler__row">
-        <span className="vel-scaler__value">×{factor.toFixed(2)}</span>
-        <button
-          type="button"
-          className="btn btn--sm"
-          onClick={() => scaleVelocities(part, factor)}
-          title={t('seq.applyTitle')}
-        >
-          {t('seq.apply')}
-        </button>
+      <div className="vel-scaler__body">
+        {/* Vertical, so the slider runs the same direction as the faders it
+            scales: pushing it up makes the row louder. */}
+        <input
+          className="vel-scaler__range"
+          type="range"
+          min={0}
+          max={2}
+          step={0.05}
+          value={factor}
+          aria-label={t('seq.scaleAria')}
+          onChange={(e) => setFactor(Number(e.target.value))}
+          onDoubleClick={() => setFactor(1)}
+        />
+        <div className="vel-scaler__side">
+          <span className="vel-scaler__value">×{factor.toFixed(2)}</span>
+          <button
+            type="button"
+            className="btn btn--sm"
+            onClick={() => scaleVelocities(part, factor)}
+            title={t('seq.applyTitle')}
+          >
+            {t('seq.apply')}
+          </button>
+        </div>
       </div>
     </div>
   )

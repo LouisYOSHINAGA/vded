@@ -320,17 +320,18 @@
 }
 
 .step--accent::after {
-  /* A bar across a filled pad, not a ring: an outline at this size reads as an
-     empty step. The colour follows whatever contrasts with the part's tint, so
-     the mark is equally clear on a light or a dark skin. */
+  /* A cap along the pad's top edge, matching the cap on a full velocity fader:
+     the pad reads as a meter filled to the top. A bar through the middle read
+     as a strikethrough, which usually means disabled. The colour follows
+     whatever contrasts with the part's tint, so the mark is equally clear on a
+     light or a dark skin. */
   content: "";
   position: absolute;
-  left: 25%;
-  right: 25%;
-  top: 50%;
+  left: 18%;
+  right: 18%;
+  top: 2px;
   height: 3px;
-  border-radius: 1px;
-  transform: translateY(-50%);
+  border-radius: 2px;
   background: color-mix(in srgb, var(--tint-ink) 85%, transparent);
 }
 
@@ -490,27 +491,39 @@
 .vel-scaler {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding-left: 7px;
-  border-left: 1px solid var(--c-line-soft);
+  gap: 5px;
 }
 
-.vel-scaler__range {
-  width: 100%;
-  accent-color: var(--tint);
-  cursor: ew-resize;
-}
-
-.vel-scaler__row {
+.vel-scaler__body {
   display: flex;
   align-items: center;
+  gap: 9px;
+}
+
+/* `writing-mode` is the standard way to stand a range input on end;
+   `appearance: slider-vertical` keeps older engines in line. */
+.vel-scaler__range {
+  writing-mode: vertical-lr;
+  direction: rtl;
+  appearance: slider-vertical;
+  -webkit-appearance: slider-vertical;
+  width: 16px;
+  height: 96px;
+  margin: 0;
+  accent-color: var(--tint);
+  cursor: ns-resize;
+}
+
+.vel-scaler__side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 6px;
 }
 
 .vel-scaler__value {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 13px;
   font-variant-numeric: tabular-nums;
   color: var(--tint);
-  min-width: 44px;
 }
