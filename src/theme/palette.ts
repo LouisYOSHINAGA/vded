@@ -16,10 +16,7 @@ export interface ThemeSeed {
   /** Primary text. */
   ink: string
   accent: string
-  /** Layer 1 defaults to the accent; layer 2 sets the two apart. */
-  layer1: string
-  layer2: string
-  /** One colour per sequencer part, in order. */
+  /** One colour per sequencer part, in order. Layer 2 is derived from it. */
   parts: string[]
   danger: string
   warn: string
@@ -107,20 +104,25 @@ export function buildThemeVars(seed: ThemeSeed): ThemeVars {
     '--c-accent-hot': dark ? lift(accent, 0.22) : lift(accent, 0.13),
     '--c-accent-deep': sink(accent, 0.32),
     '--c-accent-glow': rgba(accent, dark ? 0.45 : 0.24),
-    '--c-layer1': seed.layer1,
-    '--c-layer2': seed.layer2,
-    '--c-on-layer1': readableOn(seed.layer1),
-    '--c-on-layer2': readableOn(seed.layer2),
     '--c-danger': seed.danger,
     '--c-warn': seed.warn,
     '--c-ok': seed.ok,
     '--c-info': seed.info,
   }
 
+  /*
+   * Layer 2 is the part's own colour pulled halfway to a neutral mid-tone.
+   * Giving the layers hues of their own put them in competition with the six
+   * part colours; this way a layer always belongs, visibly, to its part.
+   */
+  const neutral = mix(panel, ink, 0.5)
   const parts: ThemeVars = {}
   seed.parts.slice(0, 6).forEach((color, i) => {
+    const second = mix(color, neutral, 0.5)
     parts[`--c-part-${i + 1}`] = color
     parts[`--c-on-part-${i + 1}`] = readableOn(color)
+    parts[`--c-part-${i + 1}-2`] = second
+    parts[`--c-on-part-${i + 1}-2`] = readableOn(second)
   })
 
   const depth: ThemeVars = dark
@@ -140,7 +142,7 @@ export function buildThemeVars(seed: ThemeSeed): ThemeVars {
   return { ...surfaces, ...inks, ...accents, ...parts, ...depth }
 }
 
-/** True when the seed's own text/background pairing is hard to read. */
+/** Returns translation keys for anything that will be hard to read. */
 export function seedWarnings(seed: ThemeSeed): string[] {
   const warnings: string[] = []
   const contrast = (a: string, b: string) => {
@@ -148,9 +150,9 @@ export function seedWarnings(seed: ThemeSeed): string[] {
     const lb = luminance(b)
     return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05)
   }
-  if (contrast(seed.ink, seed.panel) < 4.5) warnings.push('文字色とパネル色のコントラストが不足しています')
-  if (contrast(seed.accent, seed.panel) < 2) warnings.push('アクセント色がパネルに埋もれています')
-  if (seed.mode === 'dark' && luminance(seed.panel) > 0.35) warnings.push('dark モードですがパネルが明るすぎます')
-  if (seed.mode === 'light' && luminance(seed.panel) < 0.4) warnings.push('light モードですがパネルが暗すぎます')
+  if (contrast(seed.ink, seed.panel) < 4.5) warnings.push('warn.contrast')
+  if (contrast(seed.accent, seed.panel) < 2) warnings.push('warn.accent')
+  if (seed.mode === 'dark' && luminance(seed.panel) > 0.35) warnings.push('warn.darkPanel')
+  if (seed.mode === 'light' && luminance(seed.panel) < 0.4) warnings.push('warn.lightPanel')
   return warnings
 }

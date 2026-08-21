@@ -16,13 +16,14 @@ export type IconName =
   | 'random'
   | 'clear'
   | 'send'
+  | 'refresh'
+  | 'link'
   | 'info'
   | 'waveSine'
   | 'waveSaw'
   | 'waveNoiseHp'
   | 'waveNoiseLp'
   | 'waveNoiseBp'
-  | 'modExp'
   | 'modTri'
   | 'modRandom'
   | 'egAd'
@@ -56,6 +57,18 @@ const PATHS: Record<IconName, JSX.Element> = {
   ),
   clear: <path d="M6.5 6.5 17.5 17.5M17.5 6.5 6.5 17.5" {...STROKE} />,
   send: <path d="M12 19V6m0 0-5 5m5-5 5 5M5 21h14" {...STROKE} />,
+  refresh: (
+    <g>
+      <path d="M20 12a8 8 0 1 1-2.6-5.9" {...STROKE} />
+      <path d="M20 4.5V10h-5.5" {...STROKE} />
+    </g>
+  ),
+  link: (
+    <g>
+      <path d="M10 14a4.5 4.5 0 0 0 6.4 0l2.6-2.6a4.5 4.5 0 0 0-6.4-6.4L11.3 6.3" {...STROKE} />
+      <path d="M14 10a4.5 4.5 0 0 0-6.4 0L5 12.6a4.5 4.5 0 0 0 6.4 6.4l1.3-1.3" {...STROKE} />
+    </g>
+  ),
   info: (
     <g>
       <circle cx="12" cy="12" r="8.5" {...STROKE} />
@@ -70,7 +83,6 @@ const PATHS: Record<IconName, JSX.Element> = {
   waveNoiseHp: <path d="M3 18h5q3 0 4.5-5T18 6h3" {...STROKE} />,
   waveNoiseLp: <path d="M3 6h3q3.5 0 5 5T16 18h5" {...STROKE} />,
   waveNoiseBp: <path d="M3 18h3.5q1.8 0 3-5.5T12 7t2.5 5.5 3 5.5H21" {...STROKE} />,
-  modExp: <path d="M3 18c1.5-9 3.5-11 5.5-8s3.5 8 12.5 8" {...STROKE} />,
   modTri: <path d="M3 15 6 7l4 10 4-10 4 10 2-5" {...STROKE} />,
   modRandom: <path d="M3 14h3.5V8H10v9h3.5v-6H17v4h4" {...STROKE} />,
   egAd: <path d="M3 18 8 5l13 13" {...STROKE} />,
@@ -108,5 +120,5 @@ export const WAVE_ICONS: IconName[] = [
   'waveNoiseLp',
   'waveNoiseBp',
 ]
-export const MOD_ICONS: IconName[] = ['modExp', 'modTri', 'modRandom']
+export const MOD_ICONS: IconName[] = ['egExp', 'modTri', 'modRandom']
 export const EG_ICONS: IconName[] = ['egAd', 'egExp', 'egMulti']

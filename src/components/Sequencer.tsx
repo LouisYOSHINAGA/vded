@@ -1,8 +1,10 @@
-import { useCallback, useRef } from 'react'
+import { useCallback, useRef, useState } from 'react'
+import { useT } from '../i18n'
 import {
   clearAllSteps,
   clearPartSteps,
   randomizePattern,
+  scaleVelocities,
   setPatternLength,
   setStep,
   setStepVelocity,
@@ -22,20 +24,16 @@ import { InfoTip } from './InfoTip'
 import { Knob } from './Knob'
 import { NumberField } from './NumberField'
 
-/**
- * Each part carries its own tint. The six values come from the active skin, so
- * they stay within one family instead of being an arbitrary rainbow — and the
- * skin editor lets them be reassigned outright.
- */
-const partTint = (part: number) => `var(--c-part-${part + 1})`
-const partInk = (part: number) => `var(--c-on-part-${part + 1})`
-
 /** Velocity a fresh step gets, and the value a double click returns to. */
 const DEFAULT_VELOCITY = 100
 const ACCENT_VELOCITY = 127
 const SOFT_VELOCITY = 70
 
 const DEFAULT_RAIL_WIDTH = 216
+
+/** Each part carries its own tint, taken from the active skin. */
+const partTint = (part: number) => `var(--c-part-${part + 1})`
+const partInk = (part: number) => `var(--c-on-part-${part + 1})`
 
 function clampRail(width: number): number {
   return Math.max(120, Math.min(340, Math.round(width)))
@@ -48,6 +46,7 @@ function velocityClass(velocity: number): string {
 }
 
 export function Sequencer() {
+  const t = useT()
   const pattern = useAppState((s) => s.pattern)
   const currentStep = useAppState((s) => s.transport.currentStep)
   const selectedPart = useAppState((s) => s.ui.selectedPart)
@@ -57,28 +56,25 @@ export function Sequencer() {
   /** Paint mode captured on pointer-down so a drag writes one consistent value. */
   const paint = useRef<{ on: boolean } | null>(null)
 
-  const onCellDown = useCallback(
-    (part: number, step: number, event: React.PointerEvent) => {
-      const current = store.get().pattern.steps[part][step]
-      if (event.shiftKey) {
-        // Shift cycles the accent level of an existing step instead of toggling.
-        const next =
-          current.velocity >= 118
-            ? DEFAULT_VELOCITY
-            : current.velocity >= 85
-              ? SOFT_VELOCITY
-              : ACCENT_VELOCITY
-        setStep(part, step, true, next)
-        paint.current = null
-        return
-      }
-      const on = !current.on
-      paint.current = { on }
-      setStep(part, step, on)
-      setUi({ selectedPart: part })
-    },
-    [],
-  )
+  const onCellDown = useCallback((part: number, step: number, event: React.PointerEvent) => {
+    const current = store.get().pattern.steps[part][step]
+    if (event.shiftKey) {
+      // Shift cycles the accent level of an existing step instead of toggling.
+      const next =
+        current.velocity >= 118
+          ? DEFAULT_VELOCITY
+          : current.velocity >= 85
+            ? SOFT_VELOCITY
+            : ACCENT_VELOCITY
+      setStep(part, step, true, next)
+      paint.current = null
+      return
+    }
+    const on = !current.on
+    paint.current = { on }
+    setStep(part, step, on)
+    setUi({ selectedPart: part })
+  }, [])
 
   const onCellEnter = useCallback((part: number, step: number, event: React.PointerEvent) => {
     if (!paint.current || event.buttons === 0) return
@@ -92,21 +88,21 @@ export function Sequencer() {
   return (
     <section className="panel sequencer" onPointerUp={endPaint} onPointerLeave={endPaint}>
       <div className="panel__head">
+        <h2 className="panel__title">{t('seq.title')}</h2>
         <button
           type="button"
           className={`transport__play${transport.playing ? ' transport__play--on' : ''}`}
           onClick={() => sequencer.toggle()}
-          title="再生 / 停止 (Space)"
-          aria-label={transport.playing ? '停止' : '再生'}
+          title={t('seq.playTitle')}
+          aria-label={transport.playing ? t('seq.stop') : t('seq.play')}
         >
           <Icon name={transport.playing ? 'stop' : 'play'} size={19} />
-          {transport.playing ? 'Stop' : 'Play'}
+          {transport.playing ? t('seq.stop') : t('seq.play')}
         </button>
-        <h2 className="panel__title">Step Sequencer</h2>
         <div className="panel__spacer" />
         <div className="transport">
           <Knob
-            label="Tempo"
+            label={t('seq.tempo')}
             size="sm"
             layout="inline"
             editable
@@ -115,10 +111,10 @@ export function Sequencer() {
             max={300}
             defaultValue={120}
             onChange={(bpm) => setTransport({ bpm })}
-            title="テンポ — ドラッグ、または数値をクリックして入力"
+            title={t('seq.tempoTitle')}
           />
           <Knob
-            label="Swing"
+            label={t('seq.swing')}
             size="sm"
             layout="inline"
             editable
@@ -127,22 +123,24 @@ export function Sequencer() {
             max={75}
             defaultValue={0}
             onChange={(swing) => setTransport({ swing })}
-            title="偶数ステップを後ろにずらす量 (%)"
+            title={t('seq.swingTitle')}
           />
-          <label className="transport__field" title="ノートの長さ (ms)">
-            <span className="cluster__label">Gate</span>
+          <Knob
+            label={t('seq.gate')}
+            size="sm"
+            layout="inline"
+            editable
+            value={transport.gateMs}
+            min={1}
+            max={500}
+            defaultValue={20}
+            onChange={(gateMs) => setTransport({ gateMs })}
+            title={t('seq.gateTitle')}
+          />
+          <label className="transport__field" title={t('seq.lengthAria')}>
+            <span className="cluster__label">{t('seq.length')}</span>
             <NumberField
-              ariaLabel="ゲートタイム (ms)"
-              value={transport.gateMs}
-              min={1}
-              max={500}
-              onChange={(gateMs) => setTransport({ gateMs })}
-            />
-          </label>
-          <label className="transport__field" title="パターンの長さ（ステップ数）">
-            <span className="cluster__label">Len</span>
-            <NumberField
-              ariaLabel="パターン長（ステップ数）"
+              ariaLabel={t('seq.lengthAria')}
               value={pattern.length}
               min={1}
               max={MAX_STEPS}
@@ -153,13 +151,18 @@ export function Sequencer() {
             type="button"
             className={`btn btn--sm${transport.sendClock ? ' btn--on' : ' btn--ghost'}`}
             onClick={() => setTransport({ sendClock: !transport.sendClock })}
-            title="MIDI クロックと START/STOP を実機に送る（実機側 MIDI Clock src を Auto に）"
+            title={t('seq.clockTitle')}
           >
-            MIDI Clock
+            {t('seq.clock')}
           </button>
           <MuteAllButton />
-          <button type="button" className="btn btn--ghost btn--sm" onClick={clearAllSteps} title="全パートのステップを消去">
-            Clear
+          <button
+            type="button"
+            className="btn btn--ghost btn--sm"
+            onClick={clearAllSteps}
+            title={t('seq.clearTitle')}
+          >
+            {t('seq.clear')}
           </button>
         </div>
       </div>
@@ -170,7 +173,7 @@ export function Sequencer() {
           style={{ ['--steps' as string]: MAX_STEPS, ['--rail-w' as string]: `${railWidth}px` }}
         >
           <div className="seq-grid__corner legend">
-            Part
+            {t('seq.part')}
             <RailHandle />
           </div>
           <div className="seq-ruler">
@@ -206,6 +209,7 @@ export function Sequencer() {
 }
 
 function MuteAllButton() {
+  const t = useT()
   const allMuted = useAppState((s) => s.mixer.mutes.every(Boolean))
   const anyMuted = useAppState((s) => s.mixer.mutes.some(Boolean))
   const anySolo = useAppState((s) => s.mixer.solos.some(Boolean))
@@ -215,149 +219,17 @@ function MuteAllButton() {
       type="button"
       className={`btn btn--sm${allMuted ? ' btn--mute-on' : ' btn--ghost'}`}
       onClick={toggleMuteAll}
-      title={
-        allMuted
-          ? '全パートのミュートを解除します'
-          : '全パートをミュートします（ソロも解除されます）'
-      }
+      title={allMuted ? t('seq.unmuteAllTitle') : t('seq.muteAllTitle')}
     >
-      {allMuted ? 'Unmute all' : 'Mute all'}
+      {allMuted ? t('seq.unmuteAll') : t('seq.muteAll')}
       {!allMuted && (anyMuted || anySolo) && <span className="btn__dot" aria-hidden="true" />}
     </button>
   )
 }
 
-interface PartRowProps {
-  part: number
-  selected: boolean
-  currentStep: number
-  onCellDown: (part: number, step: number, event: React.PointerEvent) => void
-  onCellEnter: (part: number, step: number, event: React.PointerEvent) => void
-}
-
-function PartRow({ part, selected, currentStep, onCellDown, onCellEnter }: PartRowProps) {
-  const name = useAppState((s) => s.patch.parts[part].name)
-  const steps = useAppState((s) => s.pattern.steps[part])
-  const length = useAppState((s) => s.pattern.length)
-  const muted = useAppState((s) => s.mixer.mutes[part])
-  const solo = useAppState((s) => s.mixer.solos[part])
-  const anySolo = useAppState((s) => s.mixer.solos.some(Boolean))
-  const audible = anySolo ? solo : !muted
-  const tint = partTint(part)
-
-  return (
-    <>
-      <div
-        className={`seq-rail${selected ? ' seq-rail--selected' : ''}${audible ? '' : ' seq-rail--silent'}${
-          part % 2 === 1 ? ' seq-rail--alt' : ''
-        }`}
-        style={{ ['--tint' as string]: tint, ['--tint-ink' as string]: partInk(part) }}
-      >
-        <button
-          type="button"
-          className="seq-rail__select"
-          onClick={() => setUi({ selectedPart: part })}
-          title={`PART ${part + 1} を編集対象にする`}
-        >
-          <span className="seq-rail__num">{part + 1}</span>
-          <span className="seq-rail__name">{name}</span>
-        </button>
-        <div className="seq-rail__buttons">
-          <button
-            type="button"
-            className={`micro-btn${muted ? ' micro-btn--mute' : ''}`}
-            onClick={() => toggleMute(part)}
-            title="ミュート（エディタ内蔵シーケンサのみ）"
-            aria-label="ミュート"
-            aria-pressed={muted}
-          >
-            <Icon name="mute" />
-          </button>
-          <button
-            type="button"
-            className={`micro-btn${solo ? ' micro-btn--solo' : ''}`}
-            onClick={() => toggleSolo(part)}
-            title="ソロ"
-            aria-label="ソロ"
-            aria-pressed={solo}
-          >
-            <Icon name="solo" />
-          </button>
-          <button
-            type="button"
-            className="micro-btn"
-            onPointerDown={() => triggerPart(part)}
-            title="試聴（ノートを 1 発送信）"
-            aria-label="試聴"
-          >
-            <Icon name="trigger" />
-          </button>
-        </div>
-      </div>
-      <div
-        className={`seq-row${part % 2 === 1 ? ' seq-row--alt' : ''}${
-          selected ? ' seq-row--selected' : ''
-        }`}
-      >
-        {steps.map((step, i) => (
-          <button
-            key={i}
-            type="button"
-            className={`step${step.on ? ` step--on ${velocityClass(step.velocity)}` : ''}${
-              i % 4 === 0 ? ' step--beat' : ''
-            }${i >= length ? ' step--outside' : ''}${i === currentStep ? ' step--now' : ''}`}
-            style={{ ['--tint' as string]: tint, ['--tint-ink' as string]: partInk(part) }}
-            aria-label={`PART ${part + 1} step ${i + 1}${step.on ? ` velocity ${step.velocity}` : ' off'}`}
-            aria-pressed={step.on}
-            onPointerDown={(e) => onCellDown(part, i, e)}
-            onPointerEnter={(e) => onCellEnter(part, i, e)}
-          />
-        ))}
-      </div>
-      <div className="seq-row__tools">
-        <button
-          type="button"
-          className="micro-btn"
-          title="パターンを 1 ステップ左へ"
-          aria-label="1 ステップ左へ"
-          onClick={() => shiftPart(part, -1)}
-        >
-          <Icon name="shiftLeft" />
-        </button>
-        <button
-          type="button"
-          className="micro-btn"
-          title="パターンを 1 ステップ右へ"
-          aria-label="1 ステップ右へ"
-          onClick={() => shiftPart(part, 1)}
-        >
-          <Icon name="shiftRight" />
-        </button>
-        <button
-          type="button"
-          className="micro-btn"
-          title="このパートのステップをランダマイズ（FUNC+10 相当）"
-          aria-label="ランダマイズ"
-          onClick={() => randomizePattern(part)}
-        >
-          <Icon name="random" />
-        </button>
-        <button
-          type="button"
-          className="micro-btn"
-          title="このパートのステップを消去"
-          aria-label="ステップを消去"
-          onClick={() => clearPartSteps(part)}
-        >
-          <Icon name="clear" />
-        </button>
-      </div>
-    </>
-  )
-}
-
 /** Drag handle that resizes the part rail; double click restores the default. */
 function RailHandle() {
+  const t = useT()
   const width = useAppState((s) => s.ui.seqRailWidth)
   const drag = useRef<{ startX: number; startWidth: number } | null>(null)
 
@@ -365,10 +237,10 @@ function RailHandle() {
     <span
       className="seq-grid__resizer"
       role="separator"
-      aria-label="パート名欄の幅"
+      aria-label={t('seq.railWidth')}
       aria-orientation="vertical"
       tabIndex={0}
-      title="ドラッグで幅を調整（ダブルクリックで既定値）"
+      title={t('seq.railWidthTitle')}
       onPointerDown={(e) => {
         e.preventDefault()
         e.currentTarget.setPointerCapture(e.pointerId)
@@ -391,7 +263,143 @@ function RailHandle() {
   )
 }
 
+interface PartRowProps {
+  part: number
+  selected: boolean
+  currentStep: number
+  onCellDown: (part: number, step: number, event: React.PointerEvent) => void
+  onCellEnter: (part: number, step: number, event: React.PointerEvent) => void
+}
+
+function PartRow({ part, selected, currentStep, onCellDown, onCellEnter }: PartRowProps) {
+  const t = useT()
+  const name = useAppState((s) => s.patch.parts[part].name)
+  const steps = useAppState((s) => s.pattern.steps[part])
+  const length = useAppState((s) => s.pattern.length)
+  const muted = useAppState((s) => s.mixer.mutes[part])
+  const solo = useAppState((s) => s.mixer.solos[part])
+  const anySolo = useAppState((s) => s.mixer.solos.some(Boolean))
+  const audible = anySolo ? solo : !muted
+  const tintStyle = {
+    ['--tint' as string]: partTint(part),
+    ['--tint-ink' as string]: partInk(part),
+  }
+
+  return (
+    <>
+      <div
+        className={`seq-rail${selected ? ' seq-rail--selected' : ''}${audible ? '' : ' seq-rail--silent'}${
+          part % 2 === 1 ? ' seq-rail--alt' : ''
+        }`}
+        style={tintStyle}
+      >
+        <button
+          type="button"
+          className="seq-rail__select"
+          onClick={() => setUi({ selectedPart: part })}
+          title={t('seq.selectPart', { n: part + 1 })}
+        >
+          <span className="seq-rail__num">{part + 1}</span>
+          <span className="seq-rail__name">{name}</span>
+        </button>
+        <div className="seq-rail__buttons">
+          <button
+            type="button"
+            className={`micro-btn${muted ? ' micro-btn--mute' : ''}`}
+            onClick={() => toggleMute(part)}
+            title={t('seq.muteTitle')}
+            aria-label={t('seq.mute')}
+            aria-pressed={muted}
+          >
+            <Icon name="mute" />
+          </button>
+          <button
+            type="button"
+            className={`micro-btn${solo ? ' micro-btn--solo' : ''}`}
+            onClick={() => toggleSolo(part)}
+            title={t('seq.solo')}
+            aria-label={t('seq.solo')}
+            aria-pressed={solo}
+          >
+            <Icon name="solo" />
+          </button>
+          <button
+            type="button"
+            className="micro-btn"
+            onPointerDown={() => triggerPart(part)}
+            title={t('seq.triggerTitle')}
+            aria-label={t('seq.trigger')}
+          >
+            <Icon name="trigger" />
+          </button>
+        </div>
+      </div>
+      <div
+        className={`seq-row${part % 2 === 1 ? ' seq-row--alt' : ''}${
+          selected ? ' seq-row--selected' : ''
+        }`}
+        style={tintStyle}
+      >
+        {steps.map((step, i) => (
+          <button
+            key={i}
+            type="button"
+            className={`step${step.on ? ` step--on ${velocityClass(step.velocity)}` : ''}${
+              i % 4 === 0 ? ' step--beat' : ''
+            }${i >= length ? ' step--outside' : ''}${i === currentStep ? ' step--now' : ''}`}
+            aria-label={`${t('seq.stepAria', { part: part + 1, step: i + 1 })} ${
+              step.on ? t('seq.stepVelocity', { v: step.velocity }) : t('seq.stepOff')
+            }`}
+            aria-pressed={step.on}
+            onPointerDown={(e) => onCellDown(part, i, e)}
+            onPointerEnter={(e) => onCellEnter(part, i, e)}
+          />
+        ))}
+      </div>
+      <div className="seq-row__tools">
+        <button
+          type="button"
+          className="micro-btn"
+          title={t('seq.shiftLeft')}
+          aria-label={t('seq.shiftLeft')}
+          onClick={() => shiftPart(part, -1)}
+        >
+          <Icon name="shiftLeft" />
+        </button>
+        <button
+          type="button"
+          className="micro-btn"
+          title={t('seq.shiftRight')}
+          aria-label={t('seq.shiftRight')}
+          onClick={() => shiftPart(part, 1)}
+        >
+          <Icon name="shiftRight" />
+        </button>
+        <button
+          type="button"
+          className="micro-btn"
+          title={t('seq.randomize')}
+          aria-label={t('seq.randomize')}
+          onClick={() => randomizePattern(part)}
+        >
+          <Icon name="random" />
+        </button>
+        <button
+          type="button"
+          className="micro-btn"
+          title={t('seq.clearPart')}
+          aria-label={t('seq.clearPart')}
+          onClick={() => clearPartSteps(part)}
+        >
+          <Icon name="clear" />
+        </button>
+      </div>
+    </>
+  )
+}
+
 function VelocityLane({ part, railWidth }: { part: number; railWidth: number }) {
+  const t = useT()
   const steps = useAppState((s) => s.pattern.steps[part])
   const length = useAppState((s) => s.pattern.length)
   const name = useAppState((s) => s.patch.parts[part].name)
@@ -415,10 +423,9 @@ function VelocityLane({ part, railWidth }: { part: number; railWidth: number }) 
     >
       <div className="vel-lane__label">
         <span className="legend">
-          Velocity
-          <InfoTip label="ベロシティの操作方法">
-            上下ドラッグで値を変更、ダブルクリックで {DEFAULT_VELOCITY}。
-            OFF のステップをドラッグすると、その値で ON になります。
+          {t('seq.velocity')}
+          <InfoTip label={t('seq.velocity')} align="right">
+            {t('seq.velocityHelp', { def: DEFAULT_VELOCITY })}
           </InfoTip>
         </span>
         <span className="vel-lane__part">{name}</span>
@@ -432,11 +439,13 @@ function VelocityLane({ part, railWidth }: { part: number; railWidth: number }) 
             }${i % 4 === 0 ? ' vel-fader--beat' : ''}`}
             role="slider"
             tabIndex={0}
-            aria-label={`PART ${part + 1} step ${i + 1} velocity`}
+            aria-label={t('seq.velocityAria', { part: part + 1, step: i + 1 })}
             aria-valuemin={1}
             aria-valuemax={127}
             aria-valuenow={step.velocity}
-            title={`step ${i + 1} — velocity ${step.velocity}${step.on ? '' : '（オフ／ドラッグでオンになります）'}`}
+            title={`${t('seq.velocityAria', { part: part + 1, step: i + 1 })}: ${step.velocity}${
+              step.on ? '' : t('seq.velocityOffHint')
+            }`}
             onPointerDown={(e) => {
               if (e.button !== 0) return
               e.preventDefault()
@@ -476,7 +485,44 @@ function VelocityLane({ part, railWidth }: { part: number; railWidth: number }) 
           </div>
         ))}
       </div>
-      <div className="seq-row__tools seq-row__tools--ghost" aria-hidden="true" />
+      <VelocityScaler part={part} />
+    </div>
+  )
+}
+
+/**
+ * Scales the whole row at once. The factor only lands when Apply is pressed, so
+ * dragging the slider never destroys the shape you already dialled in.
+ */
+function VelocityScaler({ part }: { part: number }) {
+  const t = useT()
+  const [factor, setFactor] = useState(1)
+
+  return (
+    <div className="vel-scaler">
+      <span className="legend">{t('seq.scale')}</span>
+      <input
+        className="vel-scaler__range"
+        type="range"
+        min={0}
+        max={2}
+        step={0.05}
+        value={factor}
+        aria-label={t('seq.scaleAria')}
+        onChange={(e) => setFactor(Number(e.target.value))}
+        onDoubleClick={() => setFactor(1)}
+      />
+      <div className="vel-scaler__row">
+        <span className="vel-scaler__value">×{factor.toFixed(2)}</span>
+        <button
+          type="button"
+          className="btn btn--sm"
+          onClick={() => scaleVelocities(part, factor)}
+          title={t('seq.applyTitle')}
+        >
+          {t('seq.apply')}
+        </button>
+      </div>
     </div>
   )
 }

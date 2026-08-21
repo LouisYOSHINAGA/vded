@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { t } from '../i18n'
 
 export interface NumberFieldProps {
   value: number
@@ -81,7 +82,7 @@ export function NumberField({
       style={{ width: `calc(${width}ch + 20px)` }}
       value={draft ?? value.toFixed(precision)}
       aria-label={ariaLabel}
-      title={title ?? `${ariaLabel}（上下ドラッグ / クリックして入力）`}
+      title={title ?? t('numberField.title', { name: ariaLabel })}
       disabled={disabled}
       onChange={(e) => setDraft(e.target.value)}
       onFocus={() => setDraft(value.toFixed(precision))}

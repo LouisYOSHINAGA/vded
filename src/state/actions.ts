@@ -10,6 +10,7 @@ import {
   type LayerTarget,
   type MidiConfig,
 } from '../midi/ccmap'
+import { t } from '../i18n'
 import { midiEngine } from '../midi/engine'
 import type {
   EgTypeIndex,
@@ -139,7 +140,7 @@ export function initPart(partIndex: number): void {
   const name = store.get().patch.parts[partIndex].name
   store.set((s) => updatePart(s, partIndex, () => makePart(name)))
   sendPart(partIndex, { quiet: true })
-  toast(`PART ${partIndex + 1} を初期化しました`)
+  toast(t('toast.partInit', { part: partIndex + 1 }))
 }
 
 export function copyPart(from: number, to: number): void {
@@ -155,7 +156,7 @@ export function copyPart(from: number, to: number): void {
     return { ...s, patch: { ...s.patch, parts }, pattern: { ...s.pattern, steps } }
   })
   sendPart(to, { quiet: true })
-  toast(`PART ${from + 1} を PART ${to + 1} にコピーしました`)
+  toast(t('toast.partCopied', { from: from + 1, to: to + 1 }))
 }
 
 function randomByte(max = 127): number {
@@ -237,6 +238,22 @@ export function setStepVelocity(partIndex: number, stepIndex: number, velocity: 
     )
     return { ...s, pattern: { ...s.pattern, steps } }
   })
+}
+
+/** Multiplies every velocity in one part, clamped to the MIDI range. */
+export function scaleVelocities(partIndex: number, factor: number): void {
+  store.set((s) => {
+    const steps = s.pattern.steps.map((row, i) =>
+      i === partIndex
+        ? row.map((step) => ({
+            ...step,
+            velocity: Math.max(1, Math.min(127, Math.round(step.velocity * factor))),
+          }))
+        : row,
+    )
+    return { ...s, pattern: { ...s.pattern, steps } }
+  })
+  toast(t('seq.applied', { part: partIndex + 1, f: factor.toFixed(2) }))
 }
 
 export function clearPartSteps(partIndex: number): void {
@@ -345,25 +362,25 @@ export function triggerPart(partIndex: number, velocity = 110): void {
 export function sendAll(): void {
   const state = store.get()
   if (!midiEngine.isConnected) {
-    toast('MIDI 出力が選択されていません', 'error')
+    toast(t('toast.noOutput'), 'error')
     return
   }
   const messages = buildFullDump(state.patch, midiConfig(state))
   midiEngine.sendCcBurst(messages)
   trackProgress(messages.length)
-  toast(`SEND ALL: ${messages.length} 件の CC を送信中…`)
+  toast(t('toast.sendAll', { n: messages.length }))
 }
 
 export function sendPart(partIndex: number, options: { quiet?: boolean } = {}): void {
   const state = store.get()
   if (!midiEngine.isConnected) {
-    if (!options.quiet) toast('MIDI 出力が選択されていません', 'error')
+    if (!options.quiet) toast(t('toast.noOutput'), 'error')
     return
   }
   const messages = buildPartDump(state.patch, midiConfig(state), partIndex)
   midiEngine.sendCcBurst(messages)
   trackProgress(messages.length)
-  if (!options.quiet) toast(`PART ${partIndex + 1}: ${messages.length} 件の CC を送信中…`)
+  if (!options.quiet) toast(t('toast.sendPart', { part: partIndex + 1, n: messages.length }))
 }
 
 export function sendWaveGuide(): void {
@@ -409,13 +426,16 @@ export function panic(): void {
   const wasPlaying = state.transport.playing
   onPanic?.()
   if (!midiEngine.isConnected) {
-    toast('MIDI 出力が選択されていないため、シーケンサの停止のみ行いました', 'warn')
+    toast(t('toast.panicNoOutput'), 'warn')
     return
   }
   const notes = Array.from(new Set(state.mixer.notes))
   midiEngine.panic(channels, notes)
   toast(
-    `PANIC: ${channels.length * notes.length} 件のノートオフを送信${wasPlaying ? '／シーケンサ停止' : ''}`,
+    t('toast.panic', {
+      n: channels.length * notes.length,
+      stopped: wasPlaying ? t('toast.panicStopped') : '',
+    }),
   )
 }
 
@@ -476,7 +496,7 @@ export function savePreset(name: string, scope: PresetScope, note = ''): void {
     appearance: scope.appearance ? structuredClone(state.settings.appearance) : null,
   }
   store.set((s) => ({ ...s, presets: [preset, ...s.presets] }))
-  toast(`プリセット「${preset.name}」を保存しました`)
+  toast(t('toast.presetSaved', { name: preset.name }))
 }
 
 export function overwritePreset(id: string, scope: PresetScope): void {
@@ -497,7 +517,7 @@ export function overwritePreset(id: string, scope: PresetScope): void {
         : preset,
     ),
   }))
-  toast('プリセットを上書きしました')
+  toast(t('toast.presetOverwritten'))
 }
 
 export function loadPreset(
@@ -515,7 +535,7 @@ export function loadPreset(
         : s.settings,
   }))
   if (options.send) sendAll()
-  else toast(`「${preset.name}」を読み込みました（SEND ALL で実機に反映）`, 'warn')
+  else toast(t('toast.presetLoaded', { name: preset.name }), 'warn')
 }
 
 export function renamePreset(id: string, name: string): void {
@@ -540,7 +560,7 @@ export function importPresets(presets: Preset[]): number {
 
 export function resetPatch(): void {
   store.set((s) => ({ ...s, patch: makeInitPatch() }))
-  toast('初期状態に戻しました')
+  toast(t('toast.reset'))
 }
 
 export interface PresetFile {

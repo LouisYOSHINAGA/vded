@@ -1,3 +1,4 @@
+import { useT } from '../i18n'
 import { useMidiSnapshot } from '../hooks/useMidiSnapshot'
 import { panic, sendAll } from '../state/actions'
 import { useAppState } from '../state/store'
@@ -7,6 +8,7 @@ import { Icon } from './Icon'
 import { ShortcutsMenu } from './ShortcutsMenu'
 
 export function TopBar() {
+  const t = useT()
   const midi = useMidiSnapshot()
   const progress = useAppState((s) => s.ui.sendAllProgress)
   const patchName = useAppState((s) => s.patch.name)
@@ -18,16 +20,17 @@ export function TopBar() {
         <span className="brand__mark">
           V<em>DED</em>
         </span>
-        <span className="brand__sub">volca drum editor</span>
+        <span className="brand__sub">{t('app.tagline')}</span>
+        <span className="brand__version">v{__APP_VERSION__}</span>
       </div>
 
       <DeviceBar />
 
       <div className="topbar__spacer" />
 
-      <div className="cluster" title="編集中のプリセット名">
-        <span className="cluster__label">Preset</span>
-        <span className="value-readout" style={{ fontSize: 12 }}>
+      <div className="cluster" title={t('top.presetTitle')}>
+        <span className="cluster__label">{t('top.preset')}</span>
+        <span className="value-readout" style={{ fontSize: 13 }}>
           {patchName || 'UNTITLED'}
         </span>
       </div>
@@ -38,10 +41,10 @@ export function TopBar() {
           className="btn btn--accent send-all"
           disabled={!connected}
           onClick={sendAll}
-          title="現在のすべてのパラメータを CC で実機に送信します（volca drum は音色を送り返せないため、実機を画面に合わせる唯一の手段です）"
+          title={t('top.sendAllTitle')}
         >
           <Icon name="send" size={15} />
-          Send all parameters
+          {t('top.sendAll')}
           {progress != null && (
             <span className="send-all__progress">
               <span className="progress">
@@ -52,13 +55,8 @@ export function TopBar() {
         </button>
         <AppearanceMenu />
         <ShortcutsMenu />
-        <button
-          type="button"
-          className="btn btn--danger"
-          onClick={panic}
-          title="全チャンネルにノートオフを送信"
-        >
-          Panic
+        <button type="button" className="btn btn--danger" onClick={panic} title={t('top.panicTitle')}>
+          {t('top.panic')}
         </button>
       </div>
     </header>

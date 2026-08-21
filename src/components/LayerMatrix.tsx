@@ -10,11 +10,13 @@ import {
 import { useAppState } from '../state/store'
 import type { LayerParamKey, PartParamKey } from '../state/types'
 import { EG_TYPE_NAMES, MOD_TYPE_NAMES, PART_COUNT, WAVE_NAMES } from '../state/types'
+import { useT } from '../i18n'
 import { Icon } from './Icon'
 import { InfoTip } from './InfoTip'
 import { NumCell } from './NumCell'
 
-const LAYER_ACCENT = ['var(--c-layer1)', 'var(--c-layer2)'] as const
+const layerAccent = (part: number, layer: number) =>
+  layer === 0 ? `var(--c-part-${part + 1})` : `var(--c-part-${part + 1}-2)`
 
 const LAYER_COLUMNS: { key: Exclude<LayerParamKey, 'select'>; label: string }[] = [
   { key: 'level', label: 'Lvl' },
@@ -44,24 +46,29 @@ function panFormat(value: number): string {
  * actually doing across its twelve layers.
  */
 export function LayerMatrix() {
+  const t = useT()
   const mode = useAppState((s) => s.settings.mode)
+  const layerLink = useAppState((s) => s.ui.layerLink)
 
   return (
     <section className="panel">
       <div className="panel__head">
-        <h2 className="panel__title">All layers</h2>
-        <InfoTip label="この表の使い方">
-          6 パート × 2 レイヤをまとめて表示します。セルは上下ドラッグ、ダブルクリックで直接入力。
-          L1 / L2 のバッジを押すと、そのレイヤを PART EDIT で開きます。
-        </InfoTip>
+        <h2 className="panel__title">{t('matrix.title')}</h2>
+        <InfoTip label={t('matrix.title')}>{t('matrix.help')}</InfoTip>
+        {layerLink && (
+          <span className="tag tag--accent" title={t('matrix.linked')}>
+            <Icon name="link" size={12} />
+            {t('part.linked')}
+          </span>
+        )}
       </div>
       <div className="panel__body matrix__body">
         <table className="matrix">
           <thead>
             <tr>
-              <th className="matrix__th matrix__th--part">Part</th>
-              <th className="matrix__th">Layer</th>
-              <th className="matrix__th matrix__th--wide">Source</th>
+              <th className="matrix__th matrix__th--part">{t('matrix.part')}</th>
+              <th className="matrix__th">{t('matrix.layer')}</th>
+              <th className="matrix__th matrix__th--wide">{t('part.source')}</th>
               <th className="matrix__th">Mod</th>
               <th className="matrix__th">EG</th>
               {LAYER_COLUMNS.map((column) => (
@@ -70,7 +77,7 @@ export function LayerMatrix() {
                 </th>
               ))}
               {PART_COLUMNS.map((column) => (
-                <th key={column.key} className="matrix__th matrix__th--num matrix__th--part-col">
+                <th key={column.key} className="matrix__th matrix__th--num">
                   {column.label}
                 </th>
               ))}
@@ -79,7 +86,7 @@ export function LayerMatrix() {
           </thead>
           <tbody>
             {Array.from({ length: PART_COUNT }, (_, part) => (
-              <MatrixPart key={part} part={part} mode={mode} />
+              <MatrixPart key={part} part={part} mode={mode} linked={layerLink} />
             ))}
           </tbody>
         </table>
@@ -88,7 +95,16 @@ export function LayerMatrix() {
   )
 }
 
-function MatrixPart({ part, mode }: { part: number; mode: 'split' | 'single' }) {
+function MatrixPart({
+  part,
+  mode,
+  linked,
+}: {
+  part: number
+  mode: 'split' | 'single'
+  linked: boolean
+}) {
+  const t = useT()
   const partData = useAppState((s) => s.patch.parts[part])
   const selected = useAppState((s) => s.ui.selectedPart === part)
 
@@ -96,7 +112,7 @@ function MatrixPart({ part, mode }: { part: number; mode: 'split' | 'single' }) 
     <>
       {[0, 1].map((layerIndex) => {
         const layer = partData.layers[layerIndex]
-        const accent = LAYER_ACCENT[layerIndex]
+        const accent = layerAccent(part, layerIndex)
         const first = layerIndex === 0
         const shadowed = mode === 'single' && layerIndex === 1
         return (
@@ -104,7 +120,7 @@ function MatrixPart({ part, mode }: { part: number; mode: 'split' | 'single' }) 
             key={layerIndex}
             className={`matrix__row${selected ? ' matrix__row--selected' : ''}${
               first ? ' matrix__row--first' : ''
-            }${shadowed ? ' matrix__row--shadowed' : ''}`}
+            }${shadowed ? ' matrix__row--shadowed' : ''}${linked ? ' matrix__row--linked' : ''}`}
           >
             {first && (
               <th className="matrix__part" rowSpan={2} scope="rowgroup">
@@ -115,6 +131,9 @@ function MatrixPart({ part, mode }: { part: number; mode: 'split' | 'single' }) 
               </th>
             )}
             <td className="matrix__layer" style={{ ['--cell-accent' as string]: accent }}>
+              {linked && first && (
+                <span className="matrix__linkmark" title={t('matrix.linked')} aria-hidden="true" />
+              )}
               <button
                 type="button"
                 className="matrix__layerbtn"
@@ -125,7 +144,7 @@ function MatrixPart({ part, mode }: { part: number; mode: 'split' | 'single' }) 
                     editorTab: 'part',
                   })
                 }
-                title={`PART ${part + 1} LAYER ${layerIndex + 1} を PART EDIT で開く`}
+                title={t('matrix.openLayer', { part: part + 1, layer: layerIndex + 1 })}
               >
                 L{layerIndex + 1}
               </button>
@@ -180,7 +199,7 @@ function MatrixPart({ part, mode }: { part: number; mode: 'split' | 'single' }) 
                       title={
                         available
                           ? `PART ${part + 1} ${column.label}`
-                          : `${column.label} は single channel mode では送信できません`
+                          : t('matrix.unavailable', { name: column.label })
                       }
                       onChange={(v) => setPartParam(part, column.key, v)}
                     />
@@ -192,8 +211,8 @@ function MatrixPart({ part, mode }: { part: number; mode: 'split' | 'single' }) 
                 <button
                   type="button"
                   className="micro-btn"
-                  title="試聴"
-                  aria-label="試聴"
+                  title={t('seq.triggerTitle')}
+                  aria-label={t('seq.trigger')}
                   onPointerDown={() => triggerPart(part)}
                 >
                   <Icon name="trigger" />
@@ -201,8 +220,8 @@ function MatrixPart({ part, mode }: { part: number; mode: 'split' | 'single' }) 
                 <button
                   type="button"
                   className="micro-btn"
-                  title="このパートを再送信"
-                  aria-label="このパートを再送信"
+                  title={t('part.sendPartTitle')}
+                  aria-label={t('part.sendPartTitle')}
                   onClick={() => sendPart(part)}
                 >
                   <Icon name="send" />

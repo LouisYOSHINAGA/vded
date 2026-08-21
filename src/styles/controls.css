@@ -153,7 +153,7 @@
   transition: background 0.12s, color 0.12s;
 }
 
-.segmented__item:hover:not(:disabled) {
+.segmented__item:hover:not(:disabled):not([aria-pressed='true']) {
   color: var(--c-ink);
   background: var(--c-panel-2);
 }

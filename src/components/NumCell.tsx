@@ -27,7 +27,7 @@ export function NumCell({
   format,
   ariaLabel,
 }: NumCellProps) {
-  const drag = useRef<{ startY: number; startValue: number } | null>(null)
+  const drag = useRef<{ startX: number; startY: number; startValue: number } | null>(null)
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
@@ -81,13 +81,18 @@ export function NumCell({
         if (disabled || e.button !== 0) return
         e.preventDefault()
         ;(e.target as Element).setPointerCapture(e.pointerId)
-        drag.current = { startY: e.clientY, startValue: value }
+        drag.current = { startX: e.clientX, startY: e.clientY, startValue: value }
       }}
       onPointerMove={(e) => {
         const state = drag.current
         if (!state) return
         const sensitivity = e.shiftKey ? (max - min) / 700 : (max - min) / 140
-        commit(state.startValue + (state.startY - e.clientY) * sensitivity)
+        // The cell reads as a horizontal bar, so accept either direction and
+        // follow whichever axis the pointer has actually travelled furthest on.
+        const dy = state.startY - e.clientY
+        const dx = e.clientX - state.startX
+        const delta = Math.abs(dx) > Math.abs(dy) ? dx : dy
+        commit(state.startValue + delta * sensitivity)
       }}
       onPointerUp={() => {
         drag.current = null

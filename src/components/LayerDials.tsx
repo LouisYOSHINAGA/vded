@@ -13,18 +13,24 @@ import {
 import { useAppState } from '../state/store'
 import type { LayerParamKey, PartParamKey } from '../state/types'
 import { EG_TYPE_NAMES, MOD_TYPE_NAMES, PART_COUNT, WAVE_NAMES } from '../state/types'
+import { useT } from '../i18n'
 import type { IconName } from './Icon'
 import { EG_ICONS, Icon, MOD_ICONS, WAVE_ICONS } from './Icon'
 import { InfoTip } from './InfoTip'
 import { Knob } from './Knob'
 
-const LAYER_KNOBS: { key: Exclude<LayerParamKey, 'select'>; label: string; def: number; bipolar?: boolean }[] = [
-  { key: 'level', label: 'Lvl', def: 100 },
+const LAYER_KNOBS: {
+  key: Exclude<LayerParamKey, 'select'>
+  label: string
+  def: number
+  bipolar?: boolean
+}[] = [
+  { key: 'level', label: 'Level', def: 100 },
   { key: 'pitch', label: 'Pitch', def: 64, bipolar: true },
-  { key: 'egAttack', label: 'Atk', def: 0 },
-  { key: 'egRelease', label: 'Rel', def: 40 },
-  { key: 'modAmount', label: 'M.Amt', def: 0 },
-  { key: 'modRate', label: 'M.Rate', def: 64 },
+  { key: 'egAttack', label: 'Attack', def: 0 },
+  { key: 'egRelease', label: 'Release', def: 40 },
+  { key: 'modAmount', label: 'Mod amt', def: 0 },
+  { key: 'modRate', label: 'Mod rate', def: 64 },
 ]
 
 const PART_KNOBS: { key: PartParamKey; label: string; def: number; bipolar?: boolean }[] = [
@@ -46,14 +52,12 @@ function panFormat(value: number): string {
  * Numbers are precise; dials show the shape of a kit at a glance.
  */
 export function LayerDials() {
+  const t = useT()
   return (
     <section className="panel">
       <div className="panel__head">
-        <h2 className="panel__title">All layers · dials</h2>
-        <InfoTip label="このタブの使い方">
-          6 パート × 2 レイヤをダイヤルで一覧します。正確な数値を読み比べるときは
-          ALL LAYERS タブへ。L1 / L2 のバッジを押すと、そのレイヤを PART EDIT で開きます。
-        </InfoTip>
+        <h2 className="panel__title">{t('dials.title')}</h2>
+        <InfoTip label={t('dials.title')}>{t('dials.help')}</InfoTip>
       </div>
       <div className="panel__body dials">
         {Array.from({ length: PART_COUNT }, (_, part) => (
@@ -65,6 +69,7 @@ export function LayerDials() {
 }
 
 function DialPart({ part }: { part: number }) {
+  const t = useT()
   const data = useAppState((s) => s.patch.parts[part])
   const selected = useAppState((s) => s.ui.selectedPart === part)
   const mode = useAppState((s) => s.settings.mode)
@@ -80,7 +85,7 @@ function DialPart({ part }: { part: number }) {
           type="button"
           className="dial-part__pick"
           onClick={() => setUi({ selectedPart: part })}
-          title={`PART ${part + 1} を編集対象にする`}
+          title={t('seq.selectPart', { n: part + 1 })}
         >
           <span className="dial-part__num">{part + 1}</span>
           <span className="dial-part__name">{data.name}</span>
@@ -91,7 +96,8 @@ function DialPart({ part }: { part: number }) {
 
       {[0, 1].map((layerIndex) => {
         const layer = data.layers[layerIndex]
-        const accent = layerIndex === 0 ? 'var(--c-layer1)' : 'var(--c-layer2)'
+        const accent =
+          layerIndex === 0 ? `var(--c-part-${part + 1})` : `var(--c-part-${part + 1}-2)`
         const shadowed = mode === 'single' && layerIndex === 1
         return (
           <div
@@ -99,7 +105,10 @@ function DialPart({ part }: { part: number }) {
             className={`dial-row${shadowed ? ' dial-row--shadowed' : ''}`}
             style={{
               ['--layer-accent' as string]: accent,
-              ['--layer-ink' as string]: layerIndex === 0 ? 'var(--c-on-layer1)' : 'var(--c-on-layer2)',
+              ['--layer-ink' as string]:
+                layerIndex === 0
+                  ? `var(--c-on-part-${part + 1})`
+                  : `var(--c-on-part-${part + 1}-2)`,
             }}
           >
             <div className="dial-row__id">
@@ -113,7 +122,7 @@ function DialPart({ part }: { part: number }) {
                     editorTab: 'part',
                   })
                 }
-                title="PART EDIT でこのレイヤを開く"
+                title={t('matrix.openLayer', { part: part + 1, layer: layerIndex + 1 })}
               >
                 L{layerIndex + 1}
               </button>
@@ -122,7 +131,7 @@ function DialPart({ part }: { part: number }) {
                   names={WAVE_NAMES}
                   icons={WAVE_ICONS}
                   value={layer.wave}
-                  ariaLabel={`PART ${part + 1} LAYER ${layerIndex + 1} 音源`}
+                  ariaLabel={`PART ${part + 1} LAYER ${layerIndex + 1} source`}
                   onChange={(v) => setLayerSelect(part, layerIndex as 0 | 1, 'wave', v)}
                 />
                 <div className="dial-row__selectpair">
@@ -130,14 +139,14 @@ function DialPart({ part }: { part: number }) {
                     names={MOD_TYPE_NAMES}
                     icons={MOD_ICONS}
                     value={layer.modType}
-                    ariaLabel={`PART ${part + 1} LAYER ${layerIndex + 1} MOD タイプ`}
+                    ariaLabel={`PART ${part + 1} LAYER ${layerIndex + 1} mod type`}
                     onChange={(v) => setLayerSelect(part, layerIndex as 0 | 1, 'modType', v)}
                   />
                   <AxisSelect
                     names={EG_TYPE_NAMES}
                     icons={EG_ICONS}
                     value={layer.egType}
-                    ariaLabel={`PART ${part + 1} LAYER ${layerIndex + 1} AMP EG`}
+                    ariaLabel={`PART ${part + 1} LAYER ${layerIndex + 1} amp EG`}
                     onChange={(v) => setLayerSelect(part, layerIndex as 0 | 1, 'egType', v)}
                   />
                 </div>
@@ -164,10 +173,7 @@ function DialPart({ part }: { part: number }) {
       <div className="dial-row dial-row--part">
         <span className="dial-row__id dial-row__id--static">
           <span className="dial-row__badge dial-row__badge--part">P</span>
-          <span className="dial-row__source">
-            PART
-            <em>レイヤ共通</em>
-          </span>
+          <span className="dial-row__source">{t('dials.part')}</span>
         </span>
         <div className="dial-row__knobs">
           {PART_KNOBS.map((knob) => {
@@ -187,7 +193,7 @@ function DialPart({ part }: { part: number }) {
                 title={
                   available
                     ? `${knob.label} — CC${partCc(midiConfig(), part, knob.key) ?? '—'}`
-                    : `${knob.label} は single channel mode では送信できません`
+                    : t('matrix.unavailable', { name: knob.label })
                 }
               />
             )
@@ -201,6 +207,7 @@ function DialPart({ part }: { part: number }) {
 
 /** Mute / solo / audition / send, in the same order as the sequencer rail. */
 function PartTransport({ part }: { part: number }) {
+  const t = useT()
   const muted = useAppState((s) => s.mixer.mutes[part])
   const solo = useAppState((s) => s.mixer.solos[part])
 
@@ -210,8 +217,8 @@ function PartTransport({ part }: { part: number }) {
         type="button"
         className={`micro-btn${muted ? ' micro-btn--mute' : ''}`}
         onClick={() => toggleMute(part)}
-        title="ミュート"
-        aria-label="ミュート"
+        title={t('seq.muteTitle')}
+        aria-label={t('seq.mute')}
         aria-pressed={muted}
       >
         <Icon name="mute" />
@@ -220,8 +227,8 @@ function PartTransport({ part }: { part: number }) {
         type="button"
         className={`micro-btn${solo ? ' micro-btn--solo' : ''}`}
         onClick={() => toggleSolo(part)}
-        title="ソロ"
-        aria-label="ソロ"
+        title={t('seq.solo')}
+        aria-label={t('seq.solo')}
         aria-pressed={solo}
       >
         <Icon name="solo" />
@@ -230,8 +237,8 @@ function PartTransport({ part }: { part: number }) {
         type="button"
         className="micro-btn"
         onPointerDown={() => triggerPart(part)}
-        title="試聴"
-        aria-label="試聴"
+        title={t('seq.triggerTitle')}
+        aria-label={t('seq.trigger')}
       >
         <Icon name="trigger" />
       </button>
@@ -239,8 +246,8 @@ function PartTransport({ part }: { part: number }) {
         type="button"
         className="micro-btn"
         onClick={() => sendPart(part)}
-        title="このパートを再送信"
-        aria-label="このパートを再送信"
+        title={t('part.sendPartTitle')}
+        aria-label={t('part.sendPartTitle')}
       >
         <Icon name="send" />
       </button>

@@ -40,7 +40,7 @@ export function AppearanceMenu() {
   }
 
   const activeSeed = seedFor(appearance)
-  const swatch = [activeSeed.panel, activeSeed.accent, activeSeed.layer2]
+  const swatch = [activeSeed.panel, activeSeed.accent, activeSeed.parts[3]]
 
   return (
     <div className="appearance" ref={root}>
@@ -107,7 +107,7 @@ export function AppearanceMenu() {
                         <span className="theme-card__swatch" aria-hidden="true">
                           <i style={{ background: seed.panel }} />
                           <i style={{ background: seed.accent }} />
-                          <i style={{ background: seed.layer2 }} />
+                          <i style={{ background: seed.parts[3] }} />
                         </span>
                         <span className="theme-card__name">{theme.name}</span>
                         <span className="theme-card__note hint">{theme.note}</span>
@@ -133,7 +133,7 @@ export function AppearanceMenu() {
                 <span className="theme-card__swatch" aria-hidden="true">
                   <i style={{ background: appearance.custom.panel }} />
                   <i style={{ background: appearance.custom.accent }} />
-                  <i style={{ background: appearance.custom.layer2 }} />
+                  <i style={{ background: appearance.custom.parts[3] }} />
                 </span>
                 <span className="theme-card__name">Custom</span>
                 <span className="theme-card__note hint">自分で配色を指定する</span>

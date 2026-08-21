@@ -4,6 +4,7 @@ import {
   layerCc,
   partCc,
 } from '../midi/ccmap'
+import { useT } from '../i18n'
 import {
   copyPart,
   initPart,
@@ -27,7 +28,11 @@ import { EG_ICONS, Icon, MOD_ICONS, WAVE_ICONS } from './Icon'
 import { Knob } from './Knob'
 import { Segmented } from './Segmented'
 
-const LAYER_ACCENT = ['var(--c-layer1)', 'var(--c-layer2)'] as const
+/** Layer 1 is the part's colour; layer 2 is its muted sibling. */
+const layerAccent = (part: number, layer: number) =>
+  layer === 0 ? `var(--c-part-${part + 1})` : `var(--c-part-${part + 1}-2)`
+const layerInk = (part: number, layer: number) =>
+  layer === 0 ? `var(--c-on-part-${part + 1})` : `var(--c-on-part-${part + 1}-2)`
 
 function panFormat(value: number): string {
   if (value === 64) return 'CTR'
@@ -49,6 +54,7 @@ const KNOBS: {
 ]
 
 export function PartEditor() {
+  const t = useT()
   const partIndex = useAppState((s) => s.ui.selectedPart)
   const part = useAppState((s) => s.patch.parts[s.ui.selectedPart])
   const layerLink = useAppState((s) => s.ui.layerLink)
@@ -58,15 +64,11 @@ export function PartEditor() {
   return (
     <section className="panel part-editor">
       <div className="panel__head">
-        <h2 className="panel__title">Part Edit</h2>
+        <h2 className="panel__title">{t('part.title')}</h2>
         {singleMode && (
           <span className="tag tag--warn">
-            Single ch
-            <InfoTip label="single channel mode の制約">
-              1 つの CC がレイヤ 1 / 2 の両方に効くため、レイヤ別の値を実機へ送ることはできません。
-              画面上ではレイヤ 2 も編集できますが、送信されるのはレイヤ 1 の値です。
-              BIT / FOLD / DRIVE / DRY GAIN も single では制御できません。
-            </InfoTip>
+            {t('part.singleChip')}
+            <InfoTip label={t('part.singleChip')}>{t('part.singleHelp')}</InfoTip>
           </span>
         )}
         <div className="part-tabs">
@@ -78,6 +80,7 @@ export function PartEditor() {
               aria-pressed={i === partIndex}
               onClick={() => setUi({ selectedPart: i })}
               onDoubleClick={() => triggerPart(i)}
+              title={t('seq.selectPart', { n: i + 1 })}
             >
               {i + 1}
             </button>
@@ -88,8 +91,8 @@ export function PartEditor() {
           value={part.name}
           maxLength={14}
           onChange={(e) => setPartName(partIndex, e.target.value)}
-          aria-label="パート名"
-          title="パート名（エディタ内のラベル。実機には送信されません）"
+          aria-label={t('part.nameAria')}
+          title={t('part.nameTitle')}
         />
         <div className="panel__spacer" />
         <button
@@ -97,16 +100,18 @@ export function PartEditor() {
           className={`btn btn--sm${layerLink ? ' btn--on' : ' btn--ghost'}`}
           disabled={singleMode}
           onClick={() => setUi({ layerLink: !layerLink })}
-          title={
-            singleMode
-              ? 'single channel mode では 1 つの CC が両レイヤに効くため、常にリンク状態です'
-              : 'レイヤ 1 と 2 を同時に編集し、L1+2 の CC 1 通で送信します'
-          }
+          title={singleMode ? t('part.linkSingleTitle') : t('part.linkTitle')}
         >
-          Link L1+2
+          <Icon name="link" size={14} />
+          {t('part.link')}
         </button>
-        <button type="button" className="btn btn--ghost btn--sm" onClick={() => initPart(partIndex)} title="このパートを初期化">
-          Init
+        <button
+          type="button"
+          className="btn btn--ghost btn--sm"
+          onClick={() => initPart(partIndex)}
+          title={t('part.initTitle')}
+        >
+          {t('part.init')}
         </button>
         <select
           className="select btn--sm part-editor__copy"
@@ -116,9 +121,9 @@ export function PartEditor() {
             if (!Number.isNaN(to)) copyPart(partIndex, to)
             e.currentTarget.value = ''
           }}
-          title="このパートの音色・パターンを別のパートへコピー（FUNC+7 相当）"
+          title={t('part.copyTitle')}
         >
-          <option value="">Copy to…</option>
+          <option value="">{t('part.copyTo')}</option>
           {Array.from({ length: PART_COUNT }, (_, i) => i)
             .filter((i) => i !== partIndex)
             .map((i) => (
@@ -131,18 +136,25 @@ export function PartEditor() {
           type="button"
           className="btn btn--sm"
           onClick={() => sendPart(partIndex)}
-          title="このパートのパラメータだけを実機に再送信"
+          title={t('part.sendPartTitle')}
         >
           <Icon name="send" size={14} />
-          Send part
+          {t('part.sendPart')}
         </button>
       </div>
 
       <div className="panel__body part-editor__body">
-        <div className="layer-grid">
-          {[0, 1].map((index) => (
-            <LayerPanel key={index} partIndex={partIndex} layerIndex={index as 0 | 1} />
-          ))}
+        <div className={`layer-grid${layerLink ? ' layer-grid--linked' : ''}`}>
+          <LayerPanel partIndex={partIndex} layerIndex={0} />
+          {layerLink && (
+            <div className="layer-link" aria-hidden="true">
+              <span className="layer-link__chip">
+                <Icon name="link" size={15} />
+                {t('part.linked')}
+              </span>
+            </div>
+          )}
+          <LayerPanel partIndex={partIndex} layerIndex={1} />
         </div>
 
         <PartProcessing partIndex={partIndex} />
@@ -152,11 +164,11 @@ export function PartEditor() {
 }
 
 function LayerPanel({ partIndex, layerIndex }: { partIndex: number; layerIndex: 0 | 1 }) {
+  const t = useT()
   const layer = useAppState((s) => s.patch.parts[partIndex].layers[layerIndex])
-  const layerLink = useAppState((s) => s.ui.layerLink)
   const selectedLayer = useAppState((s) => s.ui.selectedLayer)
   const mode = useAppState((s) => s.settings.mode)
-  const accent = LAYER_ACCENT[layerIndex]
+  const accent = layerAccent(partIndex, layerIndex)
   const shadowed = mode === 'single' && layerIndex === 1
   const target = resolveTarget(store.get(), layerIndex)
   const selectValue = encodeSelectFromLayer(layer)
@@ -169,7 +181,7 @@ function LayerPanel({ partIndex, layerIndex }: { partIndex: number; layerIndex: 
       }`}
       style={{
         ['--layer-accent' as string]: accent,
-        ['--layer-ink' as string]: layerIndex === 0 ? 'var(--c-on-layer1)' : 'var(--c-on-layer2)',
+        ['--layer-ink' as string]: layerInk(partIndex, layerIndex),
       }}
     >
       <header className="layer-panel__head">
@@ -178,27 +190,27 @@ function LayerPanel({ partIndex, layerIndex }: { partIndex: number; layerIndex: 
           className="layer-panel__pick"
           aria-pressed={selectedLayer === layerIndex}
           onClick={() => setUi({ selectedLayer: layerIndex })}
-          title="FUNC タブのランダマイズ対象にする"
+          title={t('part.layerPickTitle')}
         >
           <span className="layer-panel__badge">L{layerIndex + 1}</span>
-          <span className="layer-panel__title">Layer {layerIndex + 1}</span>
+          <span className="layer-panel__title">{t('part.layer', { n: layerIndex + 1 })}</span>
         </button>
-        {layerLink && <span className="tag tag--accent">Linked</span>}
-        {shadowed && <span className="tag tag--warn">送信されません</span>}
+        {shadowed && <span className="tag tag--warn">{t('part.notSent')}</span>}
         <div className="panel__spacer" />
         <button
           type="button"
           className="micro-btn"
-          title="このレイヤをランダマイズ（FUNC+9 相当）"
+          title={t('part.randomizeLayer')}
+          aria-label={t('part.randomizeLayer')}
           onClick={() => randomizeLayer(partIndex, layerIndex)}
         >
-          ⚄
+          <Icon name="random" />
         </button>
       </header>
 
       <div className="layer-panel__select">
         <SelectAxis
-          label="Source"
+          label={t('part.source')}
           names={WAVE_NAMES}
           icons={WAVE_ICONS}
           value={layer.wave}
@@ -206,7 +218,7 @@ function LayerPanel({ partIndex, layerIndex }: { partIndex: number; layerIndex: 
           onChange={(v) => setLayerSelect(partIndex, layerIndex, 'wave', v)}
         />
         <SelectAxis
-          label="Mod type"
+          label={t('part.modType')}
           names={MOD_TYPE_NAMES}
           icons={MOD_ICONS}
           value={layer.modType}
@@ -214,7 +226,7 @@ function LayerPanel({ partIndex, layerIndex }: { partIndex: number; layerIndex: 
           onChange={(v) => setLayerSelect(partIndex, layerIndex, 'modType', v)}
         />
         <SelectAxis
-          label="Amp EG"
+          label={t('part.ampEg')}
           names={EG_TYPE_NAMES}
           icons={EG_ICONS}
           value={layer.egType}
@@ -287,6 +299,7 @@ const PROCESSING: { key: PartParamKey; label: string; defaultValue: number; bipo
 ]
 
 function PartProcessing({ partIndex }: { partIndex: number }) {
+  const t = useT()
   const part = useAppState((s) => s.patch.parts[partIndex])
   const mode = useAppState((s) => s.settings.mode)
   const sendQuant = useAppState((s) => s.settings.sendPitchModQuantize)
@@ -295,10 +308,8 @@ function PartProcessing({ partIndex }: { partIndex: number }) {
     <div className="processing">
       <header className="processing__head">
         <span className="legend">
-          Part processing
-          <InfoTip label="パート処理について">
-            レイヤ 1 / 2 共通のパラメータです。実機では EDIT ページの隠しパラメータにあたります。
-          </InfoTip>
+          {t('part.processing')}
+          <InfoTip label={t('part.processing')}>{t('part.processingHelp')}</InfoTip>
         </span>
       </header>
       <div className="processing__knobs">
@@ -317,18 +328,14 @@ function PartProcessing({ partIndex }: { partIndex: number }) {
               title={
                 available
                   ? `${item.label} — CC${partCc(midiConfig(), partIndex, item.key) ?? '—'}`
-                  : `${item.label} は single channel mode では送信できません`
+                  : t('matrix.unavailable', { name: item.label })
               }
             />
           )
         })}
         <label
           className="checkbox processing__quant"
-          title={
-            sendQuant
-              ? 'PITCH MOD QUANT (CC53) を送信します'
-              : '公式チャートに記載のない CC のため、既定では送信しません（MIDI MAP タブで有効化）'
-          }
+          title={sendQuant ? t('part.quantTitle') : t('part.quantOffTitle')}
         >
           <input
             type="checkbox"

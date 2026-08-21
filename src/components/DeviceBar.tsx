@@ -1,52 +1,67 @@
+import { useEffect } from 'react'
+import { useT } from '../i18n'
 import { midiEngine } from '../midi/engine'
 import { useMidiSnapshot } from '../hooks/useMidiSnapshot'
 import { setSettings, setUi } from '../state/actions'
 import { useAppState } from '../state/store'
 import { PART_COUNT } from '../state/types'
+import { Icon } from './Icon'
 import { NumberField } from './NumberField'
 import { Segmented } from './Segmented'
 
-const STATUS_TEXT: Record<string, string> = {
-  unsupported: 'Web MIDI 非対応',
-  idle: 'MIDI 未接続',
-  requesting: '接続中…',
-  ready: 'MIDI 準備完了',
-  denied: 'アクセス拒否',
-  error: 'エラー',
+const STATUS_KEY: Record<string, string> = {
+  unsupported: 'device.unsupported',
+  idle: 'device.statusIdle',
+  requesting: 'device.statusRequesting',
+  ready: 'device.statusReady',
+  denied: 'device.statusDenied',
+  error: 'device.statusError',
 }
 
 /** MIDI port discovery, selection and channel-mode configuration. */
 export function DeviceBar() {
+  const t = useT()
   const midi = useMidiSnapshot()
   const mode = useAppState((s) => s.settings.mode)
   const baseChannel = useAppState((s) => s.settings.baseChannel)
 
+  // Ask for MIDI as soon as the editor opens: the port list is the first thing
+  // anyone needs, and it cannot be enumerated before permission is granted.
+  useEffect(() => {
+    void midiEngine.connect()
+  }, [])
+
   const selected = midi.outputs.find((p) => p.id === midi.outputId) ?? null
   const connected = Boolean(selected)
+  const ready = midi.status === 'ready'
   const maxBase = mode === 'split' ? 16 - PART_COUNT + 1 : 16
   const channelHint =
     mode === 'split'
-      ? `CH ${baseChannel}–${baseChannel + PART_COUNT - 1} → PART 1–6`
-      : `CH ${baseChannel} → 全パート共通`
+      ? t('mode.splitHint', { from: baseChannel, to: baseChannel + PART_COUNT - 1 })
+      : t('mode.singleHint', { ch: baseChannel })
 
   return (
     <>
       <div className="cluster device">
-        <span className="cluster__label">Device</span>
+        <span className="cluster__label">{t('device.label')}</span>
         <span
           className={`led ${connected ? (selected?.isVolcaDrum ? 'led--on' : 'led--warn') : ''}`}
-          title={STATUS_TEXT[midi.status] ?? midi.status}
+          title={t(STATUS_KEY[midi.status] ?? 'device.statusError')}
         />
-        {midi.status === 'ready' ? (
-          <>
-            <select
-              className="select device__select"
-              value={midi.outputId ?? ''}
-              onChange={(e) => midiEngine.selectOutput(e.target.value || null)}
-              aria-label="MIDI 出力デバイス"
-              title="MIDI OUT — volca drum を接続したポート"
-            >
-              <option value="">— MIDI OUT を選択 —</option>
+        <select
+          className="select device__select"
+          value={midi.outputId ?? ''}
+          disabled={midi.status === 'unsupported'}
+          onChange={(e) => midiEngine.selectOutput(e.target.value || null)}
+          onPointerDown={() => {
+            if (!ready) void midiEngine.connect()
+          }}
+          aria-label={t('device.outputAria')}
+          title={t('device.outputTitle')}
+        >
+          {ready ? (
+            <>
+              <option value="">{t('device.chooseOutput')}</option>
               {midi.outputs.map((port) => (
                 <option key={port.id} value={port.id}>
                   {port.isVolcaDrum ? '★ ' : ''}
@@ -54,49 +69,46 @@ export function DeviceBar() {
                   {port.manufacturer ? ` (${port.manufacturer})` : ''}
                 </option>
               ))}
-            </select>
-            <select
-              className="select device__select device__select--in"
-              value={midi.inputId ?? ''}
-              onChange={(e) => midiEngine.selectInput(e.target.value || null)}
-              aria-label="MIDI 入力デバイス"
-              title="MIDI IN — モニタ用（volca drum は送信しません）"
-            >
-              <option value="">IN: なし</option>
-              {midi.inputs.map((port) => (
-                <option key={port.id} value={port.id}>
-                  IN: {port.name}
-                </option>
-              ))}
-            </select>
-            <button
-              type="button"
-              className="btn btn--ghost btn--sm"
-              onClick={() => midiEngine.refreshPorts(true)}
-              title="ポートを再スキャン"
-            >
-              ⟳
-            </button>
-          </>
-        ) : (
-          <button
-            type="button"
-            className="btn btn--accent btn--sm"
-            disabled={midi.status === 'unsupported' || midi.status === 'requesting'}
-            onClick={() => void midiEngine.connect()}
-          >
-            {midi.status === 'unsupported' ? 'Web MIDI 非対応' : 'MIDI に接続'}
-          </button>
-        )}
+            </>
+          ) : (
+            <option value="">
+              {midi.status === 'unsupported' ? t('device.unsupported') : t('device.connectHint')}
+            </option>
+          )}
+        </select>
+        <select
+          className="select device__select device__select--in"
+          value={midi.inputId ?? ''}
+          disabled={!ready}
+          onChange={(e) => midiEngine.selectInput(e.target.value || null)}
+          aria-label={t('device.inputAria')}
+          title={t('device.inputTitle')}
+        >
+          <option value="">{t('device.inputNone')}</option>
+          {midi.inputs.map((port) => (
+            <option key={port.id} value={port.id}>
+              IN: {port.name}
+            </option>
+          ))}
+        </select>
+        <button
+          type="button"
+          className="btn btn--ghost device__rescan"
+          onClick={() => (ready ? midiEngine.refreshPorts(true) : void midiEngine.connect())}
+          title={t('device.rescan')}
+          aria-label={t('device.rescan')}
+        >
+          <Icon name="refresh" size={17} />
+        </button>
       </div>
 
       <div className="cluster">
-        <span className="cluster__label">Mode</span>
+        <span className="cluster__label">{t('mode.label')}</span>
         <Segmented
-          ariaLabel="MIDI チャンネルモード"
+          ariaLabel={t('mode.aria')}
           options={[
-            { value: 'split', label: 'Split', title: 'パート 1–6 をチャンネル 1–6 で個別制御（推奨・工場出荷時）' },
-            { value: 'single', label: 'Single', title: '全パートを 1 チャンネルで制御。レイヤ別・BIT/FOLD/DRIVE/GAIN は不可' },
+            { value: 'split', label: 'Split', title: t('mode.splitTitle') },
+            { value: 'single', label: 'Single', title: t('mode.singleTitle') },
           ]}
           value={mode}
           onChange={(next) => {
@@ -108,7 +120,7 @@ export function DeviceBar() {
         <label className="row" style={{ gap: 4 }}>
           <span className="cluster__label">CH</span>
           <NumberField
-            ariaLabel="ベース MIDI チャンネル"
+            ariaLabel={t('mode.channelAria')}
             value={baseChannel}
             min={1}
             max={maxBase}

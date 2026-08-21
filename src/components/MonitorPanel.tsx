@@ -1,3 +1,4 @@
+import { useT } from '../i18n'
 import { midiEngine } from '../midi/engine'
 import { useMidiSnapshot } from '../hooks/useMidiSnapshot'
 import { setUi } from '../state/actions'
@@ -5,20 +6,32 @@ import { useAppState } from '../state/store'
 
 /** Live view of what actually leaves (and enters) the MIDI port. */
 export function MonitorPanel() {
+  const t = useT()
   const midi = useMidiSnapshot()
   const open = useAppState((s) => s.ui.showMonitor)
 
   return (
     <section className="panel">
       <div className="panel__head">
-        <h2 className="panel__title">MIDI monitor</h2>
-        {midi.queued > 0 && <span className="tag tag--accent">queue {midi.queued}</span>}
+        <h2 className="panel__title">{t('monitor.title')}</h2>
+        {midi.queued > 0 && (
+          <span className="tag tag--accent">{t('monitor.queue', { n: midi.queued })}</span>
+        )}
         <div className="panel__spacer" />
-        <button type="button" className="btn btn--ghost btn--sm" onClick={() => midiEngine.clearLog()} disabled={midi.log.length === 0}>
-          Clear
+        <button
+          type="button"
+          className="btn btn--ghost btn--sm"
+          onClick={() => midiEngine.clearLog()}
+          disabled={midi.log.length === 0}
+        >
+          {t('monitor.clear')}
         </button>
-        <button type="button" className="btn btn--ghost btn--sm" onClick={() => setUi({ showMonitor: !open })}>
-          {open ? 'Hide' : 'Show'}
+        <button
+          type="button"
+          className="btn btn--ghost btn--sm"
+          onClick={() => setUi({ showMonitor: !open })}
+        >
+          {open ? t('monitor.hide') : t('monitor.show')}
         </button>
       </div>
       {open && (
@@ -32,7 +45,9 @@ export function MonitorPanel() {
                 {entry.detail && <span className="monitor__detail">{entry.detail}</span>}
               </li>
             ))}
-            {midi.log.length === 0 && <li className="hint monitor__empty">まだ送受信はありません。</li>}
+            {midi.log.length === 0 && (
+              <li className="hint monitor__empty">{t('monitor.empty')}</li>
+            )}
           </ul>
         </div>
       )}

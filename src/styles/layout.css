@@ -48,6 +48,15 @@
   color: var(--c-accent);
 }
 
+.brand__version {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--c-ink-faint);
+  padding: 1px 5px;
+  border-radius: var(--r-sm);
+  background: color-mix(in srgb, var(--c-ink) 7%, transparent);
+}
+
 .brand__sub {
   font-size: 10px;
   font-weight: 600;
@@ -252,8 +261,14 @@
 
 .device__select {
   max-width: 210px;
-  min-height: 24px;
-  font-size: 11px;
+  min-height: 26px;
+  font-size: 12px;
+}
+
+.device__rescan {
+  width: 30px;
+  min-height: 26px;
+  padding: 0;
 }
 
 .device__select--in {

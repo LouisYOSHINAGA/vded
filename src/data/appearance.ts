@@ -1,3 +1,5 @@
+import type { Lang } from '../i18n'
+import { detectLang } from '../i18n'
 import type { ThemeSeed } from '../theme/palette'
 
 export type ThemeId =
@@ -14,6 +16,7 @@ export type FontId = 'default' | 'mono' | 'system' | 'condensed' | 'serif'
 export interface Appearance {
   theme: ThemeId
   font: FontId
+  lang: Lang
   /** UI scale multiplier, 1 = 100%. */
   zoom: number
   /** Edited by the skin editor; used when `theme` is 'custom'. */
@@ -35,8 +38,6 @@ export const THEME_SEEDS: Record<Exclude<ThemeId, 'custom'>, ThemeSeed> = {
     panel: '#f6f4ef',
     ink: '#23211d',
     accent: '#cf421c',
-    layer1: '#cf421c',
-    layer2: '#a9761a',
     parts: ['#cf421c', '#b8741a', '#6f8420', '#1f8272', '#2a6ba3', '#7a4fa3'],
     ...LIGHT_SEMANTICS,
   },
@@ -46,8 +47,6 @@ export const THEME_SEEDS: Record<Exclude<ThemeId, 'custom'>, ThemeSeed> = {
     panel: '#f5f7f9',
     ink: '#1c2126',
     accent: '#3f5ecd',
-    layer1: '#3f5ecd',
-    layer2: '#1f8a72',
     parts: ['#3f5ecd', '#1f7fae', '#1c8a72', '#7f8a1e', '#c06a17', '#a03f8f'],
     ...LIGHT_SEMANTICS,
   },
@@ -57,8 +56,6 @@ export const THEME_SEEDS: Record<Exclude<ThemeId, 'custom'>, ThemeSeed> = {
     panel: '#ffffff',
     ink: '#1a1c1b',
     accent: '#0f8a86',
-    layer1: '#0f8a86',
-    layer2: '#b0621f',
     parts: ['#0f8a86', '#2f74bb', '#6a56c0', '#b0491f', '#a8781a', '#5e8f22'],
     ...LIGHT_SEMANTICS,
   },
@@ -68,8 +65,6 @@ export const THEME_SEEDS: Record<Exclude<ThemeId, 'custom'>, ThemeSeed> = {
     panel: '#191b1e',
     ink: '#e7e3dc',
     accent: '#e8552f',
-    layer1: '#e8552f',
-    layer2: '#d8952f',
     parts: ['#ef6038', '#eda23c', '#c3cc57', '#57c9a2', '#59a6e0', '#ab8ae0'],
     ...DARK_SEMANTICS,
   },
@@ -79,8 +74,6 @@ export const THEME_SEEDS: Record<Exclude<ThemeId, 'custom'>, ThemeSeed> = {
     panel: '#16181a',
     ink: '#e6e6e4',
     accent: '#eda12a',
-    layer1: '#eda12a',
-    layer2: '#9aa6ad',
     parts: ['#eda12a', '#d9c04a', '#9ac36a', '#5cbfa8', '#6ca8cf', '#b394d4'],
     ...DARK_SEMANTICS,
   },
@@ -90,8 +83,6 @@ export const THEME_SEEDS: Record<Exclude<ThemeId, 'custom'>, ThemeSeed> = {
     panel: '#121924',
     ink: '#dfe9f4',
     accent: '#3fb6e6',
-    layer1: '#3fb6e6',
-    layer2: '#7d92e0',
     parts: ['#45b8e8', '#5ad0c0', '#7fd47a', '#e0c257', '#e88f5a', '#a48ae8'],
     ...DARK_SEMANTICS,
   },
@@ -100,6 +91,7 @@ export const THEME_SEEDS: Record<Exclude<ThemeId, 'custom'>, ThemeSeed> = {
 export const DEFAULT_APPEARANCE: Appearance = {
   theme: 'paper',
   font: 'default',
+  lang: detectLang(),
   zoom: 1,
   custom: { ...THEME_SEEDS.paper, parts: [...THEME_SEEDS.paper.parts] },
 }
@@ -141,12 +133,10 @@ export const FONTS: FontInfo[] = [
 
 export const ZOOM_STEPS = [0.7, 0.8, 0.9, 1, 1.1, 1.25] as const
 
-/** Labels for the editable seed fields, in the order the editor shows them. */
+/** Editable seed fields, in the order the editor shows them. */
 export const SEED_FIELDS: { key: keyof ThemeSeed; label: string }[] = [
-  { key: 'bg', label: '背景' },
-  { key: 'panel', label: 'パネル' },
-  { key: 'ink', label: '文字' },
-  { key: 'accent', label: 'アクセント' },
-  { key: 'layer1', label: 'レイヤ 1' },
-  { key: 'layer2', label: 'レイヤ 2' },
+  { key: 'bg', label: 'Background' },
+  { key: 'panel', label: 'Panel' },
+  { key: 'ink', label: 'Text' },
+  { key: 'accent', label: 'Accent' },
 ]

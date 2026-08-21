@@ -1,5 +1,6 @@
 import type { Appearance } from '../data/appearance'
 import { seedFor } from '../data/appearance'
+import { setLang } from '../i18n'
 import { buildThemeVars } from './palette'
 
 let applied: string[] = []
@@ -19,6 +20,8 @@ export function applyAppearance(appearance: Appearance): void {
     root.style.setProperty(name, value)
   }
 
+  setLang(appearance.lang)
+  document.documentElement.lang = appearance.lang
   root.dataset.theme = appearance.theme
   root.dataset.mode = seed.mode
   root.dataset.font = appearance.font
