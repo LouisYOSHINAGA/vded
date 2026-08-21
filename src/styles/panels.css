@@ -882,6 +882,42 @@ code {
   border-top-color: var(--tint);
 }
 
+.dial-part--dragging {
+  opacity: 0.45;
+}
+
+/* Which edge the dragged block would land against. */
+.dial-part--over-before {
+  box-shadow: inset 4px 0 0 var(--c-accent), inset 0 0 0 1px var(--c-accent);
+}
+
+.dial-part--over-after {
+  box-shadow: inset -4px 0 0 var(--c-accent), inset 0 0 0 1px var(--c-accent);
+}
+
+.dial-part__grip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 22px;
+  flex: none;
+  border-radius: var(--r-sm);
+  color: var(--c-ink-faint);
+  cursor: grab;
+  touch-action: none;
+}
+
+.dial-part__grip:hover,
+.dial-part__grip:focus-visible {
+  background: var(--hover-soft);
+  color: var(--c-ink-dim);
+}
+
+.dial-part__grip:active {
+  cursor: grabbing;
+}
+
 .dial-part__transport {
   display: flex;
   gap: 3px;

@@ -466,6 +466,20 @@ export function setUi(patch: Partial<AppState['ui']>): void {
   store.patchSlice('ui', patch)
 }
 
+/** Moves one part block in the Dials tab, keeping the rest in their order. */
+export function moveDialPart(part: number, before: number | null): void {
+  const order = store.get().ui.dialOrder
+  const rest = order.filter((p) => p !== part)
+  const at = before === null ? rest.length : rest.indexOf(before)
+  const next = [...rest.slice(0, at < 0 ? rest.length : at), part, ...rest.slice(at < 0 ? rest.length : at)]
+  setUi({ dialOrder: next })
+}
+
+/** Back to PART 1..6, the order printed on the hardware. */
+export function resetDialOrder(): void {
+  setUi({ dialOrder: [0, 1, 2, 3, 4, 5] })
+}
+
 export function setTransport(patch: Partial<AppState['transport']>): void {
   store.patchSlice('transport', patch)
 }

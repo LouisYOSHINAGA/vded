@@ -9,6 +9,7 @@ export type IconName =
   | 'play'
   | 'stop'
   | 'trigger'
+  | 'grip'
   | 'mute'
   | 'solo'
   | 'shiftLeft'
@@ -59,6 +60,17 @@ const PATHS: Record<IconName, JSX.Element> = {
   ),
   clear: <path d="M6.5 6.5 17.5 17.5M17.5 6.5 6.5 17.5" {...STROKE} />,
   send: <path d="M12 19V6m0 0-5 5m5-5 5 5M5 21h14" {...STROKE} />,
+  // Two columns of dots: the drag grip everyone recognises from list rows.
+  grip: (
+    <g fill="currentColor" stroke="none">
+      <circle cx="9" cy="6" r="1.6" />
+      <circle cx="15" cy="6" r="1.6" />
+      <circle cx="9" cy="12" r="1.6" />
+      <circle cx="15" cy="12" r="1.6" />
+      <circle cx="9" cy="18" r="1.6" />
+      <circle cx="15" cy="18" r="1.6" />
+    </g>
+  ),
   refresh: (
     <g>
       <path d="M20 12a8 8 0 1 1-2.6-5.9" {...STROKE} />

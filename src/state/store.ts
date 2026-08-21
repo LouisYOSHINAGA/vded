@@ -52,6 +52,8 @@ export interface UiState {
   showMonitor: boolean
   /** Width of the sequencer's part rail, in pixels. */
   seqRailWidth: number
+  /** Part indices in the order the Dials tab shows them; drag-reorderable. */
+  dialOrder: number[]
   /** Progress of a running SEND ALL, 0..1, or null when idle. */
   sendAllProgress: number | null
 }
@@ -102,6 +104,7 @@ export function makeInitialState(): AppState {
       editorTab: 'part',
       showMonitor: false,
       seqRailWidth: 216,
+      dialOrder: [0, 1, 2, 3, 4, 5],
       sendAllProgress: null,
     },
     presets: [],

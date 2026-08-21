@@ -157,6 +157,10 @@ const EN: Dict = {
   'dials.help':
     'Every part and both of its layers as dials. Use the All layers tab to compare exact numbers. The L1 / L2 badges open that layer in Part edit.',
   'dials.part': 'Part',
+  'dials.resetOrder': 'Reset order',
+  'dials.resetOrderTitle': 'Back to PART 1–6, the order printed on the hardware',
+  'dials.reorderAria': 'Reorder PART {n}',
+  'dials.reorderTitle': 'Drag to reorder, or use the arrow keys',
 
   'wg.title': 'Wave guide',
   'wg.help': 'One resonator shared by every part. Each part feeds it through WG SEND.',
@@ -452,6 +456,10 @@ const JA: Dict = {
   'dials.help':
     '全 PART の LAYER 1 / 2 をダイヤルで一覧します。正確な数値を比べるときは All layers タブへ。L1 / L2 のバッジでその LAYER を Part edit で開きます。',
   'dials.part': 'Part',
+  'dials.resetOrder': '並び順を戻す',
+  'dials.resetOrderTitle': '実機と同じ PART 1〜6 の並びに戻します',
+  'dials.reorderAria': 'PART {n} を並べ替え',
+  'dials.reorderTitle': 'ドラッグ、または矢印キーで並べ替え',
 
   'wg.title': 'Wave guide',
   'wg.help': '全 PART 共通の共鳴器です。送り量は各 PART の WG SEND で決めます。',

@@ -4,6 +4,7 @@ import { makeEmptyPattern, makeInitPatch } from './defaults'
 import type { AppState } from './store'
 import { makeInitialState, store } from './store'
 import type { Preset } from './types'
+import { PART_COUNT } from './types'
 
 const KEY = 'vded.workspace.v1'
 const SCHEMA = 1
@@ -17,7 +18,13 @@ interface Persisted {
   mixer: AppState['mixer']
   ui: Pick<
     AppState['ui'],
-    'selectedPart' | 'selectedLayer' | 'layerLink' | 'editorTab' | 'showMonitor' | 'seqRailWidth'
+    | 'selectedPart'
+    | 'selectedLayer'
+    | 'layerLink'
+    | 'editorTab'
+    | 'showMonitor'
+    | 'seqRailWidth'
+    | 'dialOrder'
   >
   transport: Pick<AppState['transport'], 'bpm' | 'swing' | 'gateMs' | 'sendClock'>
 }
@@ -41,12 +48,25 @@ export function loadWorkspace(): Partial<AppState> | null {
         appearance: { ...base.settings.appearance, ...data.settings?.appearance },
       },
       mixer: { ...base.mixer, ...data.mixer },
-      ui: { ...base.ui, ...data.ui, sendAllProgress: null },
+      ui: {
+        ...base.ui,
+        ...data.ui,
+        dialOrder: validOrder(data.ui?.dialOrder) ?? base.ui.dialOrder,
+        sendAllProgress: null,
+      },
       transport: { ...base.transport, ...data.transport, playing: false, currentStep: -1 },
     }
   } catch {
     return null
   }
+}
+
+/** A saved order is only usable if it is still a permutation of every part. */
+function validOrder(order: number[] | undefined): number[] | null {
+  if (!Array.isArray(order) || order.length !== PART_COUNT) return null
+  const seen = new Set(order)
+  if (seen.size !== PART_COUNT) return null
+  return order.every((n) => Number.isInteger(n) && n >= 0 && n < PART_COUNT) ? order : null
 }
 
 function serialize(state: AppState): string {
@@ -64,6 +84,7 @@ function serialize(state: AppState): string {
       editorTab: state.ui.editorTab,
       showMonitor: state.ui.showMonitor,
       seqRailWidth: state.ui.seqRailWidth,
+      dialOrder: state.ui.dialOrder,
     },
     transport: {
       bpm: state.transport.bpm,
@@ -93,6 +114,7 @@ function persistedSlices(state: AppState): unknown[] {
     state.ui.editorTab,
     state.ui.showMonitor,
     state.ui.seqRailWidth,
+    state.ui.dialOrder,
     state.transport.bpm,
     state.transport.swing,
     state.transport.gateMs,
