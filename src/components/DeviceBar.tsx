@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useT } from '../i18n'
+import type { ChannelMode } from '../midi/ccmap'
 import { midiEngine } from '../midi/engine'
 import { useMidiSnapshot } from '../hooks/useMidiSnapshot'
 import { setSettings, setUi } from '../state/actions'
@@ -7,7 +8,6 @@ import { useAppState } from '../state/store'
 import { PART_COUNT } from '../state/types'
 import { Icon } from './Icon'
 import { NumberField } from './NumberField'
-import { Segmented } from './Segmented'
 
 const STATUS_KEY: Record<string, string> = {
   unsupported: 'device.unsupported',
@@ -104,19 +104,21 @@ export function DeviceBar() {
 
       <div className="cluster">
         <span className="cluster__label">{t('mode.label')}</span>
-        <Segmented
-          ariaLabel={t('mode.aria')}
-          options={[
-            { value: 'split', label: 'Split', title: t('mode.splitTitle') },
-            { value: 'single', label: 'Single', title: t('mode.singleTitle') },
-          ]}
+        <select
+          className="select device__mode"
           value={mode}
-          onChange={(next) => {
+          aria-label={t('mode.aria')}
+          title={mode === 'split' ? t('mode.splitTitle') : t('mode.singleTitle')}
+          onChange={(e) => {
+            const next = e.target.value as ChannelMode
             const clamped = next === 'split' ? Math.min(baseChannel, 16 - PART_COUNT + 1) : baseChannel
             setSettings({ mode: next, baseChannel: clamped })
             if (next === 'single') setUi({ layerLink: true })
           }}
-        />
+        >
+          <option value="split">Split</option>
+          <option value="single">Single</option>
+        </select>
         <label className="row" style={{ gap: 4 }}>
           <span className="cluster__label">CH</span>
           <NumberField

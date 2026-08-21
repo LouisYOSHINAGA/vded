@@ -176,25 +176,25 @@ export function Knob({
         </svg>
       </div>
       <span className="knob__readout">
-      <span className="knob__label legend" id={`${id}-label`}>
-        {label}
-      </span>
-      {editable ? (
-        <span className="knob__field">
-          <NumberField
-            ariaLabel={label}
-            value={value}
-            min={min}
-            max={max}
-            onChange={onChange}
-            disabled={disabled}
-            className="number-field--knob"
-          />
-          {unit && <span className="knob__unit">{unit}</span>}
+        <span className="knob__label legend" id={`${id}-label`}>
+          {label}
         </span>
-      ) : (
-        <span className="knob__value value-readout">{readout}</span>
-      )}
+        {editable ? (
+          <span className="knob__field">
+            <NumberField
+              ariaLabel={label}
+              value={value}
+              min={min}
+              max={max}
+              onChange={onChange}
+              disabled={disabled}
+              className="number-field--knob"
+            />
+            {unit && <span className="knob__unit">{unit}</span>}
+          </span>
+        ) : (
+          <span className="knob__value value-readout">{readout}</span>
+        )}
       </span>
     </div>
   )

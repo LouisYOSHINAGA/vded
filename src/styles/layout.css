@@ -280,6 +280,11 @@
   padding: 0;
 }
 
+.device__mode {
+  min-height: 26px;
+  font-size: 12px;
+}
+
 .device__select--in {
   max-width: 112px;
   color: var(--c-ink-dim);

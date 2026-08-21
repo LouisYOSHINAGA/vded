@@ -21,15 +21,17 @@
   gap: 8px;
 }
 
+/* Label centred over the value it names, so the two read as one column
+   whatever the label's length. */
 .knob--inline .knob__readout {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: 1px;
 }
 
 .knob--inline .knob__label {
-  text-align: left;
+  text-align: center;
 }
 
 .knob__dial {
