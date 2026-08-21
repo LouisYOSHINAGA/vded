@@ -735,15 +735,17 @@
 }
 
 .func__table,
+/* Content width, not full width: spread across the panel, the CC fields ended
+   up an inch apart with nothing between them. */
 .ccmap__table {
-  width: 100%;
+  width: auto;
   border-collapse: collapse;
   font-size: calc(12.5px * var(--fs, 1));
 }
 
 .func__table th,
 .ccmap__table th {
-  padding: 7px 8px;
+  padding: 7px 10px;
   text-align: left;
   font-size: calc(10.5px * var(--fs, 1));
   font-weight: 700;
@@ -755,7 +757,7 @@
 
 .func__table td,
 .ccmap__table td {
-  padding: 8px;
+  padding: 8px 10px;
   font-size: calc(12.5px * var(--fs, 1));
   border-bottom: 1px solid var(--c-line-soft);
   vertical-align: top;
@@ -804,10 +806,10 @@
 
 .ccmap__table--narrow {
   width: auto;
-  min-width: 320px;
 }
 
 .ccmap__name {
+  padding-right: 18px;
   color: var(--c-ink) !important;
   font-weight: 600;
   letter-spacing: calc(var(--track-legend) * 0.6);
@@ -1060,8 +1062,17 @@ button.dial-row__badge:hover {
   cursor: pointer;
 }
 
-.dial-row__badge--part {
-  background: var(--c-raise-2);
+/* The part row has no layer to badge, so the label carries the whole column
+   and is centred in it. */
+.dial-row__id--static {
+  justify-content: center;
+}
+
+.dial-row__partlabel {
+  font-size: calc(11.5px * var(--fs, 1));
+  font-weight: 600;
+  letter-spacing: calc(var(--track-legend) * 0.6);
+  text-transform: uppercase;
   color: var(--c-ink-dim);
 }
 

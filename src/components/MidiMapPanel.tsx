@@ -288,7 +288,6 @@ export function MidiMapPanel() {
           </tbody>
         </table>
 
-        <p className="hint ccmap__source">{t('map.changedNote')}</p>
       </div>
     </section>
   )

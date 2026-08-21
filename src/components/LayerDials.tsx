@@ -206,8 +206,8 @@ function DialPart({
         <button
           type="button"
           className="dial-part__pick"
-          onClick={() => setUi({ selectedPart: part })}
-          title={t('seq.selectPart', { n: part + 1 })}
+          onClick={() => setUi({ selectedPart: part, editorTab: 'part' })}
+          title={t('matrix.openPart', { n: part + 1 })}
         >
           <span className="dial-part__num">{part + 1}</span>
           <span className="dial-part__name">{data.name}</span>
@@ -294,8 +294,7 @@ function DialPart({
 
       <div className="dial-row dial-row--part">
         <span className="dial-row__id dial-row__id--static">
-          <span className="dial-row__badge dial-row__badge--part">P</span>
-          <span className="dial-row__source">{t('dials.part')}</span>
+          <span className="dial-row__partlabel">{t('dials.part')}</span>
         </span>
         <div className="dial-row__knobs">
           {PART_KNOBS.map((knob) => {
