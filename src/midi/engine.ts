@@ -30,8 +30,7 @@ export type MidiStatus = 'unsupported' | 'idle' | 'requesting' | 'ready' | 'deni
 export interface LogEntry {
   id: number
   time: number
-  direction: 'out' | 'in'
-  /** CC, NOTE, PANIC, CLOCK… shown as-is in the TYPE column. */
+  /** CC or PANIC — the two kinds of message the editor sends. */
   kind: string
   channel: number | null
   /** CC number, or note number for note messages. */
@@ -45,9 +44,7 @@ export interface EngineSnapshot {
   status: MidiStatus
   error: string | null
   outputs: PortInfo[]
-  inputs: PortInfo[]
   outputId: string | null
-  inputId: string | null
   log: LogEntry[]
   /** Number of CC messages waiting in the queue. */
   queued: number
@@ -95,15 +92,10 @@ export class MidiEngine {
       : 'unsupported',
     error: null,
     outputs: [],
-    inputs: [],
     outputId: null,
-    inputId: null,
     log: [],
     queued: 0,
   }
-
-  /** Called with every incoming MIDI message from the selected input. */
-  onIncoming: ((data: Uint8Array) => void) | null = null
 
   subscribe = (listener: () => void): (() => void) => {
     this.listeners.add(listener)
@@ -121,8 +113,8 @@ export class MidiEngine {
     this.listeners.forEach((l) => l())
   }
 
-  private log(direction: 'out' | 'in', fields: Omit<LogEntry, 'id' | 'time' | 'direction'>): void {
-    const entry: LogEntry = { id: ++this.logId, time: performance.now(), direction, ...fields }
+  private log(fields: Omit<LogEntry, 'id' | 'time'>): void {
+    const entry: LogEntry = { id: ++this.logId, time: performance.now(), ...fields }
     const log = [entry, ...this.snapshot.log].slice(0, LOG_LIMIT)
     this.emit({ log })
   }
@@ -152,46 +144,19 @@ export class MidiEngine {
     if (!this.access) return
     const outputs: PortInfo[] = []
     this.access.outputs.forEach((port) => outputs.push(describePort(port)))
-    const inputs: PortInfo[] = []
-    this.access.inputs.forEach((port) => inputs.push(describePort(port)))
 
     let outputId = this.snapshot.outputId
-    let inputId = this.snapshot.inputId
     if (outputId && !outputs.some((p) => p.id === outputId)) outputId = null
-    if (inputId && !inputs.some((p) => p.id === inputId)) inputId = null
 
     if (!outputId && (autoSelect || outputs.length === 1)) {
       const preferred = outputs.find((p) => p.isVolcaDrum) ?? outputs.find((p) => p.isKorg) ?? outputs[0]
       outputId = preferred ? preferred.id : null
     }
-    this.emit({ outputs, inputs, outputId, inputId })
-    this.bindInput(inputId)
+    this.emit({ outputs, outputId })
   }
 
   selectOutput(id: string | null): void {
     this.emit({ outputId: id })
-  }
-
-  selectInput(id: string | null): void {
-    this.emit({ inputId: id })
-    this.bindInput(id)
-  }
-
-  private bindInput(id: string | null): void {
-    if (!this.access) return
-    this.access.inputs.forEach((port) => {
-      port.onmidimessage = null
-    })
-    if (!id) return
-    const port = this.access.inputs.get(id)
-    if (!port) return
-    port.onmidimessage = (event: MIDIMessageEvent) => {
-      const data = event.data
-      if (!data) return
-      // Clock spam would drown the monitor; count it silently.
-      if (data[0] !== 0xf8) this.log('in', decodeIncoming(data))
-      this.onIncoming?.(data)
-    }
   }
 
   private get output(): MIDIOutput | null {
@@ -245,7 +210,7 @@ export class MidiEngine {
         this.sendRaw([0x80 | ((channel - 1) & 0x0f), note & 0x7f, 0])
       }
     }
-    this.log('out', {
+    this.log({
       kind: 'PANIC',
       channel: null,
       number: null,
@@ -304,7 +269,7 @@ export class MidiEngine {
           this.dumpRemaining = 0
           break
         }
-        this.log('out', {
+        this.log({
           kind: 'CC',
           channel: message.channel,
           number: message.cc,
@@ -324,31 +289,6 @@ export class MidiEngine {
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
-type IncomingFields = Omit<LogEntry, 'id' | 'time' | 'direction'>
-
-function decodeIncoming(data: Uint8Array): IncomingFields {
-  const status = data[0] & 0xf0
-  const channel = (data[0] & 0x0f) + 1
-  switch (status) {
-    case 0x90:
-      return data[2] === 0
-        ? { kind: 'NOTE OFF', channel, number: data[1], value: 0, target: '' }
-        : { kind: 'NOTE ON', channel, number: data[1], value: data[2], target: '' }
-    case 0x80:
-      return { kind: 'NOTE OFF', channel, number: data[1], value: 0, target: '' }
-    case 0xb0:
-      return { kind: 'CC', channel, number: data[1], value: data[2], target: '' }
-    default:
-      return {
-        kind: 'RAW',
-        channel: null,
-        number: null,
-        value: null,
-        target: Array.from(data).map((b) => b.toString(16).padStart(2, '0')).join(' '),
-      }
-  }
 }
 
 export const midiEngine = new MidiEngine()

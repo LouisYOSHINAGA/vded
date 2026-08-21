@@ -22,7 +22,6 @@ interface Persisted {
     | 'selectedLayer'
     | 'layerLink'
     | 'editorTab'
-    | 'showMonitor'
     | 'seqRailWidth'
     | 'dialOrder'
   >
@@ -82,7 +81,6 @@ function serialize(state: AppState): string {
       selectedLayer: state.ui.selectedLayer,
       layerLink: state.ui.layerLink,
       editorTab: state.ui.editorTab,
-      showMonitor: state.ui.showMonitor,
       seqRailWidth: state.ui.seqRailWidth,
       dialOrder: state.ui.dialOrder,
     },
@@ -112,7 +110,6 @@ function persistedSlices(state: AppState): unknown[] {
     state.ui.selectedLayer,
     state.ui.layerLink,
     state.ui.editorTab,
-    state.ui.showMonitor,
     state.ui.seqRailWidth,
     state.ui.dialOrder,
     state.transport.bpm,

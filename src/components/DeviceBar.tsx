@@ -7,7 +7,6 @@ import { setSettings, setUi } from '../state/actions'
 import { useAppState } from '../state/store'
 import { PART_COUNT } from '../state/types'
 import { Icon } from './Icon'
-import { NumberField } from './NumberField'
 
 const STATUS_KEY: Record<string, string> = {
   unsupported: 'device.unsupported',
@@ -76,21 +75,6 @@ export function DeviceBar() {
             </option>
           )}
         </select>
-        <select
-          className="select device__select device__select--in"
-          value={midi.inputId ?? ''}
-          disabled={!ready}
-          onChange={(e) => midiEngine.selectInput(e.target.value || null)}
-          aria-label={t('device.inputAria')}
-          title={t('device.inputTitle')}
-        >
-          <option value="">{t('device.inputNone')}</option>
-          {midi.inputs.map((port) => (
-            <option key={port.id} value={port.id}>
-              IN: {port.name}
-            </option>
-          ))}
-        </select>
         <button
           type="button"
           className="btn btn--ghost device__rescan"
@@ -121,13 +105,18 @@ export function DeviceBar() {
         </select>
         <label className="row" style={{ gap: 4 }}>
           <span className="cluster__label">CH</span>
-          <NumberField
-            ariaLabel={t('mode.channelAria')}
+          <select
+            className="select device__ch"
             value={baseChannel}
-            min={1}
-            max={maxBase}
-            onChange={(channel) => setSettings({ baseChannel: channel })}
-          />
+            aria-label={t('mode.channelAria')}
+            onChange={(e) => setSettings({ baseChannel: Number(e.target.value) })}
+          >
+            {Array.from({ length: maxBase }, (_, i) => i + 1).map((channel) => (
+              <option key={channel} value={channel}>
+                {channel}
+              </option>
+            ))}
+          </select>
         </label>
         <span
           className="hint device__hint"

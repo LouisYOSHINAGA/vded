@@ -49,7 +49,6 @@ export interface UiState {
   /** Edit both layers at once and use the combined "1-2" CC. */
   layerLink: boolean
   editorTab: EditorTab
-  showMonitor: boolean
   /** Width of the sequencer's part rail, in pixels. */
   seqRailWidth: number
   /** Part indices in the order the Dials tab shows them; drag-reorderable. */
@@ -102,7 +101,6 @@ export function makeInitialState(): AppState {
       selectedLayer: 0,
       layerLink: false,
       editorTab: 'part',
-      showMonitor: false,
       seqRailWidth: 216,
       dialOrder: [0, 1, 2, 3, 4, 5],
       sendAllProgress: null,
