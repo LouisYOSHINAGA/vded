@@ -23,6 +23,10 @@
   /* Tracking for the silkscreen-style legends; loosened for wide faces. */
   --track-legend: 0.1em;
   --track-title: 0.14em;
+
+  /* Hover overlays. Mixing with the ink keeps them readable in any skin. */
+  --hover-soft: color-mix(in srgb, var(--c-ink) 7%, transparent);
+  --hover-strong: color-mix(in srgb, var(--c-ink) 12%, transparent);
 }
 
 [data-font='mono'] {

@@ -92,11 +92,23 @@
   width: 2px;
 }
 
+/*
+ * Beats are grouped by whitespace: the row splits into four equal beat groups
+ * with a wider gap between them, and each group splits into four equal pads.
+ * Because every level uses equal fractions, all sixteen pads stay the same
+ * width and the ruler, steps and velocity lane share the same column edges.
+ */
 .seq-ruler,
 .seq-row,
 .vel-lane__row {
   display: grid;
-  grid-template-columns: repeat(var(--steps, 16), minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.seq-beat {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 5px;
 }
 
@@ -130,7 +142,9 @@
   border-bottom: 1px solid var(--c-line-soft);
 }
 
-.seq-ruler__tick--beat {
+/* The first tick of each beat group carries the count; whitespace does the
+   rest of the grouping. */
+.seq-beat > .seq-ruler__tick:first-child {
   color: var(--c-ink-dim);
   border-bottom-color: var(--c-line);
 }
@@ -232,7 +246,7 @@
   transition: background 0.1s, color 0.1s;
 }
 
-.micro-btn:hover {
+.micro-btn:hover:not([aria-pressed='true']) {
   background: var(--c-raise-2);
   color: var(--c-ink);
 }
@@ -256,23 +270,6 @@
   background: linear-gradient(180deg, var(--c-step-off), var(--c-step-off-2));
   box-shadow: inset 0 0 0 1px var(--c-step-line), 0 1px 0 rgba(255, 255, 255, 0.03) inset;
   transition: background 0.08s, box-shadow 0.08s;
-}
-
-/*
- * Beats are marked by a hairline in the gutter. A margin would have made every
- * fourth pad narrower, and an outline on the pad itself read as a different
- * step state; a rule between columns keeps all sixteen pads identical.
- */
-.step--beat:not(:first-child)::before,
-.seq-ruler__tick--beat:not(:first-child)::before,
-.vel-fader--beat:not(:first-child)::before {
-  content: "";
-  position: absolute;
-  left: -3px;
-  top: -1px;
-  bottom: -1px;
-  width: 1px;
-  background: var(--c-step-line-beat);
 }
 
 .seq-ruler__tick,
@@ -350,8 +347,6 @@
   display: flex;
   gap: 3px;
   justify-content: flex-end;
-  padding-left: 7px;
-  border-left: 1px solid var(--c-line-soft);
 }
 
 

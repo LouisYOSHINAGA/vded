@@ -155,7 +155,7 @@
 
 .segmented__item:hover:not(:disabled):not([aria-pressed='true']) {
   color: var(--c-ink);
-  background: var(--c-panel-2);
+  background: var(--hover-soft);
 }
 
 .segmented__item[aria-pressed='true'] {

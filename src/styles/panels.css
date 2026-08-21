@@ -20,8 +20,8 @@
   font-weight: 700;
 }
 
-.part-tabs__item:hover {
-  background: var(--c-raise-2);
+.part-tabs__item:hover:not([aria-pressed='true']) {
+  background: var(--hover-strong);
   color: var(--c-ink);
 }
 
@@ -261,7 +261,7 @@
 }
 
 .matrix__partbtn:hover {
-  background: var(--c-panel-2);
+  background: var(--hover-soft);
 }
 
 .matrix__partnum {
@@ -845,7 +845,7 @@ code {
 }
 
 .dial-part__pick:hover {
-  background: color-mix(in srgb, var(--tint) 14%, transparent);
+  background: color-mix(in srgb, var(--tint) 16%, transparent);
 }
 
 .dial-part__num {

@@ -35,6 +35,11 @@ const DEFAULT_RAIL_WIDTH = 216
 const partTint = (part: number) => `var(--c-part-${part + 1})`
 const partInk = (part: number) => `var(--c-on-part-${part + 1})`
 
+/** Splits the sixteen steps into four beats. */
+function beats<T>(items: T[]): T[][] {
+  return [0, 1, 2, 3].map((beat) => items.slice(beat * 4, beat * 4 + 4))
+}
+
 function clampRail(width: number): number {
   return Math.max(120, Math.min(340, Math.round(width)))
 }
@@ -177,14 +182,18 @@ export function Sequencer() {
             <RailHandle />
           </div>
           <div className="seq-ruler">
-            {Array.from({ length: MAX_STEPS }, (_, i) => (
-              <div
-                key={i}
-                className={`seq-ruler__tick${i % 4 === 0 ? ' seq-ruler__tick--beat' : ''}${
-                  i >= pattern.length ? ' seq-ruler__tick--off' : ''
-                }${i === currentStep ? ' seq-ruler__tick--now' : ''}`}
-              >
-                {i + 1}
+            {beats(Array.from({ length: MAX_STEPS }, (_, i) => i)).map((beat, b) => (
+              <div className="seq-beat" key={b}>
+                {beat.map((i) => (
+                  <div
+                    key={i}
+                    className={`seq-ruler__tick${i >= pattern.length ? ' seq-ruler__tick--off' : ''}${
+                      i === currentStep ? ' seq-ruler__tick--now' : ''
+                    }`}
+                  >
+                    {i + 1}
+                  </div>
+                ))}
               </div>
             ))}
           </div>
@@ -340,20 +349,27 @@ function PartRow({ part, selected, currentStep, onCellDown, onCellEnter }: PartR
         }`}
         style={tintStyle}
       >
-        {steps.map((step, i) => (
-          <button
-            key={i}
-            type="button"
-            className={`step${step.on ? ` step--on ${velocityClass(step.velocity)}` : ''}${
-              i % 4 === 0 ? ' step--beat' : ''
-            }${i >= length ? ' step--outside' : ''}${i === currentStep ? ' step--now' : ''}`}
-            aria-label={`${t('seq.stepAria', { part: part + 1, step: i + 1 })} ${
-              step.on ? t('seq.stepVelocity', { v: step.velocity }) : t('seq.stepOff')
-            }`}
-            aria-pressed={step.on}
-            onPointerDown={(e) => onCellDown(part, i, e)}
-            onPointerEnter={(e) => onCellEnter(part, i, e)}
-          />
+        {beats(steps).map((beat, b) => (
+          <div className="seq-beat" key={b}>
+            {beat.map((step, j) => {
+              const i = b * 4 + j
+              return (
+                <button
+                  key={i}
+                  type="button"
+                  className={`step${step.on ? ` step--on ${velocityClass(step.velocity)}` : ''}${
+                    i >= length ? ' step--outside' : ''
+                  }${i === currentStep ? ' step--now' : ''}`}
+                  aria-label={`${t('seq.stepAria', { part: part + 1, step: i + 1 })} ${
+                    step.on ? t('seq.stepVelocity', { v: step.velocity }) : t('seq.stepOff')
+                  }`}
+                  aria-pressed={step.on}
+                  onPointerDown={(e) => onCellDown(part, i, e)}
+                  onPointerEnter={(e) => onCellEnter(part, i, e)}
+                />
+              )
+            })}
+          </div>
         ))}
       </div>
       <div className="seq-row__tools">
@@ -431,12 +447,16 @@ function VelocityLane({ part, railWidth }: { part: number; railWidth: number }) 
         <span className="vel-lane__part">{name}</span>
       </div>
       <div className="vel-lane__row">
-        {steps.map((step, i) => (
+        {beats(steps).map((beat, b) => (
+          <div className="seq-beat" key={b}>
+            {beat.map((step, j) => {
+              const i = b * 4 + j
+              return (
           <div
             key={i}
             className={`vel-fader${step.on ? '' : ' vel-fader--off'}${
               i >= length ? ' vel-fader--outside' : ''
-            }${i % 4 === 0 ? ' vel-fader--beat' : ''}`}
+            }`}
             role="slider"
             tabIndex={0}
             aria-label={t('seq.velocityAria', { part: part + 1, step: i + 1 })}
@@ -482,6 +502,9 @@ function VelocityLane({ part, railWidth }: { part: number; railWidth: number }) 
               </span>
             </div>
             <span className="vel-fader__value">{step.on ? step.velocity : '–'}</span>
+          </div>
+              )
+            })}
           </div>
         ))}
       </div>

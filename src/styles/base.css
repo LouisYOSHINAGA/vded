@@ -154,6 +154,11 @@ button {
   background: linear-gradient(180deg, var(--c-btn-hover), var(--c-btn-hover-2));
 }
 
+/* Anything already lit stays lit: the generic hover must not repaint it. */
+.btn[aria-pressed='true']:hover:not(:disabled) {
+  filter: brightness(1.06);
+}
+
 .btn:active:not(:disabled) {
   box-shadow: var(--shadow-press);
 }
@@ -170,7 +175,7 @@ button {
 }
 
 .btn--ghost:hover:not(:disabled) {
-  background: var(--c-panel-2);
+  background: var(--hover-soft);
   color: var(--c-ink);
 }
 

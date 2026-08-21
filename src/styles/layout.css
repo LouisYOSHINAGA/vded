@@ -167,9 +167,9 @@
   color: var(--c-ink-faint);
 }
 
-.tabs__item:hover {
+.tabs__item:hover:not([aria-selected='true']) {
   color: var(--c-ink);
-  background: color-mix(in srgb, var(--c-ink) 9%, transparent);
+  background: var(--hover-strong);
 }
 
 .tabs__item[aria-selected='true'] {
@@ -504,7 +504,7 @@ kbd {
 }
 
 .theme-card__pick:hover {
-  background: color-mix(in srgb, var(--c-ink) 6%, transparent);
+  background: var(--hover-soft);
 }
 
 .theme-card__name {
