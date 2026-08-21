@@ -210,7 +210,15 @@
 .matrix {
   width: 100%;
   border-collapse: separate;
-  border-spacing: 2px;
+  border-spacing: 0;
+}
+
+/* A pixel of cell padding keeps the columns apart the way border-spacing did,
+   but as part of the cell — so a selected row's background runs unbroken from
+   the part name through to the tool icons. */
+.matrix tbody > tr > td,
+.matrix tbody > tr > th {
+  padding: 1px;
 }
 
 .matrix__th {
@@ -237,8 +245,11 @@
   border-top: 1px solid var(--c-line-soft);
 }
 
-.matrix__row--selected .matrix__partbtn {
-  background: color-mix(in srgb, var(--c-accent) 15%, transparent);
+/* The whole band is highlighted, not just the name: the selected part's rows
+   are what the Part edit tab and the sequencer are pointing at. */
+.matrix__row--selected > th,
+.matrix__row--selected > td {
+  background: color-mix(in srgb, var(--row-tint) 15%, transparent);
 }
 
 .matrix__row--shadowed td:not(.matrix__partcell):not(.matrix__tools) {
@@ -246,7 +257,6 @@
 }
 
 .matrix__part {
-  padding: 0;
   vertical-align: middle;
 }
 
@@ -280,8 +290,8 @@
 }
 
 .matrix__row--selected .matrix__partnum {
-  background: var(--c-accent);
-  color: var(--c-on-accent);
+  background: var(--row-tint);
+  color: var(--row-ink);
 }
 
 .matrix__partname {

@@ -1,3 +1,4 @@
+import type React from 'react'
 import { isPartParamAvailable } from '../midi/ccmap'
 import {
   sendPart,
@@ -121,6 +122,12 @@ function MatrixPart({
             className={`matrix__row${selected ? ' matrix__row--selected' : ''}${
               first ? ' matrix__row--first' : ''
             }${shadowed ? ' matrix__row--shadowed' : ''}${linked ? ' matrix__row--linked' : ''}`}
+            style={
+              {
+                '--row-tint': `var(--c-part-${part + 1})`,
+                '--row-ink': `var(--c-on-part-${part + 1})`,
+              } as React.CSSProperties
+            }
           >
             {first && (
               <th className="matrix__part" rowSpan={2} scope="rowgroup">
