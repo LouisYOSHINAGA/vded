@@ -24,8 +24,8 @@ const LAYER_COLUMNS: { key: Exclude<LayerParamKey, 'select'>; label: string }[] 
   { key: 'pitch', label: 'Pitch' },
   { key: 'egAttack', label: 'Atk' },
   { key: 'egRelease', label: 'Rel' },
-  { key: 'modAmount', label: 'M.Amt' },
-  { key: 'modRate', label: 'M.Rate' },
+  { key: 'modAmount', label: 'Mod Amt' },
+  { key: 'modRate', label: 'Mod Rate' },
 ]
 
 const PART_COLUMNS: { key: PartParamKey; label: string }[] = [
@@ -56,12 +56,6 @@ export function LayerMatrix() {
       <div className="panel__head">
         <h2 className="panel__title">{t('matrix.title')}</h2>
         <InfoTip label={t('matrix.title')}>{t('matrix.help')}</InfoTip>
-        {layerLink && (
-          <span className="tag tag--accent" title={t('matrix.linked')}>
-            <Icon name="link" size={12} />
-            {t('part.linked')}
-          </span>
-        )}
       </div>
       <div className="panel__body matrix__body">
         <table className="matrix">
@@ -121,7 +115,9 @@ function MatrixPart({
             key={layerIndex}
             className={`matrix__row${selected ? ' matrix__row--selected' : ''}${
               first ? ' matrix__row--first' : ''
-            }${shadowed ? ' matrix__row--shadowed' : ''}${linked ? ' matrix__row--linked' : ''}`}
+            }${layerIndex === 1 ? ' matrix__row--last' : ''}${
+              shadowed ? ' matrix__row--shadowed' : ''
+            }${linked ? ' matrix__row--linked' : ''}`}
             style={
               {
                 '--row-tint': `var(--c-part-${part + 1})`,
@@ -131,16 +127,22 @@ function MatrixPart({
           >
             {first && (
               <th className="matrix__part" rowSpan={2} scope="rowgroup">
-                <button type="button" className="matrix__partbtn" onClick={() => setUi({ selectedPart: part })}>
+                <button
+                  type="button"
+                  className="matrix__partbtn"
+                  onClick={() => setUi({ selectedPart: part, editorTab: 'part' })}
+                  title={t('matrix.openPart', { n: part + 1 })}
+                >
                   <span className="matrix__partnum">{part + 1}</span>
                   <span className="matrix__partname">{partData.name}</span>
                 </button>
               </th>
             )}
-            <td className="matrix__layer" style={{ ['--cell-accent' as string]: accent }}>
-              {linked && first && (
-                <span className="matrix__linkmark" title={t('matrix.linked')} aria-hidden="true" />
-              )}
+            <td
+              className="matrix__layer"
+              style={{ ['--cell-accent' as string]: accent }}
+              title={linked ? t('matrix.linked') : undefined}
+            >
               <button
                 type="button"
                 className="matrix__layerbtn"

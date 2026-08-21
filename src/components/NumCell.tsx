@@ -13,8 +13,8 @@ export interface NumCellProps {
 }
 
 /**
- * Compact drag-editable number used by the all-layer matrix: vertical drag like
- * a knob, double click to type, and a bar in the background for scanning.
+ * Compact drag-editable number used by the all-layer matrix: horizontal drag
+ * along the bar it draws, double click to type.
  */
 export function NumCell({
   value,
@@ -27,7 +27,7 @@ export function NumCell({
   format,
   ariaLabel,
 }: NumCellProps) {
-  const drag = useRef<{ startX: number; startY: number; startValue: number } | null>(null)
+  const drag = useRef<{ startX: number; startValue: number } | null>(null)
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
@@ -81,18 +81,15 @@ export function NumCell({
         if (disabled || e.button !== 0) return
         e.preventDefault()
         ;(e.target as Element).setPointerCapture(e.pointerId)
-        drag.current = { startX: e.clientX, startY: e.clientY, startValue: value }
+        drag.current = { startX: e.clientX, startValue: value }
       }}
       onPointerMove={(e) => {
         const state = drag.current
         if (!state) return
         const sensitivity = e.shiftKey ? (max - min) / 700 : (max - min) / 140
-        // The cell reads as a horizontal bar, so accept either direction and
-        // follow whichever axis the pointer has actually travelled furthest on.
-        const dy = state.startY - e.clientY
-        const dx = e.clientX - state.startX
-        const delta = Math.abs(dx) > Math.abs(dy) ? dx : dy
-        commit(state.startValue + delta * sensitivity)
+        // Horizontal only: the cell reads as a bar that fills left to right,
+        // and a vertical axis fought with scrolling the table.
+        commit(state.startValue + (e.clientX - state.startX) * sensitivity)
       }}
       onPointerUp={() => {
         drag.current = null
@@ -108,10 +105,10 @@ export function NumCell({
       onKeyDown={(e) => {
         if (disabled) return
         const step = e.shiftKey ? 1 : 4
-        if (e.key === 'ArrowUp') {
+        if (e.key === 'ArrowRight') {
           e.preventDefault()
           commit(value + step)
-        } else if (e.key === 'ArrowDown') {
+        } else if (e.key === 'ArrowLeft') {
           e.preventDefault()
           commit(value - step)
         }

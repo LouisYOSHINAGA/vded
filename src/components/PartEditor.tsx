@@ -1,9 +1,5 @@
-import {
-  encodeSelectFromLayer,
-  isPartParamAvailable,
-  layerCc,
-  partCc,
-} from '../midi/ccmap'
+import type React from 'react'
+import { isPartParamAvailable, layerCc, partCc } from '../midi/ccmap'
 import { useT } from '../i18n'
 import {
   copyPart,
@@ -77,6 +73,12 @@ export function PartEditor() {
               key={i}
               type="button"
               className="part-tabs__item"
+              style={
+                {
+                  '--tint': `var(--c-part-${i + 1})`,
+                  '--tint-ink': `var(--c-on-part-${i + 1})`,
+                } as React.CSSProperties
+              }
               aria-pressed={i === partIndex}
               onClick={() => setUi({ selectedPart: i })}
               onDoubleClick={() => triggerPart(i)}
@@ -95,16 +97,6 @@ export function PartEditor() {
           title={t('part.nameTitle')}
         />
         <div className="panel__spacer" />
-        <button
-          type="button"
-          className={`btn btn--sm${layerLink ? ' btn--on' : ' btn--ghost'}`}
-          disabled={singleMode}
-          onClick={() => setUi({ layerLink: !layerLink })}
-          title={singleMode ? t('part.linkSingleTitle') : t('part.linkTitle')}
-        >
-          <Icon name="link" size={14} />
-          {t('part.link')}
-        </button>
         <button
           type="button"
           className="btn btn--ghost btn--sm"
@@ -146,14 +138,21 @@ export function PartEditor() {
       <div className="panel__body part-editor__body">
         <div className={`layer-grid${layerLink ? ' layer-grid--linked' : ''}`}>
           <LayerPanel partIndex={partIndex} layerIndex={0} />
-          {layerLink && (
-            <div className="layer-link" aria-hidden="true">
-              <span className="layer-link__chip">
-                <Icon name="link" size={15} />
-                {t('part.linked')}
-              </span>
-            </div>
-          )}
+          {/* The link control lives between the two panels it joins, and is
+              always present, so turning it on never reflows the layout. */}
+          <div className="layer-link">
+            <button
+              type="button"
+              className="layer-link__chip"
+              aria-pressed={layerLink}
+              disabled={singleMode}
+              onClick={() => setUi({ layerLink: !layerLink })}
+              title={singleMode ? t('part.linkSingleTitle') : t('part.linkTitle')}
+            >
+              <Icon name="link" size={15} />
+              {t('part.link')}
+            </button>
+          </div>
           <LayerPanel partIndex={partIndex} layerIndex={1} />
         </div>
 
@@ -171,8 +170,6 @@ function LayerPanel({ partIndex, layerIndex }: { partIndex: number; layerIndex: 
   const accent = layerAccent(partIndex, layerIndex)
   const shadowed = mode === 'single' && layerIndex === 1
   const target = resolveTarget(store.get(), layerIndex)
-  const selectValue = encodeSelectFromLayer(layer)
-  const selectCc = layerCc(midiConfig(), partIndex, target, 'select')
 
   return (
     <div
@@ -185,16 +182,10 @@ function LayerPanel({ partIndex, layerIndex }: { partIndex: number; layerIndex: 
       }}
     >
       <header className="layer-panel__head">
-        <button
-          type="button"
-          className="layer-panel__pick"
-          aria-pressed={selectedLayer === layerIndex}
-          onClick={() => setUi({ selectedLayer: layerIndex })}
-          title={t('part.layerPickTitle')}
-        >
+        <span className="layer-panel__pick">
           <span className="layer-panel__badge">L{layerIndex + 1}</span>
           <span className="layer-panel__title">{t('part.layer', { n: layerIndex + 1 })}</span>
-        </button>
+        </span>
         {shadowed && <span className="tag tag--warn">{t('part.notSent')}</span>}
         <div className="panel__spacer" />
         <button
@@ -233,12 +224,6 @@ function LayerPanel({ partIndex, layerIndex }: { partIndex: number; layerIndex: 
           accent={accent}
           onChange={(v) => setLayerSelect(partIndex, layerIndex, 'egType', v)}
         />
-        <p className="layer-panel__selecthint hint">
-          SELECT = CC{selectCc ?? '—'} → <span className="value-readout">{selectValue}</span>
-          <span className="layer-panel__combo">
-            {WAVE_NAMES[layer.wave]} · {MOD_TYPE_NAMES[layer.modType]} · {EG_TYPE_NAMES[layer.egType]}
-          </span>
-        </p>
       </div>
 
       <div className="layer-panel__knobs">
