@@ -8,7 +8,6 @@ import type { Preset } from '../state/types'
 function preset(
   id: string,
   name: string,
-  note: string,
   parts: ReturnType<typeof makePart>[],
   waveGuide: ReturnType<typeof makeWaveGuide>,
   rows: string[],
@@ -17,7 +16,6 @@ function preset(
   return {
     id,
     name,
-    note,
     createdAt: now,
     updatedAt: now,
     patch: { name, parts, waveGuide },
@@ -29,7 +27,6 @@ export const FACTORY_PRESETS: Preset[] = [
   preset(
     'factory-four-on-floor',
     'FOUR ON FLOOR',
-    'まずはここから。素直な 4 つ打ちと基本的な音づくり。',
     [
       makePart('KICK', {
         layers: [
@@ -90,7 +87,6 @@ export const FACTORY_PRESETS: Preset[] = [
   preset(
     'factory-bitcrush',
     'BIT CRUSH',
-    'BIT / FOLD / DRIVE を強めに。split channel mode 専用（single では効きません）。',
     [
       makePart('CRUSH BD', {
         layers: [
@@ -159,7 +155,6 @@ export const FACTORY_PRESETS: Preset[] = [
   preset(
     'factory-waveguide',
     'WAVE GUIDE BLOOM',
-    'SEND を高めに振って共鳴器を主役にしたキット。',
     [
       makePart('SUB', {
         layers: [

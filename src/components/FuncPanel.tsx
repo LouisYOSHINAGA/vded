@@ -1,5 +1,6 @@
 import { midiEngine } from '../midi/engine'
 import { FUNC_ENTRIES, GLOBAL_SETTINGS } from '../data/funcReference'
+import { useT } from '../i18n'
 import {
   initPart,
   panic,
@@ -12,6 +13,8 @@ import {
 } from '../state/actions'
 import { useAppState } from '../state/store'
 import { PART_COUNT } from '../state/types'
+import { Icon } from './Icon'
+import { InfoTip } from './InfoTip'
 import { NumberField } from './NumberField'
 
 const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
@@ -25,6 +28,8 @@ function noteName(note: number): string {
  * MIDI realtime can do, and what has to be done on the panel itself.
  */
 export function FuncPanel() {
+  const t = useT()
+  const lang = useAppState((s) => s.settings.appearance.lang)
   const selectedPart = useAppState((s) => s.ui.selectedPart)
   const selectedLayer = useAppState((s) => s.ui.selectedLayer)
   const model = useAppState((s) => s.patch.waveGuide.model)
@@ -35,78 +40,84 @@ export function FuncPanel() {
   return (
     <section className="panel">
       <div className="panel__head">
-        <h2 className="panel__title">Func</h2>
-        <span className="hint">実機の FUNC ボタンで使える機能と、その VDED での代替。</span>
+        <h2 className="panel__title">{t('func.title')}</h2>
+        <InfoTip label={t('func.title')}>{t('func.help')}</InfoTip>
       </div>
 
       <div className="panel__body func">
         <div className="func__section">
-          <h3 className="func__heading">エディタから実行</h3>
+          <h3 className="func__heading">{t('func.editorSection')}</h3>
           <div className="func__actions">
             <button type="button" className="btn" onClick={() => randomizeLayer(selectedPart, selectedLayer)}>
-              Randomize layer
+              {t('func.randomizeLayer')}
             </button>
             <button type="button" className="btn" onClick={() => randomizePattern(selectedPart)}>
-              Randomize pattern
+              {t('func.randomizePattern')}
             </button>
             <button type="button" className="btn" onClick={() => setWaveGuideParam('wgModel', model === 1 ? 0 : 1)}>
-              Toggle WG model
+              {t('func.toggleModel')}
             </button>
             <button type="button" className="btn" onClick={() => initPart(selectedPart)}>
-              Init part
+              {t('func.initPart')}
             </button>
             <button type="button" className="btn btn--accent" onClick={sendAll}>
-              Send all parameters
+              {t('top.sendAll')}
             </button>
           </div>
           <p className="hint">
-            対象は PART {selectedPart + 1} / LAYER {selectedLayer + 1}。パートは上のシーケンサか PART EDIT のタブで選びます。
+            {t('func.target', { part: selectedPart + 1, layer: selectedLayer + 1 })}
           </p>
         </div>
 
         <div className="func__section">
-          <h3 className="func__heading">MIDI リアルタイム</h3>
+          <h3 className="func__heading">{t('func.realtimeSection')}</h3>
           <div className="func__actions">
             <button type="button" className="btn" onClick={() => midiEngine.realtime(0xfa)} title="Start (0xFA)">
-              Start
+              {t('func.start')}
             </button>
             <button type="button" className="btn" onClick={() => midiEngine.realtime(0xfb)} title="Continue (0xFB)">
-              Continue
+              {t('func.continue')}
             </button>
             <button type="button" className="btn" onClick={() => midiEngine.realtime(0xfc)} title="Stop (0xFC)">
-              Stop
+              {t('func.stop')}
             </button>
             <button type="button" className="btn btn--danger" onClick={panic}>
-              Panic
+              {t('top.panic')}
             </button>
           </div>
-          <p className="hint">
-            実機の MIDI Clock src が Auto のときのみ有効です。VDED 内蔵シーケンサと同期させるなら、
-            シーケンサの MIDI CLOCK を ON にしてください。
-          </p>
+          <p className="hint">{t('func.realtimeHelp')}</p>
         </div>
 
         <div className="func__section">
-          <h3 className="func__heading">パートのトリガーノート</h3>
+          <h3 className="func__heading">{t('func.notesSection')}</h3>
           <p className="hint">
-            volca drum はノートナンバーで音色を選びません。どのパートが鳴るかは MIDI チャンネルで決まります
-            （現在: {mode === 'split' ? `CH ${baseChannel}–${baseChannel + PART_COUNT - 1}` : `CH ${baseChannel} 共通`}）。
-            外部シーケンサに合わせたいときだけ変更してください。
+            {t('func.notesHelp', {
+              channels:
+                mode === 'split'
+                  ? `CH ${baseChannel}–${baseChannel + PART_COUNT - 1}`
+                  : `CH ${baseChannel}`,
+            })}
           </p>
           <div className="func__notes">
             {Array.from({ length: PART_COUNT }, (_, part) => (
               <label key={part} className="func__note">
                 <span className="legend">Part {part + 1}</span>
                 <NumberField
-                  ariaLabel={`PART ${part + 1} トリガーノート番号`}
+                  ariaLabel={t('func.noteAria', { part: part + 1 })}
                   value={notes[part]}
                   min={0}
                   max={127}
                   onChange={(note) => setPartNote(part, note)}
                 />
                 <span className="hint">{noteName(notes[part])}</span>
-                <button type="button" className="micro-btn" onPointerDown={() => triggerPart(part)} title="試聴">
-                  ▸
+                <button
+                  type="button"
+                  className="micro-btn"
+                  onPointerDown={() => triggerPart(part)}
+                  title={t('seq.triggerTitle')}
+                  aria-label={t('seq.trigger')}
+                >
+                  <Icon name="trigger" />
                 </button>
               </label>
             ))}
@@ -114,13 +125,16 @@ export function FuncPanel() {
         </div>
 
         <div className="func__section">
-          <h3 className="func__heading">実機側で設定が必要な項目</h3>
+          <h3 className="func__heading">{t('func.settingsSection')}</h3>
           <div className="func__settings">
             {GLOBAL_SETTINGS.map((setting) => (
-              <div key={setting.title} className={`banner ${setting.critical ? 'banner--warn' : 'banner--info'}`}>
+              <div
+                key={setting.title.en}
+                className={`banner ${setting.critical ? 'banner--warn' : 'banner--info'}`}
+              >
                 <div>
-                  <strong>{setting.title}</strong>
-                  <div>{setting.body}</div>
+                  <strong>{setting.title[lang]}</strong>
+                  <div>{setting.body[lang]}</div>
                 </div>
               </div>
             ))}
@@ -128,13 +142,13 @@ export function FuncPanel() {
         </div>
 
         <div className="func__section">
-          <h3 className="func__heading">FUNC ショートカット早見表</h3>
+          <h3 className="func__heading">{t('func.tableSection')}</h3>
           <table className="func__table">
             <thead>
               <tr>
-                <th>FUNC +</th>
-                <th>機能</th>
-                <th>VDED での代替</th>
+                <th>{t('func.tableKey')}</th>
+                <th>{t('func.tableFunction')}</th>
+                <th>{t('func.tableMirror')}</th>
               </tr>
             </thead>
             <tbody>
@@ -144,18 +158,15 @@ export function FuncPanel() {
                     {entry.step != null && <span className="func__step">{entry.step}</span>}
                     {entry.label}
                   </td>
-                  <td>{entry.description}</td>
+                  <td>{entry.description[lang]}</td>
                   <td className={entry.mirrored ? 'func__mirror' : 'func__mirror func__mirror--none'}>
-                    {entry.mirrored ?? '実機のみ'}
+                    {entry.mirrored ? entry.mirrored[lang] : t('func.machineOnly')}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-          <p className="hint">
-            SysEx とプログラムチェンジに非対応のため、実機メモリの保存／呼び出しとモーションシーケンスは
-            MIDI から操作できません。音色の管理は <strong>PRESETS</strong> タブで行ってください。
-          </p>
+          <p className="hint">{t('func.tableFoot')}</p>
         </div>
       </div>
     </section>

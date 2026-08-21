@@ -1,4 +1,5 @@
 import { DEFAULT_CC_TABLE, cloneCcTable, type CcTable } from '../midi/ccmap'
+import { useT } from '../i18n'
 import { setSettings } from '../state/actions'
 import { store, toast, useAppState } from '../state/store'
 import type { LayerParamKey, PartParamKey } from '../state/types'
@@ -72,6 +73,7 @@ function CcInput({
  * unit, fix it in place rather than waiting for a new build.
  */
 export function MidiMapPanel() {
+  const t = useT()
   const mode = useAppState((s) => s.settings.mode)
   const table = useAppState((s) => s.settings.ccTable)
   const sendQuant = useAppState((s) => s.settings.sendPitchModQuantize)
@@ -84,15 +86,10 @@ export function MidiMapPanel() {
   return (
     <section className="panel">
       <div className="panel__head">
-        <h2 className="panel__title">MIDI map</h2>
-        <span className="tag">{mode === 'split' ? 'split channel' : 'single channel'}</span>
-        <InfoTip label="split / single とは">
-          <strong>split channel</strong> は 6 つのパートを 6 本の MIDI チャンネルに分割するモードです
-          （パート n → CH {channelRange}）。CC 番号は全パート共通で、どのパートに効くかはチャンネルが決めます。
-          <strong> single channel</strong> はその逆で、1 本のチャンネルにすべてを載せ、パートは CC 番号で
-          区別します。送信側がチャンネルを 1 本しか持てない場合や、1 本のケーブルに複数の volca を
-          数珠つなぎしていてチャンネルを節約したい場合のためのモードで、代償としてレイヤ別制御と
-          BIT / FOLD / DRIVE / DRY GAIN が使えません。
+        <h2 className="panel__title">{t('map.title')}</h2>
+        <span className="tag">{mode === 'split' ? t('map.splitTag') : t('map.singleTag')}</span>
+        <InfoTip label={t('map.modeHelpTitle')}>
+          {t('map.modeHelp', { from: baseChannel, to: baseChannel + PART_COUNT - 1 })}
         </InfoTip>
         <div className="panel__spacer" />
         <button
@@ -100,10 +97,10 @@ export function MidiMapPanel() {
           className="btn btn--ghost btn--sm"
           onClick={() => {
             setSettings({ ccTable: cloneCcTable(DEFAULT_CC_TABLE) })
-            toast('CC マップを既定値に戻しました')
+            toast(t('map.resetDone'))
           }}
         >
-          Reset to default
+          {t('map.reset')}
         </button>
       </div>
 
@@ -111,20 +108,20 @@ export function MidiMapPanel() {
         <div className="ccmap__options">
           <label className="checkbox">
             <input type="checkbox" checked={liveSend} onChange={(e) => setSettings({ liveSend: e.target.checked })} />
-            <span className="legend">ノブ操作を即座に送信</span>
+            <span className="legend">{t('map.liveSend')}</span>
           </label>
-          <label className="checkbox" title="公式チャートに記載のない CC53 を送信対象に加えます">
+          <label className="checkbox" title={t('map.sendQuantTitle')}>
             <input
               type="checkbox"
               checked={sendQuant}
               onChange={(e) => setSettings({ sendPitchModQuantize: e.target.checked })}
             />
-            <span className="legend">Pitch mod quant (CC53) を送信</span>
+            <span className="legend">{t('map.sendQuant')}</span>
           </label>
-          <label className="row" style={{ gap: 5 }} title="ノブ操作時の CC 送出間隔">
-            <span className="legend">CC 間隔</span>
+          <label className="row" style={{ gap: 5 }} title={t('map.ccIntervalTitle')}>
+            <span className="legend">{t('map.ccInterval')}</span>
             <NumberField
-              ariaLabel="CC 送出間隔 (ms)"
+              ariaLabel={t('map.ccInterval')}
               value={ccInterval}
               min={0}
               max={20}
@@ -134,10 +131,10 @@ export function MidiMapPanel() {
             />
             <span className="hint">ms</span>
           </label>
-          <label className="row" style={{ gap: 5 }} title="SEND ALL の送出間隔。取りこぼすときは大きくしてください">
-            <span className="legend">一括送信 間隔</span>
+          <label className="row" style={{ gap: 5 }} title={t('map.dumpIntervalTitle')}>
+            <span className="legend">{t('map.dumpInterval')}</span>
             <NumberField
-              ariaLabel="一括送信の送出間隔 (ms)"
+              ariaLabel={t('map.dumpInterval')}
               value={dumpInterval}
               min={0}
               max={40}
@@ -151,7 +148,7 @@ export function MidiMapPanel() {
 
         {mode === 'split' ? (
           <>
-            <h3 className="func__heading">レイヤ パラメータ（パート n → CH {channelRange}）</h3>
+                <h3 className="func__heading">{t('map.layerParams', { range: channelRange })}</h3>
             <table className="ccmap__table">
               <thead>
                 <tr>
@@ -184,7 +181,7 @@ export function MidiMapPanel() {
               </tbody>
             </table>
 
-            <h3 className="func__heading">パート パラメータ</h3>
+            <h3 className="func__heading">{t('map.partParams')}</h3>
             <table className="ccmap__table ccmap__table--narrow">
               <tbody>
                 {SPLIT_PART_ROWS.map((key) => (
@@ -203,9 +200,7 @@ export function MidiMapPanel() {
                       />
                     </td>
                     <td className="hint">
-                      {key === 'pitchModQuantize'
-                        ? '公式チャート未記載。上のチェックで送信を有効化。'
-                        : 'レイヤ 1 / 2 共通'}
+                      {key === 'pitchModQuantize' ? t('map.quantNote') : t('map.sharedNote')}
                     </td>
                   </tr>
                 ))}
@@ -214,7 +209,7 @@ export function MidiMapPanel() {
           </>
         ) : (
           <>
-            <h3 className="func__heading">パート別 CC（全パートが 1 チャンネルを共有）</h3>
+            <h3 className="func__heading">{t('map.perPart')}</h3>
             <table className="ccmap__table">
               <thead>
                 <tr>
@@ -269,7 +264,7 @@ export function MidiMapPanel() {
           </>
         )}
 
-        <h3 className="func__heading">ウェーブガイド（グローバル）</h3>
+        <h3 className="func__heading">{t('map.global')}</h3>
         <table className="ccmap__table ccmap__table--narrow">
           <tbody>
             {(['wgModel', 'wgDecay', 'wgBody', 'wgTune'] as const).map((key) => (
@@ -287,15 +282,13 @@ export function MidiMapPanel() {
                     }
                   />
                 </td>
-                <td className="hint">{key === 'wgModel' ? '0 = TUBE / 64 = STRING' : ''}</td>
+                <td className="hint">{key === 'wgModel' ? t('map.modelNote') : ''}</td>
               </tr>
             ))}
           </tbody>
         </table>
 
-        <p className="hint ccmap__source">
-          既定値の出典は <code>docs/midi-implementation.md</code>。変更した値はアクセント色で表示されます。
-        </p>
+        <p className="hint ccmap__source">{t('map.changedNote')}</p>
       </div>
     </section>
   )

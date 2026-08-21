@@ -99,17 +99,17 @@ export const DEFAULT_APPEARANCE: Appearance = {
 export interface ThemeInfo {
   id: ThemeId
   name: string
-  note: string
+  note: Record<Lang, string>
   mode: 'light' | 'dark'
 }
 
 export const THEMES: ThemeInfo[] = [
-  { id: 'paper', name: 'Paper', note: '温かみのある紙色＋バーミリオン', mode: 'light' },
-  { id: 'studio', name: 'Studio', note: 'ニュートラルグレー＋インディゴ', mode: 'light' },
-  { id: 'daylight', name: 'Daylight', note: '純白＋ティール。最も明るい構成', mode: 'light' },
-  { id: 'vermilion', name: 'Vermilion', note: '実機のパネルに合わせたチャコール', mode: 'dark' },
-  { id: 'carbon', name: 'Carbon', note: 'グラファイト＋アンバー', mode: 'dark' },
-  { id: 'blueprint', name: 'Blueprint', note: '濃紺＋アイスブルー', mode: 'dark' },
+  { id: 'paper', name: 'Paper', note: { en: 'Warm paper and vermilion', ja: '温かみのある紙色＋バーミリオン' }, mode: 'light' },
+  { id: 'studio', name: 'Studio', note: { en: 'Neutral grey and indigo', ja: 'ニュートラルグレー＋インディゴ' }, mode: 'light' },
+  { id: 'daylight', name: 'Daylight', note: { en: 'Pure white and teal', ja: '純白＋ティール' }, mode: 'light' },
+  { id: 'vermilion', name: 'Vermilion', note: { en: "The machine's charcoal panel", ja: '実機のパネルに合わせたチャコール' }, mode: 'dark' },
+  { id: 'carbon', name: 'Carbon', note: { en: 'Graphite and amber', ja: 'グラファイト＋アンバー' }, mode: 'dark' },
+  { id: 'blueprint', name: 'Blueprint', note: { en: 'Deep navy and ice blue', ja: '濃紺＋アイスブルー' }, mode: 'dark' },
 ]
 
 export function seedFor(appearance: Appearance): ThemeSeed {
@@ -120,15 +120,15 @@ export function seedFor(appearance: Appearance): ThemeSeed {
 export interface FontInfo {
   id: FontId
   name: string
-  note: string
+  note: Record<Lang, string>
 }
 
 export const FONTS: FontInfo[] = [
-  { id: 'default', name: 'Meiryo / Consolas', note: '和文はメイリオ系、数値は Consolas' },
-  { id: 'mono', name: 'Consolas 全面', note: 'すべて等幅。コンソール寄りの見え方' },
-  { id: 'system', name: 'System UI', note: 'OS 標準の UI フォント' },
-  { id: 'condensed', name: 'Condensed', note: '機材のシルクスクリーン風・幅が狭い' },
-  { id: 'serif', name: 'Serif', note: '明朝／セリフ' },
+  { id: 'default', name: 'Meiryo / Consolas', note: { en: 'Humanist sans, Consolas numerals', ja: '和文はメイリオ系、数値は Consolas' } },
+  { id: 'mono', name: 'Consolas', note: { en: 'Monospaced throughout', ja: 'すべて等幅' } },
+  { id: 'system', name: 'System UI', note: { en: 'The OS interface font', ja: 'OS 標準の UI フォント' } },
+  { id: 'condensed', name: 'Condensed', note: { en: 'Narrow, like panel silkscreen', ja: '機材のシルクスクリーン風' } },
+  { id: 'serif', name: 'Serif', note: { en: 'Serif / Mincho', ja: '明朝／セリフ' } },
 ]
 
 export const ZOOM_STEPS = [0.7, 0.8, 0.9, 1, 1.1, 1.25] as const

@@ -18,6 +18,8 @@ export type IconName =
   | 'send'
   | 'refresh'
   | 'link'
+  | 'overwrite'
+  | 'rename'
   | 'info'
   | 'waveSine'
   | 'waveSaw'
@@ -69,6 +71,8 @@ const PATHS: Record<IconName, JSX.Element> = {
       <path d="M14 10a4.5 4.5 0 0 0-6.4 0L5 12.6a4.5 4.5 0 0 0 6.4 6.4l1.3-1.3" {...STROKE} />
     </g>
   ),
+  overwrite: <path d="M12 5v13m0 0-5-5m5 5 5-5M5 3h14" {...STROKE} />,
+  rename: <path d="M4 20h4L19 9a2.4 2.4 0 0 0-3.4-3.4L4.5 16.7 4 20Z" {...STROKE} />,
   info: (
     <g>
       <circle cx="12" cy="12" r="8.5" {...STROKE} />

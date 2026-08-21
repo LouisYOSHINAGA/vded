@@ -190,9 +190,15 @@ function MatrixPart({
               PART_COLUMNS.map((column) => {
                 const available = isPartParamAvailable(mode, column.key)
                 return (
-                  <td key={column.key} rowSpan={2} className="matrix__partcell">
+                  <td
+                    key={column.key}
+                    rowSpan={2}
+                    className="matrix__partcell"
+                    style={{ ['--cell-accent' as string]: `var(--c-part-${part + 1})` }}
+                  >
                     <NumCell
                       value={partData[column.key as 'send'] as number}
+                      accent={`var(--c-part-${part + 1})`}
                       disabled={!available}
                       format={column.key === 'pan' ? panFormat : undefined}
                       ariaLabel={`part ${part + 1} ${column.label}`}

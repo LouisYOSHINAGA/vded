@@ -10,7 +10,9 @@ import {
   resetPatch,
   savePreset,
 } from '../state/actions'
+import { useT } from '../i18n'
 import { store, toast, useAppState } from '../state/store'
+import { Icon } from './Icon'
 import { InfoTip } from './InfoTip'
 import type { Preset } from '../state/types'
 
@@ -31,6 +33,7 @@ function formatDate(ms: number): string {
 }
 
 export function PresetPanel() {
+  const t = useT()
   const presets = useAppState((s) => s.presets)
   const patchName = useAppState((s) => s.patch.name)
   const [name, setName] = useState('')
@@ -55,16 +58,22 @@ export function PresetPanel() {
     try {
       const parsed = parsePresetFile(await file.text())
       const count = importPresets(parsed)
-      toast(count > 0 ? `${count} 件のプリセットを読み込みました` : '読み込めるプリセットがありません', count > 0 ? 'info' : 'warn')
+      toast(
+        count > 0 ? t('presets.imported', { n: count }) : t('presets.importedNone'),
+        count > 0 ? 'info' : 'warn',
+      )
     } catch (err) {
-      toast(`ファイルを解析できません: ${err instanceof Error ? err.message : err}`, 'error')
+      toast(
+        t('presets.parseError', { message: err instanceof Error ? err.message : String(err) }),
+        'error',
+      )
     }
   }
 
   return (
     <section className="panel presets">
       <div className="panel__head">
-        <h2 className="panel__title">Presets</h2>
+        <h2 className="panel__title">{t('presets.title')}</h2>
         <span className="tag">{presets.length}</span>
         <div className="panel__spacer" />
         <button
@@ -72,12 +81,17 @@ export function PresetPanel() {
           className="btn btn--ghost btn--sm"
           onClick={() => download(`vded-presets-${Date.now()}.json`, JSON.stringify(makePresetFile(presets), null, 2))}
           disabled={presets.length === 0}
-          title="全プリセットを JSON ファイルに書き出し"
+          title={t('presets.exportTitle')}
         >
-          Export
+          {t('presets.export')}
         </button>
-        <button type="button" className="btn btn--ghost btn--sm" onClick={() => fileInput.current?.click()} title="JSON からプリセットを読み込み">
-          Import
+        <button
+          type="button"
+          className="btn btn--ghost btn--sm"
+          onClick={() => fileInput.current?.click()}
+          title={t('presets.importTitle')}
+        >
+          {t('presets.import')}
         </button>
         <input
           ref={fileInput}
@@ -96,23 +110,23 @@ export function PresetPanel() {
         <div className="presets__save">
           <input
             className="text-input"
-            placeholder={patchName || 'プリセット名'}
+            placeholder={patchName || t('presets.namePlaceholder')}
             value={name}
             maxLength={28}
             onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'Enter') onSave()
             }}
-            aria-label="保存するプリセット名"
+            aria-label={t('presets.nameAria')}
           />
           <button type="button" className="btn btn--accent btn--sm" onClick={onSave}>
-            Save
+            {t('presets.save')}
           </button>
         </div>
         <div className="presets__options">
           <label className="checkbox">
             <input type="checkbox" checked={withPattern} onChange={(e) => setWithPattern(e.target.checked)} />
-            <span className="legend">パターンも含める</span>
+            <span className="legend">{t('presets.withPattern')}</span>
           </label>
           <label className="checkbox">
             <input
@@ -120,21 +134,21 @@ export function PresetPanel() {
               checked={withAppearance}
               onChange={(e) => setWithAppearance(e.target.checked)}
             />
-            <span className="legend">スキン／フォントも含める</span>
+            <span className="legend">{t('presets.withAppearance')}</span>
           </label>
           <label className="checkbox">
             <input type="checkbox" checked={sendOnLoad} onChange={(e) => setSendOnLoad(e.target.checked)} />
-            <span className="legend">読込時に実機へ送信</span>
+            <span className="legend">{t('presets.sendOnLoad')}</span>
           </label>
         </div>
 
         {presets.length > 4 && (
           <input
             className="text-input presets__search"
-            placeholder="検索…"
+            placeholder={t('presets.search')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            aria-label="プリセット検索"
+            aria-label={t('presets.searchAria')}
           />
         )}
 
@@ -149,20 +163,20 @@ export function PresetPanel() {
             />
           ))}
           {filtered.length === 0 && (
-            <li className="presets__empty hint">
-              プリセットがありません。エディットしてから <strong>SAVE</strong> で保存できます。
-            </li>
+            <li className="presets__empty hint">{t('presets.empty')}</li>
           )}
         </ul>
 
         <div className="presets__footer">
-          <button type="button" className="btn btn--ghost btn--sm" onClick={resetPatch} title="初期状態に戻す">
-            Init
+          <button
+            type="button"
+            className="btn btn--ghost btn--sm"
+            onClick={resetPatch}
+            title={t('presets.initTitle')}
+          >
+            {t('presets.init')}
           </button>
-          <InfoTip label="プリセットの保存先">
-            volca drum は音色を送り返せないため、プリセットはブラウザ側にのみ保存されます
-            （EXPORT / IMPORT で JSON としてやり取りできます）。
-          </InfoTip>
+          <InfoTip label={t('presets.title')}>{t('presets.storageHelp')}</InfoTip>
         </div>
       </div>
     </section>
@@ -180,6 +194,7 @@ function PresetRow({
   withAppearance: boolean
   sendOnLoad: boolean
 }) {
+  const t = useT()
   const [renaming, setRenaming] = useState(false)
   const [draft, setDraft] = useState(preset.name)
 
@@ -199,14 +214,14 @@ function PresetRow({
             if (e.key === 'Enter') e.currentTarget.blur()
             if (e.key === 'Escape') setRenaming(false)
           }}
-          aria-label="プリセット名を変更"
+          aria-label={t('presets.renameAria')}
         />
       ) : (
         <button
           type="button"
           className="preset__main"
           onClick={() => loadPreset(preset, { withPattern, withAppearance, send: sendOnLoad })}
-          title="クリックで読み込み"
+          title={t('presets.loadTitle')}
         >
           <span className="preset__name">{preset.name}</span>
           <span className="preset__meta">
@@ -217,21 +232,37 @@ function PresetRow({
         </button>
       )}
       <div className="preset__actions">
-        <button type="button" className="micro-btn" title="現在の状態で上書き" onClick={() => overwritePreset(preset.id, { pattern: withPattern, appearance: withAppearance })}>
-          ⤓
-        </button>
-        <button type="button" className="micro-btn" title="名前を変更" onClick={() => setRenaming(true)}>
-          ✎
+        <button
+          type="button"
+          className="micro-btn"
+          title={t('presets.overwrite')}
+          aria-label={t('presets.overwrite')}
+          onClick={() =>
+            overwritePreset(preset.id, { pattern: withPattern, appearance: withAppearance })
+          }
+        >
+          <Icon name="overwrite" />
         </button>
         <button
           type="button"
           className="micro-btn"
-          title="削除"
+          title={t('presets.rename')}
+          aria-label={t('presets.rename')}
+          onClick={() => setRenaming(true)}
+        >
+          <Icon name="rename" />
+        </button>
+        <button
+          type="button"
+          className="micro-btn"
+          title={t('presets.delete')}
+          aria-label={t('presets.delete')}
           onClick={() => {
-            if (window.confirm(`「${preset.name}」を削除しますか？`)) deletePreset(preset.id)
+            if (window.confirm(t('presets.deleteConfirm', { name: preset.name })))
+              deletePreset(preset.id)
           }}
         >
-          ✕
+          <Icon name="clear" />
         </button>
       </div>
     </li>

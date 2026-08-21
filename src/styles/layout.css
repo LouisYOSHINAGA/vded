@@ -135,18 +135,31 @@
 
 /* ---------------- Tabs ---------------- */
 
+/*
+ * The strip and the panel below are one folder: the selected tab shares the
+ * panel's surface and loses its bottom edge, so the tabs visibly belong to the
+ * thing they switch instead of floating between two blocks.
+ */
+.tabbed {
+  display: flex;
+  flex-direction: column;
+}
+
 .tabs {
   display: flex;
-  gap: 2px;
-  padding: 3px;
-  border-radius: var(--r-md);
-  background: var(--c-void);
-  box-shadow: inset 0 0 0 1px var(--c-line-soft);
+  gap: 3px;
+  padding: 0 8px;
+  margin-bottom: -1px;
+  z-index: 1;
 }
 
 .tabs__item {
-  padding: 7px 14px;
-  border-radius: 3px;
+  position: relative;
+  padding: 8px 16px 9px;
+  border-radius: var(--r-md) var(--r-md) 0 0;
+  background: color-mix(in srgb, var(--c-ink) 5%, transparent);
+  box-shadow: inset 0 1px 0 var(--c-line-soft), inset 1px 0 0 var(--c-line-soft),
+    inset -1px 0 0 var(--c-line-soft);
   font-size: 11.5px;
   font-weight: 700;
   letter-spacing: var(--track-title);
@@ -156,23 +169,19 @@
 
 .tabs__item:hover {
   color: var(--c-ink);
+  background: color-mix(in srgb, var(--c-ink) 9%, transparent);
 }
 
 .tabs__item[aria-selected='true'] {
-  background: var(--c-raise);
+  background: var(--c-panel-2);
   color: var(--c-ink);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset;
+  box-shadow: inset 0 2px 0 var(--c-accent), inset 1px 0 0 var(--c-line-soft),
+    inset -1px 0 0 var(--c-line-soft);
 }
 
-.tabs__item[aria-selected='true']::before {
-  content: "";
-  display: inline-block;
-  width: 4px;
-  height: 4px;
-  margin-right: 6px;
-  vertical-align: 2px;
-  border-radius: 50%;
-  background: var(--c-accent);
+.tabbed__body > .panel {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
 }
 
 /* ---------------- Toast ---------------- */
@@ -260,7 +269,7 @@
 }
 
 .device__select {
-  max-width: 210px;
+  max-width: 186px;
   min-height: 26px;
   font-size: 12px;
 }
@@ -272,7 +281,7 @@
 }
 
 .device__select--in {
-  max-width: 130px;
+  max-width: 112px;
   color: var(--c-ink-dim);
 }
 
