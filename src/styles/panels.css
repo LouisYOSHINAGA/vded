@@ -848,7 +848,7 @@ code {
 }
 
 .layer-panel__pick:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--hover-soft);
 }
 
 .layer-panel__pick[aria-pressed='true'] .layer-panel__title {
@@ -941,7 +941,7 @@ code {
 }
 
 .dial-part__pick:hover {
-  background: color-mix(in srgb, var(--tint) 16%, transparent);
+  background: var(--hover-soft);
 }
 
 .dial-part__num {

@@ -192,7 +192,12 @@
   flex: 1;
   min-width: 0;
   padding: 3px 4px;
+  border-radius: var(--r-sm);
   text-align: left;
+}
+
+.seq-rail__select:hover {
+  background: var(--hover-soft);
 }
 
 .seq-rail__num {
@@ -250,8 +255,10 @@
   transition: background 0.1s, color 0.1s;
 }
 
+/* Same overlay as every other plain control: hover moves the surface toward
+   the ink, which darkens on a light skin and lightens on a dark one. */
 .micro-btn:hover:not([aria-pressed='true']) {
-  background: var(--c-raise-2);
+  background: linear-gradient(var(--hover-soft), var(--hover-soft)), var(--c-raise);
   color: var(--c-ink);
 }
 
