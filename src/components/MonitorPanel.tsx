@@ -37,18 +37,37 @@ export function MonitorPanel() {
       {open && (
         <div className="panel__body monitor">
           {midi.error && <div className="banner banner--error">{midi.error}</div>}
-          <ul className="monitor__list">
-            {midi.log.map((entry) => (
-              <li key={entry.id} className={`monitor__row monitor__row--${entry.direction}`}>
-                <span className="monitor__dir">{entry.direction === 'out' ? '→' : '←'}</span>
-                <span className="monitor__text">{entry.text}</span>
-                {entry.detail && <span className="monitor__detail">{entry.detail}</span>}
-              </li>
-            ))}
-            {midi.log.length === 0 && (
-              <li className="hint monitor__empty">{t('monitor.empty')}</li>
-            )}
-          </ul>
+          {/* A table, not a sentence per line: CC numbers and values are only
+              worth reading when they line up in columns. */}
+          <table className="monitor__table">
+            <thead>
+              <tr>
+                <th scope="col">{t('monitor.colDir')}</th>
+                <th scope="col">{t('monitor.colType')}</th>
+                <th scope="col">{t('monitor.colCh')}</th>
+                <th scope="col">{t('monitor.colNum')}</th>
+                <th scope="col">{t('monitor.colValue')}</th>
+                <th scope="col" className="monitor__th--target">
+                  {t('monitor.colTarget')}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {midi.log.map((entry) => (
+                <tr key={entry.id} className={`monitor__row monitor__row--${entry.direction}`}>
+                  <td className="monitor__dir">{entry.direction === 'out' ? 'OUT' : 'IN'}</td>
+                  <td className="monitor__kind">{entry.kind}</td>
+                  <td className="monitor__num">{entry.channel ?? ''}</td>
+                  <td className="monitor__num">{entry.number ?? ''}</td>
+                  <td className="monitor__num monitor__num--value">{entry.value ?? ''}</td>
+                  <td className="monitor__target" title={entry.target}>
+                    {entry.target}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {midi.log.length === 0 && <p className="hint monitor__empty">{t('monitor.empty')}</p>}
         </div>
       )}
     </section>

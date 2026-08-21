@@ -22,12 +22,23 @@ export interface PortInfo {
 
 export type MidiStatus = 'unsupported' | 'idle' | 'requesting' | 'ready' | 'denied' | 'error'
 
+/**
+ * One monitor row. The fields are kept apart rather than pre-formatted so the
+ * monitor can lay them out in columns: scanning a stream of CCs is much easier
+ * when the numbers line up.
+ */
 export interface LogEntry {
   id: number
   time: number
   direction: 'out' | 'in'
-  text: string
-  detail?: string
+  /** CC, NOTE, PANIC, CLOCK… shown as-is in the TYPE column. */
+  kind: string
+  channel: number | null
+  /** CC number, or note number for note messages. */
+  number: number | null
+  value: number | null
+  /** What the message controls: a parameter name, or free text. */
+  target: string
 }
 
 export interface EngineSnapshot {
@@ -110,8 +121,8 @@ export class MidiEngine {
     this.listeners.forEach((l) => l())
   }
 
-  private log(direction: 'out' | 'in', text: string, detail?: string): void {
-    const entry: LogEntry = { id: ++this.logId, time: performance.now(), direction, text, detail }
+  private log(direction: 'out' | 'in', fields: Omit<LogEntry, 'id' | 'time' | 'direction'>): void {
+    const entry: LogEntry = { id: ++this.logId, time: performance.now(), direction, ...fields }
     const log = [entry, ...this.snapshot.log].slice(0, LOG_LIMIT)
     this.emit({ log })
   }
@@ -178,7 +189,7 @@ export class MidiEngine {
       const data = event.data
       if (!data) return
       // Clock spam would drown the monitor; count it silently.
-      if (data[0] !== 0xf8) this.log('in', formatIncoming(data))
+      if (data[0] !== 0xf8) this.log('in', decodeIncoming(data))
       this.onIncoming?.(data)
     }
   }
@@ -234,7 +245,13 @@ export class MidiEngine {
         this.sendRaw([0x80 | ((channel - 1) & 0x0f), note & 0x7f, 0])
       }
     }
-    this.log('out', 'PANIC — note off', `ch ${channels.join(', ')} · note ${unique.join(', ')}`)
+    this.log('out', {
+      kind: 'PANIC',
+      channel: null,
+      number: null,
+      value: null,
+      target: `note off · ch ${channels.join(',')} · note ${unique.join(',')}`,
+    })
   }
 
   // -------------------------------------------------------------------------
@@ -287,11 +304,13 @@ export class MidiEngine {
           this.dumpRemaining = 0
           break
         }
-        this.log(
-          'out',
-          `CC ${message.cc} = ${message.value}`,
-          `ch ${message.channel} · ${message.label}`,
-        )
+        this.log('out', {
+          kind: 'CC',
+          channel: message.channel,
+          number: message.cc,
+          value: message.value,
+          target: message.label,
+        })
         this.emit({ queued: this.queue.length })
         const gap = isDump ? this.options.dumpIntervalMs : this.options.ccIntervalMs
         if (this.queue.length > 0) await sleep(gap)
@@ -307,18 +326,28 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-function formatIncoming(data: Uint8Array): string {
+type IncomingFields = Omit<LogEntry, 'id' | 'time' | 'direction'>
+
+function decodeIncoming(data: Uint8Array): IncomingFields {
   const status = data[0] & 0xf0
   const channel = (data[0] & 0x0f) + 1
   switch (status) {
     case 0x90:
-      return data[2] === 0 ? `note off ${data[1]} (ch ${channel})` : `note on ${data[1]} v${data[2]} (ch ${channel})`
+      return data[2] === 0
+        ? { kind: 'NOTE OFF', channel, number: data[1], value: 0, target: '' }
+        : { kind: 'NOTE ON', channel, number: data[1], value: data[2], target: '' }
     case 0x80:
-      return `note off ${data[1]} (ch ${channel})`
+      return { kind: 'NOTE OFF', channel, number: data[1], value: 0, target: '' }
     case 0xb0:
-      return `CC ${data[1]} = ${data[2]} (ch ${channel})`
+      return { kind: 'CC', channel, number: data[1], value: data[2], target: '' }
     default:
-      return Array.from(data).map((b) => b.toString(16).padStart(2, '0')).join(' ')
+      return {
+        kind: 'RAW',
+        channel: null,
+        number: null,
+        value: null,
+        target: Array.from(data).map((b) => b.toString(16).padStart(2, '0')).join(' '),
+      }
   }
 }
 

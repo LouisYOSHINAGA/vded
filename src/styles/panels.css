@@ -593,32 +593,54 @@
 
 .monitor {
   padding: 8px 10px;
+  max-height: 260px;
+  overflow: auto;
 }
 
-.monitor__list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  max-height: 240px;
-  overflow-y: auto;
+.monitor__table {
+  width: 100%;
+  border-collapse: collapse;
   font-family: var(--font-mono);
-  font-size: 11px;
-}
-
-.monitor__row {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-  padding: 2px 4px;
-  border-radius: 3px;
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
+/* The header stays put while the log scrolls: the columns are only readable
+   if you can still tell which one is which. */
+.monitor__table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 3px 6px;
+  background: var(--c-panel);
+  border-bottom: 1px solid var(--c-line-soft);
+  font-family: var(--font-ui);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: var(--track-legend);
+  text-transform: uppercase;
+  color: var(--c-ink-faint);
+  text-align: right;
+}
+
+.monitor__table thead th:first-child,
+.monitor__table thead th.monitor__th--target {
+  text-align: left;
+}
+
+.monitor__table td {
+  padding: 2px 6px;
+}
+
 .monitor__row:nth-child(odd) {
-  background: rgba(255, 255, 255, 0.018);
+  background: color-mix(in srgb, var(--c-ink) 4%, transparent);
 }
 
 .monitor__dir {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: var(--track-legend);
   color: var(--c-accent);
 }
 
@@ -626,14 +648,26 @@
   color: var(--c-info);
 }
 
-.monitor__text {
+.monitor__kind {
+  color: var(--c-ink-dim);
+  text-align: right;
+}
+
+.monitor__num {
+  text-align: right;
   color: var(--c-ink);
 }
 
-.monitor__detail {
-  color: var(--c-ink-faint);
+.monitor__num--value {
+  font-weight: 700;
+}
+
+.monitor__target {
+  width: 100%;
+  max-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: var(--c-ink-faint);
 }
 
 .monitor__empty {
