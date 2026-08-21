@@ -37,7 +37,7 @@
 }
 
 .brand__mark {
-  font-size: 19px;
+  font-size: calc(19px * var(--fs, 1));
   font-weight: 800;
   letter-spacing: calc(var(--track-title) * 1.7);
   color: var(--c-ink);
@@ -50,7 +50,7 @@
 
 .brand__version {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: calc(12px * var(--fs, 1));
   color: var(--c-ink-dim);
   padding: 2px 6px;
   border-radius: var(--r-sm);
@@ -58,7 +58,7 @@
 }
 
 .brand__sub {
-  font-size: 10px;
+  font-size: calc(10px * var(--fs, 1));
   font-weight: 600;
   letter-spacing: calc(var(--track-title) * 1.4);
   text-transform: uppercase;
@@ -76,7 +76,7 @@
 }
 
 .cluster__label {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs, 1));
   font-weight: 700;
   letter-spacing: var(--track-title);
   text-transform: uppercase;
@@ -160,7 +160,7 @@
   background: color-mix(in srgb, var(--c-ink) 5%, transparent);
   box-shadow: inset 0 1px 0 var(--c-line-soft), inset 1px 0 0 var(--c-line-soft),
     inset -1px 0 0 var(--c-line-soft);
-  font-size: 11.5px;
+  font-size: calc(11.5px * var(--fs, 1));
   font-weight: 700;
   letter-spacing: var(--track-title);
   text-transform: uppercase;
@@ -199,7 +199,7 @@
   border-radius: var(--r-pill);
   background: var(--c-step-off);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 0 0 1px var(--c-line);
-  font-size: 12px;
+  font-size: calc(12px * var(--fs, 1));
   animation: toast-in 0.18s ease-out;
 }
 
@@ -246,7 +246,7 @@
   gap: 8px;
   padding: 9px 12px;
   border-radius: var(--r-md);
-  font-size: 12.5px;
+  font-size: calc(12.5px * var(--fs, 1));
   line-height: 1.5;
 }
 
@@ -271,7 +271,7 @@
 .device__select {
   max-width: 186px;
   min-height: 26px;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs, 1));
 }
 
 .device__rescan {
@@ -282,7 +282,7 @@
 
 .device__mode {
   min-height: 26px;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs, 1));
 }
 
 .device__select--in {
@@ -291,7 +291,7 @@
 }
 
 .device__hint {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs, 1));
   white-space: nowrap;
   color: var(--c-ink-dim);
 }
@@ -329,7 +329,7 @@
   min-height: 30px;
   width: 30px;
   padding: 0;
-  font-size: 13px;
+  font-size: calc(13px * var(--fs, 1));
 }
 
 .shortcuts__pop {
@@ -359,7 +359,7 @@
   display: flex;
   align-items: baseline;
   gap: 8px;
-  font-size: 12.5px;
+  font-size: calc(12.5px * var(--fs, 1));
   color: var(--c-ink-dim);
 }
 
@@ -375,7 +375,7 @@ kbd {
   background: var(--c-void);
   box-shadow: inset 0 0 0 1px var(--c-line);
   font-family: var(--font-mono);
-  font-size: 11.5px;
+  font-size: calc(11.5px * var(--fs, 1));
   color: var(--c-ink);
 }
 
@@ -392,6 +392,7 @@ kbd {
 .appearance__swatch,
 .theme-card__swatch {
   display: inline-flex;
+  flex: none;
   border-radius: 3px;
   overflow: hidden;
   box-shadow: inset 0 0 0 1px var(--c-line);
@@ -456,13 +457,15 @@ kbd {
 }
 
 .appearance__modelabel {
-  font-size: 10px;
+  font-size: calc(10px * var(--fs, 1));
   color: var(--c-ink-faint);
 }
 
+/* Two columns, not three: at three the longest skin names (BLUEPRINT,
+   VERMILION) squeezed the swatch to nothing and ran off the card. */
 .appearance__themes {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 5px;
 }
 
@@ -514,7 +517,10 @@ kbd {
 }
 
 .theme-card__name {
-  font-size: 12px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: calc(12px * var(--fs, 1));
   font-weight: 700;
   letter-spacing: var(--track-legend);
   text-transform: uppercase;
@@ -532,7 +538,7 @@ kbd {
 
 .skin-editor__copy {
   min-height: 22px;
-  font-size: 10px;
+  font-size: calc(10px * var(--fs, 1));
   width: 104px;
 }
 
@@ -555,7 +561,7 @@ kbd {
 }
 
 .color-field__label {
-  font-size: 10.5px;
+  font-size: calc(10.5px * var(--fs, 1));
 }
 
 .color-field__controls {
@@ -594,7 +600,7 @@ kbd {
   background: var(--c-panel);
   color: var(--c-ink);
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: calc(12px * var(--fs, 1));
 }
 
 .appearance__fonts {
@@ -623,12 +629,12 @@ kbd {
 }
 
 .font-card__name {
-  font-size: 12.5px;
+  font-size: calc(12.5px * var(--fs, 1));
   color: var(--c-ink);
 }
 
 .font-card__sample {
-  font-size: 13px;
+  font-size: calc(13px * var(--fs, 1));
   color: var(--c-ink-dim);
 }
 

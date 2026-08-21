@@ -24,7 +24,7 @@
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset,
     0 0 calc(10px * var(--glow-strength)) var(--c-accent-glow);
   color: var(--c-on-accent);
-  font-size: 13px;
+  font-size: calc(13px * var(--fs, 1));
   font-weight: 700;
   letter-spacing: var(--track-legend);
   text-transform: uppercase;
@@ -62,7 +62,7 @@
 
 .seq-grid__corner {
   position: relative;
-  font-size: 11px;
+  font-size: calc(11px * var(--fs, 1));
 }
 
 /* Splitter between the part rail and the steps. */
@@ -136,7 +136,7 @@
 .seq-ruler__tick {
   text-align: center;
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: calc(10.5px * var(--fs, 1));
   color: var(--c-ink-faint);
   padding-bottom: 2px;
   border-bottom: 1px solid var(--c-line-soft);
@@ -212,7 +212,7 @@
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tint) 65%, transparent);
   color: var(--tint);
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: calc(13px * var(--fs, 1));
   font-weight: 700;
 }
 
@@ -223,7 +223,7 @@
 }
 
 .seq-rail__name {
-  font-size: 12.5px;
+  font-size: calc(12.5px * var(--fs, 1));
   font-weight: 600;
   letter-spacing: calc(var(--track-legend) * 0.6);
   text-transform: uppercase;
@@ -249,7 +249,7 @@
   background: var(--c-raise);
   box-shadow: var(--shadow-raise);
   color: var(--c-ink);
-  font-size: 15px;
+  font-size: calc(15px * var(--fs, 1));
   font-weight: 700;
   line-height: 1;
   transition: background 0.1s, color 0.1s;
@@ -392,7 +392,7 @@
 }
 
 .vel-lane__part {
-  font-size: 13px;
+  font-size: calc(13px * var(--fs, 1));
   font-weight: 600;
   letter-spacing: calc(var(--track-legend) * 0.6);
   text-transform: uppercase;
@@ -400,7 +400,7 @@
 }
 
 .vel-lane__label .hint {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs, 1));
 }
 
 /*
@@ -459,7 +459,7 @@
 
 .vel-fader__value {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: calc(11px * var(--fs, 1));
   font-variant-numeric: tabular-nums;
   color: var(--c-ink-dim);
 }
@@ -534,7 +534,7 @@
 
 .vel-scaler__value {
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: calc(13px * var(--fs, 1));
   font-variant-numeric: tabular-nums;
   color: var(--tint);
 }

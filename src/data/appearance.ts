@@ -17,8 +17,10 @@ export interface Appearance {
   theme: ThemeId
   font: FontId
   lang: Lang
-  /** UI scale multiplier, 1 = 100%. */
+  /** UI scale multiplier, 1 = 100%. Scales everything, dials included. */
   zoom: number
+  /** Text-only multiplier, 1 = 100%. Layout metrics stay put. */
+  fontScale: number
   /** Edited by the skin editor; used when `theme` is 'custom'. */
   custom: ThemeSeed
 }
@@ -93,6 +95,7 @@ export const DEFAULT_APPEARANCE: Appearance = {
   font: 'default',
   lang: detectLang(),
   zoom: 1,
+  fontScale: 1,
   custom: { ...THEME_SEEDS.paper, parts: [...THEME_SEEDS.paper.parts] },
 }
 
@@ -132,6 +135,9 @@ export const FONTS: FontInfo[] = [
 ]
 
 export const ZOOM_STEPS = [0.7, 0.8, 0.9, 1, 1.1, 1.25] as const
+
+/** Text-only steps. Narrower than the UI scale: past these the layout breaks. */
+export const FONT_SCALE_STEPS = [0.85, 0.925, 1, 1.075, 1.15] as const
 
 /** Editable seed fields, in the order the editor shows them. */
 export const SEED_FIELDS: { key: keyof ThemeSeed; label: string }[] = [

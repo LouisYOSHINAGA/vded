@@ -26,5 +26,6 @@ export function applyAppearance(appearance: Appearance): void {
   root.dataset.mode = seed.mode
   root.dataset.font = appearance.font
   root.style.setProperty('--ui-zoom', String(appearance.zoom))
+  root.style.setProperty('--fs', String(appearance.fontScale ?? 1))
   root.style.colorScheme = seed.mode
 }

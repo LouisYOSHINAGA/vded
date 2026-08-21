@@ -15,7 +15,7 @@ body {
   background: var(--c-void);
   color: var(--c-ink);
   font-family: var(--font-ui);
-  font-size: 14px;
+  font-size: calc(14px * var(--fs, 1));
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   overscroll-behavior: none;
@@ -60,7 +60,7 @@ button {
 /* ---- shared silkscreen typography ---- */
 
 .legend {
-  font-size: 11.5px;
+  font-size: calc(11.5px * var(--fs, 1));
   font-weight: 600;
   letter-spacing: var(--track-title);
   text-transform: uppercase;
@@ -73,13 +73,13 @@ button {
 
 .value-readout {
   font-family: var(--font-mono);
-  font-size: 12.5px;
+  font-size: calc(12.5px * var(--fs, 1));
   font-variant-numeric: tabular-nums;
   color: var(--c-ink);
 }
 
 .hint {
-  font-size: 12.5px;
+  font-size: calc(12.5px * var(--fs, 1));
   line-height: 1.5;
   color: var(--c-ink-faint);
 }
@@ -102,7 +102,7 @@ button {
 }
 
 .panel__title {
-  font-size: 12.5px;
+  font-size: calc(12.5px * var(--fs, 1));
   white-space: nowrap;
   font-weight: 700;
   letter-spacing: calc(var(--track-title) * 1.15);
@@ -142,7 +142,7 @@ button {
   background: linear-gradient(180deg, var(--c-raise-2), var(--c-raise));
   box-shadow: var(--shadow-raise);
   color: var(--c-ink);
-  font-size: 11.5px;
+  font-size: calc(11.5px * var(--fs, 1));
   font-weight: 700;
   letter-spacing: var(--track-legend);
   text-transform: uppercase;
@@ -202,7 +202,7 @@ button {
 .btn--sm {
   min-height: 23px;
   padding: 0 8px;
-  font-size: 10.5px;
+  font-size: calc(10.5px * var(--fs, 1));
 }
 
 .btn--mute-on,
@@ -247,7 +247,7 @@ button {
   border-radius: var(--r-md);
   background: var(--c-void);
   color: var(--c-ink);
-  font-size: 13px;
+  font-size: calc(13px * var(--fs, 1));
 }
 
 .select {
@@ -275,7 +275,7 @@ button {
   background: var(--c-void);
   color: var(--c-ink);
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: calc(13px * var(--fs, 1));
   font-variant-numeric: tabular-nums;
   text-align: center;
   cursor: ns-resize;
@@ -349,7 +349,7 @@ button {
   padding: 2px 6px;
   border-radius: var(--r-sm);
   background: var(--c-raise);
-  font-size: 10.5px;
+  font-size: calc(10.5px * var(--fs, 1));
   font-weight: 700;
   letter-spacing: var(--track-legend);
   text-transform: uppercase;
@@ -418,7 +418,7 @@ button {
   background: var(--c-panel-2);
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3), inset 0 0 0 1px var(--c-line);
   color: var(--c-ink-dim);
-  font-size: 12.5px;
+  font-size: calc(12.5px * var(--fs, 1));
   line-height: 1.55;
   text-transform: none;
   letter-spacing: normal;

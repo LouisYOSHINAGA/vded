@@ -89,7 +89,7 @@
 }
 
 .knob__label {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs, 1));
   letter-spacing: calc(var(--track-legend) * 0.7);
   text-align: center;
   max-width: 88px;
@@ -97,17 +97,17 @@
 }
 
 .knob__value {
-  font-size: 12.5px;
+  font-size: calc(12.5px * var(--fs, 1));
   font-weight: 600;
   color: var(--knob-accent);
 }
 
 .knob--sm .knob__label {
-  font-size: 10px;
+  font-size: calc(10px * var(--fs, 1));
 }
 
 .knob--sm .knob__value {
-  font-size: 11.5px;
+  font-size: calc(11.5px * var(--fs, 1));
 }
 
 .knob__field {
@@ -119,12 +119,12 @@
 .number-field--knob {
   min-height: 21px;
   padding: 0 4px;
-  font-size: 11.5px;
+  font-size: calc(11.5px * var(--fs, 1));
   color: var(--knob-accent);
 }
 
 .knob__unit {
-  font-size: 9.5px;
+  font-size: calc(9.5px * var(--fs, 1));
   color: var(--c-ink-faint);
 }
 
@@ -147,7 +147,7 @@
   min-height: 23px;
   padding: 0 8px;
   border-radius: 3px;
-  font-size: 10px;
+  font-size: calc(10px * var(--fs, 1));
   font-weight: 700;
   letter-spacing: var(--track-legend);
   text-transform: uppercase;
@@ -210,7 +210,7 @@
 }
 
 .segmented--icons .segmented__text {
-  font-size: 9.5px;
+  font-size: calc(9.5px * var(--fs, 1));
   letter-spacing: calc(var(--track-legend) * 0.6);
 }
 

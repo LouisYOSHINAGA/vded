@@ -1,6 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import type { Appearance, ThemeId } from '../data/appearance'
-import { FONTS, SEED_FIELDS, THEMES, THEME_SEEDS, ZOOM_STEPS, seedFor } from '../data/appearance'
+import {
+  FONTS,
+  FONT_SCALE_STEPS,
+  SEED_FIELDS,
+  THEMES,
+  THEME_SEEDS,
+  ZOOM_STEPS,
+  seedFor,
+} from '../data/appearance'
 import { LANGS, useT } from '../i18n'
 import { setSettings } from '../state/actions'
 import { useAppState } from '../state/store'
@@ -196,6 +204,23 @@ export function AppearanceMenu() {
                 >
                   <span className="font-card__name">{font.name}</span>
                   <span className="font-card__sample">Aa 123 かな</span>
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <section className="appearance__group">
+            <h3 className="legend">{t('appearance.fontSize')}</h3>
+            <div className="segmented appearance__zoom">
+              {FONT_SCALE_STEPS.map((scale) => (
+                <button
+                  key={scale}
+                  type="button"
+                  className="segmented__item"
+                  aria-pressed={Math.abs(scale - (appearance.fontScale ?? 1)) < 0.001}
+                  onClick={() => update({ fontScale: scale })}
+                >
+                  {Math.round(scale * 100)}%
                 </button>
               ))}
             </div>
