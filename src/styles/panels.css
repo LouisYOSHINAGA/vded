@@ -301,7 +301,9 @@
 }
 
 .matrix__layer {
-  width: 30px;
+  width: 1%;
+  padding-left: 13px !important;
+  white-space: nowrap;
 }
 
 .matrix__layerbtn {
@@ -387,15 +389,11 @@
  * by the L1 row, the lower half by L2 — so it always meets in the middle no
  * matter how tall the rows end up.
  */
-.matrix__row--linked .matrix__layer {
-  position: relative;
-}
-
 .matrix__row--linked .matrix__layer::before {
   content: "";
   position: absolute;
   left: 1px;
-  right: 3px;
+  width: 9px;
   border-left: 2px solid color-mix(in srgb, var(--c-accent) 65%, transparent);
   pointer-events: none;
 }
@@ -739,6 +737,7 @@
    up an inch apart with nothing between them. */
 .ccmap__table {
   width: auto;
+  align-self: flex-start;
   border-collapse: collapse;
   font-size: calc(12.5px * var(--fs, 1));
 }
@@ -1164,6 +1163,8 @@ button.dial-row__badge:hover {
   line-height: 1.15;
   text-align: center;
   text-transform: uppercase;
+  /* The label is written with a newline so it stacks inside the square. */
+  white-space: pre-line;
 }
 
 .layer-link__chip:hover:not(:disabled) {

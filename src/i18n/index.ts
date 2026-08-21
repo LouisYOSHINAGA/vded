@@ -429,7 +429,7 @@ const JA: Dict = {
   'part.processing': 'Part processing',
   'part.processingHelp': 'LAYER 1 / 2 共通。実機では EDIT ページの隠しパラメータです。',
   'part.quantTitle': 'PITCH MOD QUANT (CC53) を送信します',
-  'part.quantOffTitle': '公式チャート未記載の CC です。MIDI map タブで送信を有効化してください',
+  'part.quantOffTitle': '公式資料に記載のない CC です。MIDI map タブで送信を有効化してください',
 
   'matrix.title': 'All layers',
   'matrix.help':
@@ -509,7 +509,7 @@ const JA: Dict = {
   'map.resetDone': 'CC 表を既定値に戻しました',
   'map.liveSend': 'ノブ操作を即座に送信',
   'map.sendQuant': 'Pitch mod quant (CC53) を送信',
-  'map.sendQuantTitle': '公式チャートに記載のない CC53 を送信対象に加えます',
+  'map.sendQuantTitle': '公式資料に記載のない CC53 を送信対象に加えます',
   'map.ccInterval': 'CC 間隔',
   'map.ccIntervalTitle': 'ノブ操作時の CC 送出間隔',
   'map.dumpInterval': '一括送信 間隔',
@@ -519,7 +519,7 @@ const JA: Dict = {
   'map.perPart': 'PART 別 CC（全 PART が 1 チャンネルを共有）',
   'map.global': 'Wave guide（全体共通）',
   'map.sharedNote': 'LAYER 1 / 2 共通',
-  'map.quantNote': '公式チャート未記載',
+  'map.quantNote': '公式資料に記載なし',
   'map.modelNote': '0 = TUBE / 64 = STRING',
 
   'func.title': 'Func',
