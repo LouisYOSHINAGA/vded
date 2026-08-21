@@ -20,7 +20,7 @@
   z-index: 30;
   display: flex;
   align-items: center;
-  gap: var(--gap-md);
+  gap: 10px;
   flex-wrap: wrap;
   padding: 10px 16px;
   background: linear-gradient(180deg, var(--c-topbar), var(--c-topbar-2));
@@ -31,8 +31,8 @@
 .brand {
   display: flex;
   align-items: baseline;
-  gap: 8px;
-  padding-right: var(--gap-md);
+  gap: 7px;
+  padding-right: 10px;
   border-right: 1px solid var(--c-line-soft);
 }
 

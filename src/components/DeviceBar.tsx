@@ -127,7 +127,12 @@ export function DeviceBar() {
             onChange={(channel) => setSettings({ baseChannel: channel })}
           />
         </label>
-        <span className="hint device__hint">{channelHint}</span>
+        <span
+          className="hint device__hint"
+          title={mode === 'split' ? t('mode.splitTitle') : t('mode.singleTitle')}
+        >
+          {channelHint}
+        </span>
       </div>
     </>
   )

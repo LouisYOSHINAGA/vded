@@ -46,8 +46,8 @@ const EN: Dict = {
   'mode.splitTitle': 'Parts 1–6 on channels 1–6 (recommended, factory default)',
   'mode.singleTitle': 'All parts on one channel. No per-layer control, no BIT/FOLD/DRIVE/DRY GAIN',
   'mode.channelAria': 'Base MIDI channel',
-  'mode.splitHint': 'CH {from}–{to} → PART 1–6',
-  'mode.singleHint': 'CH {ch} → all parts',
+  'mode.splitHint': 'CH {from}–{to}',
+  'mode.singleHint': 'CH {ch}',
 
   'top.preset': 'Preset',
   'top.presetTitle': 'Preset currently being edited',
@@ -336,8 +336,8 @@ const JA: Dict = {
   'mode.splitTitle': 'PART 1–6 を CH 1–6 で個別制御（推奨・工場出荷時）',
   'mode.singleTitle': '全 PART を 1 チャンネルで制御。LAYER 別と BIT/FOLD/DRIVE/DRY GAIN は不可',
   'mode.channelAria': 'ベース MIDI チャンネル',
-  'mode.splitHint': 'CH {from}–{to} → PART 1–6',
-  'mode.singleHint': 'CH {ch} → 全 PART 共通',
+  'mode.splitHint': 'CH {from}–{to}',
+  'mode.singleHint': 'CH {ch}',
 
   'top.preset': 'Preset',
   'top.presetTitle': '編集中の PRESET 名',
