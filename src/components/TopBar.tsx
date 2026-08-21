@@ -21,7 +21,7 @@ export function TopBar() {
           V<em>DED</em>
         </span>
         <span className="brand__sub">{t('app.tagline')}</span>
-        <span className="brand__version">v{__APP_VERSION__}</span>
+        <span className="brand__version">ver.{__APP_VERSION__}</span>
       </div>
 
       <DeviceBar />

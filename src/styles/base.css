@@ -354,6 +354,7 @@ button {
   letter-spacing: var(--track-legend);
   text-transform: uppercase;
   color: var(--c-ink-dim);
+  white-space: nowrap;
 }
 
 .tag--accent {

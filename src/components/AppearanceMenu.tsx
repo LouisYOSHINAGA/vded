@@ -113,7 +113,6 @@ export function AppearanceMenu() {
                           <i style={{ background: seed.parts[3] }} />
                         </span>
                         <span className="theme-card__name">{theme.name}</span>
-                        <span className="theme-card__note hint">{theme.note[lang]}</span>
                       </button>
                     )
                   })}
@@ -126,6 +125,7 @@ export function AppearanceMenu() {
                 type="button"
                 className="theme-card__pick"
                 aria-pressed={appearance.theme === 'custom'}
+                title={t('appearance.customNote')}
                 onClick={() => {
                   // Selecting Custom on its own would look like nothing
                   // happened, so open the editor with it.
@@ -139,7 +139,6 @@ export function AppearanceMenu() {
                   <i style={{ background: appearance.custom.parts[3] }} />
                 </span>
                 <span className="theme-card__name">{t('appearance.custom')}</span>
-                <span className="theme-card__note hint">{t('appearance.customNote')}</span>
               </button>
               <button
                 type="button"

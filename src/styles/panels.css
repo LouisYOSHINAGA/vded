@@ -524,10 +524,26 @@
   white-space: nowrap;
 }
 
+/* Tags and the date share one line: the date gives up width first so PTN and
+   SKIN never wrap onto a second row. */
 .preset__meta {
   display: flex;
   align-items: center;
-  gap: 6px;
+  flex-wrap: nowrap;
+  gap: 5px;
+  min-width: 0;
+}
+
+.preset__meta .tag {
+  flex: none;
+  padding: 1px 5px;
+}
+
+.preset__meta .hint {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .preset__actions {
