@@ -522,10 +522,20 @@ function VelocityLane({ part, railWidth }: { part: number; railWidth: number }) 
 function VelocityScaler({ part }: { part: number }) {
   const t = useT()
   const [factor, setFactor] = useState(1)
+  // While the field has focus it holds raw text, so half-typed values like
+  // "1." are not rewritten under the cursor.
+  const [draft, setDraft] = useState<string | null>(null)
+
+  const commitDraft = () => {
+    const parsed = Number(draft)
+    if (draft !== null && draft.trim() !== '' && Number.isFinite(parsed)) {
+      setFactor(Math.round(Math.max(0, Math.min(2, parsed)) * 20) / 20)
+    }
+    setDraft(null)
+  }
 
   return (
     <div className="vel-scaler">
-      <span className="legend">{t('seq.scale')}</span>
       <div className="vel-scaler__body">
         {/* Vertical, so the slider runs the same direction as the faders it
             scales: pushing it up makes the row louder. */}
@@ -541,7 +551,23 @@ function VelocityScaler({ part }: { part: number }) {
           onDoubleClick={() => setFactor(1)}
         />
         <div className="vel-scaler__side">
-          <span className="vel-scaler__value">×{factor.toFixed(2)}</span>
+          <span className="vel-scaler__value">
+            <span aria-hidden="true">×</span>
+            <input
+              className="vel-scaler__field"
+              type="text"
+              inputMode="decimal"
+              value={draft ?? factor.toFixed(2)}
+              aria-label={t('seq.scaleAria')}
+              onChange={(e) => setDraft(e.target.value)}
+              onFocus={(e) => e.currentTarget.select()}
+              onBlur={() => commitDraft()}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') e.currentTarget.blur()
+                if (e.key === 'Escape') setDraft(null)
+              }}
+            />
+          </span>
           <button
             type="button"
             className="btn btn--sm"
@@ -552,6 +578,7 @@ function VelocityScaler({ part }: { part: number }) {
           </button>
         </div>
       </div>
+      <span className="vel-scaler__caption legend">{t('seq.scale')}</span>
     </div>
   )
 }

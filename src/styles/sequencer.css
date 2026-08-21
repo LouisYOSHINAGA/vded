@@ -12,7 +12,11 @@
 }
 
 /* Transport sits with the panel title: it is the first thing you reach for. */
+/* The panel title and PLAY are two different things — a heading and the one
+   control that starts everything — so they get more air than the head's
+   default gap gives them. */
 .transport__play {
+  margin-left: 10px;
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -53,7 +57,7 @@
 /* ---------------- grid ---------------- */
 
 .seq-grid {
-  --tools-w: 154px;
+  --tools-w: 124px;
   display: grid;
   grid-template-columns: var(--rail-w, 216px) minmax(0, 1fr) var(--tools-w);
   gap: 4px 8px;
@@ -355,10 +359,12 @@
   background: var(--c-step-now);
 }
 
+/* Left-aligned and only as wide as the four buttons: right-aligning them in a
+   wider column left a gap between the last step and the first icon. */
 .seq-row__tools {
   display: flex;
   gap: 3px;
-  justify-content: flex-end;
+  justify-content: flex-start;
 }
 
 
@@ -366,7 +372,7 @@
 /* ---------------- velocity lane ---------------- */
 
 .vel-lane {
-  --tools-w: 154px;
+  --tools-w: 124px;
   margin-top: 14px;
   padding-top: 12px;
   border-top: 1px solid var(--c-line-soft);
@@ -379,10 +385,10 @@
 .vel-lane__label {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
   gap: 2px;
   padding-right: 4px;
-  text-align: right;
+  text-align: center;
 }
 
 .vel-lane__label .legend {
@@ -499,16 +505,25 @@
 
 /* ---------------- Velocity scaler ---------------- */
 
+/* Same anatomy as a fader — track band, then a line of text underneath — so
+   the scale slider's travel lines up exactly with the faders it multiplies. */
 .vel-scaler {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  align-items: center;
+  gap: 3px;
+  padding: 4px 0 2px;
 }
 
 .vel-scaler__body {
   display: flex;
   align-items: center;
   gap: 9px;
+  height: 96px;
+}
+
+.vel-scaler__caption {
+  font-size: calc(11px * var(--fs, 1));
 }
 
 /* `writing-mode` is the standard way to stand a range input on end;
@@ -529,12 +544,32 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  justify-content: center;
   gap: 6px;
 }
 
 .vel-scaler__value {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 1px;
   font-family: var(--font-mono);
   font-size: calc(13px * var(--fs, 1));
   font-variant-numeric: tabular-nums;
   color: var(--tint);
+}
+
+/* Type a factor directly; the slider is for reaching for one by feel. */
+.vel-scaler__field {
+  width: 4.2em;
+  padding: 1px 3px;
+  border-radius: var(--r-sm);
+  background: var(--c-void);
+  box-shadow: inset 0 0 0 1px var(--c-line-soft);
+  font: inherit;
+  color: inherit;
+  text-align: center;
+}
+
+.vel-scaler__field:focus-visible {
+  box-shadow: inset 0 0 0 1px var(--tint);
 }
