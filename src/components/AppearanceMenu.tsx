@@ -46,8 +46,13 @@ export function AppearanceMenu() {
     setSettings({ appearance: { ...appearance, ...patch } })
   }
 
+  // Edits always land in the selected slot, and selecting `custom` is implied
+  // by editing one.
   const updateSeed = (patch: Partial<ThemeSeed>) => {
-    update({ theme: 'custom', custom: { ...appearance.custom, ...patch } })
+    const customs = appearance.customs.map((seed, i) =>
+      i === appearance.customIndex ? { ...seed, ...patch } : seed,
+    )
+    update({ theme: 'custom', customs })
   }
 
   const activeSeed = seedFor(appearance)
@@ -113,7 +118,6 @@ export function AppearanceMenu() {
                         className="theme-card"
                         aria-pressed={theme.id === appearance.theme}
                         onClick={() => update({ theme: theme.id })}
-                        title={theme.note[lang]}
                       >
                         <span className="theme-card__swatch" aria-hidden="true">
                           <i style={{ background: seed.panel }} />
@@ -128,43 +132,51 @@ export function AppearanceMenu() {
               </div>
             ))}
 
-            <div className="theme-card theme-card--custom" data-active={appearance.theme === 'custom'}>
-              <button
-                type="button"
-                className="theme-card__pick"
-                aria-pressed={appearance.theme === 'custom'}
-                title={t('appearance.customNote')}
-                onClick={() => {
-                  // Selecting Custom on its own would look like nothing
-                  // happened, so open the editor with it.
-                  update({ theme: 'custom' })
-                  setEditing(true)
-                }}
-              >
-                <span className="theme-card__swatch" aria-hidden="true">
-                  <i style={{ background: appearance.custom.panel }} />
-                  <i style={{ background: appearance.custom.accent }} />
-                  <i style={{ background: appearance.custom.parts[3] }} />
-                </span>
-                <span className="theme-card__name">{t('appearance.custom')}</span>
-              </button>
-              <button
-                type="button"
-                className={`btn btn--sm${editing ? ' btn--on' : ' btn--ghost'}`}
-                onClick={() => {
-                  update({ theme: 'custom' })
-                  setEditing((value) => !value)
-                }}
-              >
-                {editing ? t('appearance.close') : t('appearance.edit')}
-              </button>
+            <div className="appearance__modegroup">
+              <div className="appearance__grouphead">
+                <span className="appearance__modelabel legend">{t('appearance.custom')}</span>
+                <button
+                  type="button"
+                  className={`btn btn--sm${editing ? ' btn--on' : ' btn--ghost'}`}
+                  onClick={() => {
+                    update({ theme: 'custom' })
+                    setEditing((value) => !value)
+                  }}
+                >
+                  {editing ? t('appearance.close') : t('appearance.edit')}
+                </button>
+              </div>
+              <div className="appearance__themes">
+                {appearance.customs.map((seed, i) => {
+                  const active = appearance.theme === 'custom' && appearance.customIndex === i
+                  return (
+                    <button
+                      key={i}
+                      type="button"
+                      className="theme-card"
+                      aria-pressed={active}
+                      onClick={() => update({ theme: 'custom', customIndex: i })}
+                      onDoubleClick={() => setEditing(true)}
+                    >
+                      <span className="theme-card__swatch" aria-hidden="true">
+                        <i style={{ background: seed.panel }} />
+                        <i style={{ background: seed.accent }} />
+                        <i style={{ background: seed.parts[3] }} />
+                      </span>
+                      <span className="theme-card__name">
+                        {t('appearance.slot', { n: i + 1 })}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
             </div>
 
             {editing && (
               <SkinEditor
                 appearance={appearance}
                 onSeed={updateSeed}
-                onCopyFrom={(seed) => update({ theme: 'custom', custom: seed })}
+                onCopyFrom={(seed) => updateSeed(seed)}
               />
             )}
           </section>
@@ -260,7 +272,7 @@ function SkinEditor({
   onCopyFrom: (seed: ThemeSeed) => void
 }) {
   const t = useT()
-  const seed = appearance.custom
+  const seed = seedFor({ ...appearance, theme: 'custom' })
   const warnings = seedWarnings(seed)
 
   return (
@@ -314,7 +326,7 @@ function SkinEditor({
 
       <h4 className="legend">{t('appearance.partColours')}</h4>
       <div className="skin-editor__grid">
-        {seed.parts.map((color, i) => (
+        {seed.parts.map((color: string, i: number) => (
           <ColorField
             key={i}
             label={`Part ${i + 1}`}
@@ -337,7 +349,6 @@ function SkinEditor({
           </div>
         </div>
       )}
-      <p className="hint">{t('appearance.paletteHelp')}</p>
     </section>
   )
 }

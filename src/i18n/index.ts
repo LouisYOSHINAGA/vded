@@ -114,7 +114,7 @@ const EN: Dict = {
   'part.title': 'Part Edit',
   'part.nameAria': 'Part name',
   'part.nameTitle': 'Part name — an editor label, never sent to the machine',
-  'part.link': 'Link\nL1+2',
+  'part.link': 'Link',
   'part.linkTitle': 'Edit both layers together and send one L1+2 CC',
   'part.linkSingleTitle': 'In single channel mode one CC always drives both layers',
   'part.init': 'Init',
@@ -264,7 +264,7 @@ const EN: Dict = {
   'appearance.fontSize': 'Text size',
   'appearance.scale': 'UI scale',
   'appearance.custom': 'Custom',
-  'appearance.customNote': 'Define your own palette',
+  'appearance.slot': 'Slot {n}',
   'appearance.edit': 'Edit',
   'appearance.close': 'Close',
   'appearance.dialog': 'Appearance',
@@ -273,8 +273,6 @@ const EN: Dict = {
   'appearance.copyFromTitle': 'Copy an existing skin into the custom palette',
   'appearance.modeTitle': 'Changes the direction of shading and hover states',
   'appearance.partColours': 'Part colours',
-  'appearance.paletteHelp':
-    'Only the base colours are set here. Hover states, surface steps and the text colour on the accent are derived automatically.',
   'appearance.colorAria': '{name} colour',
   'appearance.hexAria': '{name} colour code',
 
@@ -407,7 +405,7 @@ const JA: Dict = {
   'part.title': 'Part Edit',
   'part.nameAria': 'PART 名',
   'part.nameTitle': 'PART 名 — 本エディタ内の表示名で、実機には送信されません',
-  'part.link': 'Link\nL1+2',
+  'part.link': 'Link',
   'part.linkTitle': 'LAYER 1 と 2 を同時に編集し、L1+2 の CC 1 通で送信します',
   'part.linkSingleTitle': 'single channel mode では 1 つの CC が両 LAYER に効くため常にリンク状態です',
   'part.init': 'Init',
@@ -557,7 +555,7 @@ const JA: Dict = {
   'appearance.fontSize': '文字サイズ',
   'appearance.scale': 'UI scale',
   'appearance.custom': 'Custom',
-  'appearance.customNote': '自分で配色を指定する',
+  'appearance.slot': '枠 {n}',
   'appearance.edit': '編集',
   'appearance.close': '閉じる',
   'appearance.dialog': '外観設定',
@@ -566,8 +564,6 @@ const JA: Dict = {
   'appearance.copyFromTitle': '既存の配色を CUSTOM に複製します',
   'appearance.modeTitle': '陰影や強調の向きが変わります',
   'appearance.partColours': 'Part colours',
-  'appearance.paletteHelp':
-    '指定するのは基準色だけです。ホバーや段差、アクセント上の文字色は自動で導出されます。',
   'appearance.colorAria': '{name} の色',
   'appearance.hexAria': '{name} の色（16 進）',
 

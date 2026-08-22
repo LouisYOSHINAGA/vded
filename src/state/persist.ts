@@ -1,8 +1,11 @@
 /** localStorage persistence. Nothing here is required for the app to run. */
+import type { Appearance } from '../data/appearance'
+import { CUSTOM_SLOTS, THEME_SEEDS, makeCustomSlots } from '../data/appearance'
 import { DEFAULT_CC_TABLE } from '../midi/ccmap'
 import { makeEmptyPattern, makeInitPatch } from './defaults'
 import type { AppState } from './store'
 import { makeInitialState, store } from './store'
+import type { ThemeSeed } from '../theme/palette'
 import type { Preset } from './types'
 import { PART_COUNT } from './types'
 
@@ -44,7 +47,7 @@ export function loadWorkspace(): Partial<AppState> | null {
         ...data.settings,
         // A stale table from an older build must not shadow new defaults.
         ccTable: data.settings?.ccTable ?? DEFAULT_CC_TABLE,
-        appearance: { ...base.settings.appearance, ...data.settings?.appearance },
+        appearance: migrateAppearance(base.settings.appearance, data.settings?.appearance),
       },
       mixer: { ...base.mixer, ...data.mixer },
       ui: {
@@ -57,6 +60,26 @@ export function loadWorkspace(): Partial<AppState> | null {
     }
   } catch {
     return null
+  }
+}
+
+/**
+ * Older saves held a single `custom` palette; it becomes the first of the eight
+ * slots so nobody loses the skin they built.
+ */
+function migrateAppearance(base: Appearance, saved: Partial<Appearance> | undefined): Appearance {
+  const merged = { ...base, ...saved } as Appearance & { custom?: ThemeSeed }
+  const customs =
+    Array.isArray(merged.customs) && merged.customs.length === CUSTOM_SLOTS
+      ? merged.customs
+      : makeCustomSlots().map((seed, i) => (i === 0 && merged.custom ? merged.custom : seed))
+  delete merged.custom
+  return {
+    ...merged,
+    customs,
+    customIndex: Math.min(Math.max(0, merged.customIndex ?? 0), CUSTOM_SLOTS - 1),
+    fontScale: merged.fontScale ?? 1,
+    theme: merged.theme in THEME_SEEDS || merged.theme === 'custom' ? merged.theme : base.theme,
   }
 }
 

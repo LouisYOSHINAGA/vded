@@ -389,7 +389,7 @@
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  padding-left: 30%;
+  padding-left: 55%;
   padding-right: 4px;
   text-align: center;
 }
@@ -563,7 +563,7 @@
   padding: 2px 4px;
   border-radius: var(--r-sm);
   background: var(--c-void);
-  box-shadow: inset 0 0 0 1px var(--c-line-soft);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tint) 35%, transparent);
   font-family: var(--font-mono);
   font-size: calc(13px * var(--fs, 1));
   font-variant-numeric: tabular-nums;

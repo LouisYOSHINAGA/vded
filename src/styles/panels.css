@@ -1206,8 +1206,8 @@ button.dial-row__badge:hover {
   border-radius: var(--r-md);
   background: color-mix(in srgb, var(--tint) 16%, var(--c-raise));
   box-shadow: var(--shadow-raise);
-  color: var(--c-ink-dim);
-  font-size: calc(9px * var(--fs, 1));
+  color: var(--c-ink-faint);
+  font-size: calc(10px * var(--fs, 1));
   font-weight: 700;
   letter-spacing: var(--track-legend);
   line-height: 1.15;
