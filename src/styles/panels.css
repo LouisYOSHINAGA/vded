@@ -652,8 +652,6 @@
  */
 .monitor__head {
   overflow: hidden;
-  /* Reserve the body's scrollbar so the two stay in register. */
-  scrollbar-gutter: stable;
 }
 
 .monitor__scroll {
@@ -663,12 +661,13 @@
   overflow: auto;
   overscroll-behavior: contain;
   resize: vertical;
-  scrollbar-gutter: stable;
 }
 
 .monitor__table {
-  width: 100%;
-  min-width: 260px;
+  /* max-content plus a 100% floor: the fixed columns keep their widths and the
+     target column grows to fit, so a long name scrolls instead of truncating. */
+  width: max-content;
+  min-width: 100%;
   table-layout: fixed;
   border-collapse: separate;
   border-spacing: 0;

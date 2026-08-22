@@ -41,8 +41,11 @@ export function applyAppearance(appearance: Appearance): void {
 function repaint(): void {
   const app = document.querySelector<HTMLElement>('.app')
   if (!app) return
+  // Detaching collapses the document, so put the scroll position back.
+  const { scrollX, scrollY } = window
   const previous = app.style.display
   app.style.display = 'none'
   void app.offsetHeight
   app.style.display = previous
+  window.scrollTo(scrollX, scrollY)
 }

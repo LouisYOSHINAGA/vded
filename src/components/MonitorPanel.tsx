@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useLayoutEffect, useRef } from 'react'
 import { useT } from '../i18n'
 import { midiEngine } from '../midi/engine'
 import { useMidiSnapshot } from '../hooks/useMidiSnapshot'
@@ -17,6 +17,20 @@ export function MonitorPanel() {
   const t = useT()
   const midi = useMidiSnapshot()
   const head = useRef<HTMLDivElement>(null)
+  const body = useRef<HTMLDivElement>(null)
+
+  // The header is a second table, so it has to be told how wide the body's
+  // table came out and how much room its scrollbar takes; otherwise the two
+  // drift apart the moment a long target name widens the last column.
+  useLayoutEffect(() => {
+    const headBox = head.current
+    const bodyBox = body.current
+    const headTable = headBox?.querySelector('table')
+    const bodyTable = bodyBox?.querySelector('table')
+    if (!headBox || !bodyBox || !headTable || !bodyTable) return
+    headTable.style.width = `${bodyTable.offsetWidth}px`
+    headBox.style.paddingRight = `${bodyBox.offsetWidth - bodyBox.clientWidth}px`
+  })
 
   return (
     <section className="panel monitor-panel">
@@ -57,6 +71,7 @@ export function MonitorPanel() {
         </div>
         <div
           className="monitor__scroll"
+          ref={body}
           onScroll={(e) => {
             if (head.current) head.current.scrollLeft = e.currentTarget.scrollLeft
           }}
