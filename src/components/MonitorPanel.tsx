@@ -64,7 +64,9 @@ export function MonitorPanel() {
                 <th scope="col" className="monitor__col--val">
                   {t('monitor.colValue')}
                 </th>
-                <th scope="col">{t('monitor.colTarget')}</th>
+                <th scope="col" className="monitor__target">
+                  {t('monitor.colTarget')}
+                </th>
               </tr>
             </thead>
           </table>

@@ -209,7 +209,6 @@
   min-width: 0;
   min-height: 22px;
   font-size: calc(12.5px * var(--fs, 1));
-  text-transform: uppercase;
 }
 
 .seq-rail__num {
@@ -239,7 +238,6 @@
   font-size: calc(12.5px * var(--fs, 1));
   font-weight: 600;
   letter-spacing: calc(var(--track-legend) * 0.6);
-  text-transform: uppercase;
   color: var(--c-ink);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -413,7 +411,6 @@
   font-size: calc(13px * var(--fs, 1));
   font-weight: 600;
   letter-spacing: calc(var(--track-legend) * 0.6);
-  text-transform: uppercase;
   color: var(--tint);
 }
 
@@ -588,6 +585,9 @@
   width: 3.4em;
   min-width: 0;
   padding: 0;
+  /* The box is drawn by the wrapper; without this the input keeps the
+     browser's own grey inset border on top of it. */
+  border: none;
   background: none;
   font: inherit;
   color: inherit;

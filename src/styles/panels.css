@@ -44,7 +44,6 @@
   font-size: calc(12px * var(--fs, 1));
   font-weight: 600;
   letter-spacing: calc(var(--track-legend) * 0.8);
-  text-transform: uppercase;
 }
 
 .part-editor__copy {
@@ -315,7 +314,6 @@
   font-size: calc(12.5px * var(--fs, 1));
   font-weight: 600;
   letter-spacing: calc(var(--track-legend) * 0.6);
-  text-transform: uppercase;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -577,7 +575,6 @@
   font-size: calc(13px * var(--fs, 1));
   font-weight: 600;
   letter-spacing: calc(var(--track-legend) * 0.6);
-  text-transform: uppercase;
   color: var(--c-ink);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -679,7 +676,7 @@
 }
 
 .monitor__head th {
-  padding: 4px 6px;
+  padding: 4px 3px;
   border-bottom: 1px solid var(--c-line-soft);
   font-family: var(--font-ui);
   font-size: calc(10.5px * var(--fs, 1));
@@ -689,20 +686,22 @@
   color: var(--c-ink-faint);
 }
 
+/* Just wide enough for three digits: the numbers are meant to be read as one
+   group, not spread across the panel. */
 .monitor__col--ch {
-  width: 44px;
+  width: 34px;
 }
 
 .monitor__col--cc {
-  width: 48px;
+  width: 36px;
 }
 
 .monitor__col--val {
-  width: 54px;
+  width: 42px;
 }
 
 .monitor__table td {
-  padding: 2px 6px;
+  padding: 2px 3px;
   color: var(--c-ink);
 }
 
@@ -715,10 +714,12 @@
 }
 
 /* Never truncated: the row scrolls sideways instead, so a long parameter name
-   stays readable. */
+   stays readable. Left-aligned because it is text, not a number. */
 .monitor__target {
+  padding-left: 10px !important;
   color: var(--c-ink-faint);
   overflow: visible;
+  text-align: left;
 }
 
 .monitor__empty {
@@ -1014,7 +1015,6 @@ code {
   font-size: calc(13px * var(--fs, 1));
   font-weight: 700;
   letter-spacing: calc(var(--track-legend) * 0.6);
-  text-transform: uppercase;
   color: var(--c-ink);
 }
 

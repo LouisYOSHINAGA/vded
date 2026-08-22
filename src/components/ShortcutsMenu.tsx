@@ -21,30 +21,23 @@ const GESTURES: { keys: string; key: string }[] = [
 /** Keyboard help, on demand instead of parked in a footer. */
 export function ShortcutsMenu() {
   const t = useT()
-  const [open, setOpen] = useState(false)
-  /** Hover-opened help closes itself again; a click pins it. */
-  const pinned = useRef(false)
+  // Hover previews the help; a click pins it open. Keeping the two apart is
+  // what makes a click on an already-hovered button pin rather than close.
+  const [hovered, setHovered] = useState(false)
+  const [pinned, setPinned] = useState(false)
   const root = useRef<HTMLDivElement>(null)
+  const open = hovered || pinned
 
   useEffect(() => {
     const onDown = (event: PointerEvent) => {
-      if (!root.current?.contains(event.target as Node)) {
-        pinned.current = false
-        setOpen(false)
-      }
+      if (!root.current?.contains(event.target as Node)) setPinned(false)
     }
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        pinned.current = false
-        setOpen(false)
-      }
+      if (event.key === 'Escape') setPinned(false)
       const target = event.target as HTMLElement | null
       const typing =
         target?.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target?.tagName ?? '')
-      if (!typing && event.key === '?') {
-        pinned.current = true
-        setOpen((value) => !value)
-      }
+      if (!typing && event.key === '?') setPinned((value) => !value)
     }
     document.addEventListener('pointerdown', onDown)
     document.addEventListener('keydown', onKey)
@@ -55,29 +48,25 @@ export function ShortcutsMenu() {
   }, [])
 
   return (
-    <div
-      className="shortcuts"
-      ref={root}
-      onPointerLeave={() => {
-        if (!pinned.current) setOpen(false)
-      }}
-    >
+    <div className="shortcuts" ref={root} onPointerLeave={() => setHovered(false)}>
       <button
         type="button"
         className="btn btn--ghost shortcuts__trigger"
         aria-expanded={open}
+        aria-pressed={pinned}
         aria-haspopup="dialog"
-        onClick={() => {
-          pinned.current = !open
-          setOpen((value) => !value)
-        }}
-        onPointerEnter={() => setOpen(true)}
+        onClick={() => setPinned((value) => !value)}
+        onPointerEnter={() => setHovered(true)}
         title={t('top.shortcutsTitle')}
       >
         ?
       </button>
       {open && (
-        <div className="shortcuts__pop panel" role="dialog" aria-label={t('shortcuts.dialog')}>
+        <div
+          className={`shortcuts__pop panel${pinned ? ' shortcuts__pop--pinned' : ''}`}
+          role="dialog"
+          aria-label={t('shortcuts.dialog')}
+        >
           <h3 className="legend">{t('shortcuts.keyboard')}</h3>
           <ul className="shortcuts__list">
             {SHORTCUTS.map((item) => (

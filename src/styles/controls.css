@@ -60,7 +60,14 @@
   stroke: var(--knob-accent);
   stroke-width: 7;
   stroke-linecap: round;
-  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--knob-accent) 45%, transparent));
+}
+
+.knob__glow {
+  fill: none;
+  stroke: var(--knob-accent);
+  stroke-width: 12;
+  stroke-linecap: round;
+  opacity: calc(0.16 * var(--glow-strength, 1));
 }
 
 .knob__cap {

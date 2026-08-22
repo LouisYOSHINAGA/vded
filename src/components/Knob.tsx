@@ -167,6 +167,14 @@ export function Knob({
       >
         <svg viewBox="0 0 100 100" aria-hidden="true">
           <path className="knob__track" d={arcPath(50, 50, 40, START, START + ARC)} />
+          {/* The glow is a wider translucent copy of the fill rather than a CSS
+              drop-shadow: a filter's blur radius is a screen length, so it kept
+              its size while the dial shrank with the UI scale and smeared the
+              arc past the pointer. Drawn in user units, it scales exactly. */}
+          <path
+            className="knob__glow"
+            d={arcPath(50, 50, 40, Math.min(trackFrom, angle), Math.max(trackFrom, angle))}
+          />
           <path
             className="knob__fill"
             d={arcPath(50, 50, 40, Math.min(trackFrom, angle), Math.max(trackFrom, angle))}
