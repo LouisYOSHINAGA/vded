@@ -34,8 +34,17 @@
   text-align: center;
 }
 
+/*
+ * The one part of the app that opts out of the UI scale. The dial's box is
+ * given to it already scaled (see Knob.tsx), and this cancels the inherited
+ * `zoom` so the SVG inside renders at an effective scale of 1 — Chromium's
+ * rasteriser mis-maps a zoomed SVG viewBox and throws the value arc off the
+ * ring. Net size on screen, and the space the dial takes in the layout around
+ * it, are both unchanged.
+ */
 .knob__dial {
   position: relative;
+  zoom: calc(1 / var(--ui-zoom, 1));
   cursor: ns-resize;
   touch-action: none;
   border-radius: 50%;
@@ -59,19 +68,6 @@
   fill: none;
   stroke: var(--knob-accent);
   stroke-width: 7;
-  stroke-linecap: round;
-}
-
-/*
- * The halo's translucency lives in the stroke colour, not in `opacity`.
- * `opacity` gives the path its own paint layer, and Chromium composites such a
- * layer at the wrong scale under CSS `zoom` — which drew the arc outside the
- * dial once the UI was scaled down.
- */
-.knob__glow {
-  fill: none;
-  stroke: color-mix(in srgb, var(--knob-accent) calc(16% * var(--glow-strength, 1)), transparent);
-  stroke-width: 12;
   stroke-linecap: round;
 }
 

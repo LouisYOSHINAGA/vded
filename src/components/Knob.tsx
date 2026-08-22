@@ -62,12 +62,16 @@ export function Knob({
   layout = 'stack',
 }: KnobProps) {
   const zoom = useAppState((s) => s.settings.appearance.zoom)
-  // Snap the dial so that its *scaled* size is a whole number of pixels. The
-  // app is scaled with CSS `zoom`, and a fractional SVG viewport (34 x 0.7 =
-  // 23.8px) is where Chromium's rounding goes wrong: the viewBox is mapped from
-  // the rounded box while the strokes are placed from the unrounded one, which
-  // pushes the value arc off the ring.
-  const px = zoom > 0 ? Math.round(SIZES[size] * zoom) / zoom : SIZES[size]
+  /*
+   * The dial is sized in *final* pixels and cancels the app's UI scale inside
+   * itself (see `.knob__dial` in controls.css). The app is scaled with CSS
+   * `zoom`, and Chromium's GPU rasteriser gets an SVG's viewBox mapping wrong
+   * when it is scaled that way — the value arc ends up drawn off the ring at a
+   * larger radius. Neutralising the zoom means the SVG always maps 100 user
+   * units onto a whole number of CSS pixels at an effective scale of 1, which
+   * is the ordinary, well-trodden path through the rasteriser.
+   */
+  const px = Math.max(1, Math.round(SIZES[size] * (zoom > 0 ? zoom : 1)))
   const [dragging, setDragging] = useState(false)
   const drag = useRef<{ startY: number; startValue: number } | null>(null)
   const id = useId()
@@ -174,16 +178,12 @@ export function Knob({
       >
         {/* Keyed on the UI scale so the SVG is re-created when it changes:
             Chromium otherwise reuses the subtree's raster at the old scale. */}
-        <svg viewBox="0 0 100 100" aria-hidden="true" key={zoom}>
+        <svg viewBox="0 0 100 100" width={px} height={px} aria-hidden="true" key={zoom}>
+          {/* Track and fill are the same arc at the same width, so the
+              coloured part can never reach outside the ring. There is no halo:
+              anything wider than the track paints past it, which at small UI
+              scales reads as colour spilling off the dial. */}
           <path className="knob__track" d={arcPath(50, 50, 40, START, START + ARC)} />
-          {/* The glow is a wider translucent copy of the fill rather than a CSS
-              drop-shadow: a filter's blur radius is a screen length, so it kept
-              its size while the dial shrank with the UI scale and smeared the
-              arc past the pointer. Drawn in user units, it scales exactly. */}
-          <path
-            className="knob__glow"
-            d={arcPath(50, 50, 40, Math.min(trackFrom, angle), Math.max(trackFrom, angle))}
-          />
           <path
             className="knob__fill"
             d={arcPath(50, 50, 40, Math.min(trackFrom, angle), Math.max(trackFrom, angle))}
