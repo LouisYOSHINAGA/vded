@@ -382,11 +382,14 @@
   align-items: center;
 }
 
+/* Centred, but sitting in the right-hand part of the rail so it reads as a
+   caption for the faders next to it rather than for the whole panel. */
 .vel-lane__label {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2px;
+  padding-left: 30%;
   padding-right: 4px;
   text-align: center;
 }
@@ -509,17 +512,18 @@
    the scale slider's travel lines up exactly with the faders it multiplies. */
 .vel-scaler {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
+  align-items: flex-start;
+  gap: 9px;
   padding: 4px 0 2px;
 }
 
-.vel-scaler__body {
+/* Same anatomy as a fader — track, then a line of text underneath — so the
+   scale slider's travel lines up exactly with the faders it multiplies. */
+.vel-scaler__track {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 9px;
-  height: 96px;
+  gap: 3px;
 }
 
 .vel-scaler__caption {
@@ -540,36 +544,49 @@
   cursor: ns-resize;
 }
 
+/* The readout and APPLY are one stack of equal-width controls. */
 .vel-scaler__side {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: stretch;
   justify-content: center;
   gap: 6px;
+  height: 96px;
+  min-width: 0;
 }
 
 .vel-scaler__value {
-  display: inline-flex;
-  align-items: baseline;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   gap: 1px;
+  padding: 2px 4px;
+  border-radius: var(--r-sm);
+  background: var(--c-void);
+  box-shadow: inset 0 0 0 1px var(--c-line-soft);
   font-family: var(--font-mono);
   font-size: calc(13px * var(--fs, 1));
   font-variant-numeric: tabular-nums;
   color: var(--tint);
 }
 
+.vel-scaler__value:focus-within {
+  box-shadow: inset 0 0 0 1px var(--tint);
+}
+
 /* Type a factor directly; the slider is for reaching for one by feel. */
 .vel-scaler__field {
-  width: 4.2em;
-  padding: 1px 3px;
-  border-radius: var(--r-sm);
-  background: var(--c-void);
-  box-shadow: inset 0 0 0 1px var(--c-line-soft);
+  width: 3.4em;
+  min-width: 0;
+  padding: 0;
+  background: none;
   font: inherit;
   color: inherit;
   text-align: center;
 }
 
-.vel-scaler__field:focus-visible {
-  box-shadow: inset 0 0 0 1px var(--tint);
+.vel-scaler__apply {
+  width: 100%;
+  justify-content: center;
 }
+

@@ -46,7 +46,6 @@ const EN: Dict = {
   'mode.splitHint': 'CH {from}–{to}',
   'mode.singleHint': 'CH {ch}',
 
-  'top.preset': 'Preset',
   'top.presetTitle': 'Preset currently being edited',
   'top.sendAll': 'Send all parameters',
   'top.sendAllTitle':
@@ -170,6 +169,7 @@ const EN: Dict = {
   'wg.sendTitle': 'Re-send these four parameters',
 
   'presets.title': 'Presets',
+  'presets.editing': 'Editing',
   'presets.save': 'Save',
   'presets.nameAria': 'Preset name',
   'presets.namePlaceholder': 'Preset name',
@@ -339,7 +339,6 @@ const JA: Dict = {
   'mode.splitHint': 'CH {from}–{to}',
   'mode.singleHint': 'CH {ch}',
 
-  'top.preset': 'Preset',
   'top.presetTitle': '編集中の PRESET 名',
   'top.sendAll': 'Send all parameters',
   'top.sendAllTitle':
@@ -462,6 +461,7 @@ const JA: Dict = {
   'wg.sendTitle': 'この 4 パラメータを再送信',
 
   'presets.title': 'Presets',
+  'presets.editing': '編集中',
   'presets.save': 'Save',
   'presets.nameAria': 'PRESET 名',
   'presets.namePlaceholder': 'PRESET 名',

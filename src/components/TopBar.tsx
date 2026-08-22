@@ -11,7 +11,6 @@ export function TopBar() {
   const t = useT()
   const midi = useMidiSnapshot()
   const progress = useAppState((s) => s.ui.sendAllProgress)
-  const patchName = useAppState((s) => s.patch.name)
   const connected = Boolean(midi.outputId)
 
   return (
@@ -27,13 +26,6 @@ export function TopBar() {
       <DeviceBar />
 
       <div className="topbar__spacer" />
-
-      <div className="cluster" title={t('top.presetTitle')}>
-        <span className="cluster__label">{t('top.preset')}</span>
-        <span className="value-readout" style={{ fontSize: 13 }}>
-          {patchName || 'UNTITLED'}
-        </span>
-      </div>
 
       <div className="topbar__actions">
         <button

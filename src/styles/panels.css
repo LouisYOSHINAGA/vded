@@ -196,8 +196,12 @@
   overflow-x: auto;
 }
 
+/* Fixed layout so a column is exactly as wide as it is declared: under auto
+   layout the widest label sized its own column and the numbers came out in
+   three different widths. */
 .matrix {
   width: 100%;
+  table-layout: fixed;
   border-collapse: separate;
   border-spacing: 0;
 }
@@ -223,22 +227,39 @@
 }
 
 .matrix__th--part {
-  min-width: 108px;
+  width: 150px;
 }
 
-.matrix__th--wide {
-  min-width: 88px;
+/*
+ * Fixed widths for the two families of column: every dropdown the same, every
+ * number the same. Otherwise the widest label (MOD RATE) sized its own column
+ * and the row read as if those values mattered more.
+ */
+.matrix__th--sel {
+  width: 104px;
 }
 
-/* A little air plus a hairline between parts: enough to see where one part's
-   two layers end and the next begins. */
+.matrix__th--num {
+  width: 62px;
+  /* Two-word headers wrap rather than run into the next column. */
+  white-space: normal;
+  line-height: 1.2;
+}
+
+/* The trailing column soaks up whatever width is left, so every column before
+   it keeps exactly the width it asked for. */
+.matrix__th--layer {
+  width: 52px;
+}
+
+/* Parts are grouped by whitespace, the way the sequencer groups beats: each
+   part's two layers sit in their own band with air above and below. */
 .matrix__row--first > * {
-  border-top: 1px solid var(--c-line-soft);
-  padding-top: 7px;
+  padding-top: 11px;
 }
 
 .matrix__row--last > * {
-  padding-bottom: 7px;
+  padding-bottom: 11px;
 }
 
 /* The whole band is highlighted, not just the name: the selected part's rows
@@ -430,7 +451,7 @@
 
 .mini-select {
   width: 100%;
-  min-width: 80px;
+  min-width: 0;
   padding: 4px;
   border: none;
   border-radius: var(--r-sm);
@@ -512,6 +533,21 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 5px;
+}
+
+.presets__current {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  margin-left: 6px;
+}
+
+.presets__current .value-readout {
+  font-size: calc(13px * var(--fs, 1));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .preset {
@@ -611,17 +647,28 @@
 
 /*
  * The scroller lives inside the body, not on the panel: a sticky header inside
- * a scroller that started above the panel title would ride up over it.
+ * a scroller that started above the panel title would ride up over it. It fills
+ * whatever height the viewport leaves — nothing sits below it — and `resize`
+ * hands the drag handle to whoever wants a different split.
  */
 .monitor__scroll {
-  max-height: 244px;
+  height: 46vh;
+  min-height: 96px;
+  max-height: 78vh;
   overflow: auto;
   overscroll-behavior: contain;
+  resize: vertical;
 }
 
+/*
+ * `separate` rather than `collapse`: a collapsed border belongs to the table,
+ * not the cell, so a sticky header drawn with one lets rows show through above
+ * it as they scroll under.
+ */
 .monitor__table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   font-family: var(--font-mono);
   font-size: calc(12.5px * var(--fs, 1));
   font-variant-numeric: tabular-nums;
@@ -633,9 +680,9 @@
   position: sticky;
   top: 0;
   z-index: 1;
-  padding: 3px 6px;
+  padding: 4px 6px;
   background: var(--c-panel);
-  box-shadow: inset 0 -1px 0 var(--c-line-soft);
+  border-bottom: 1px solid var(--c-line-soft);
   font-family: var(--font-ui);
   font-size: calc(10.5px * var(--fs, 1));
   font-weight: 700;
@@ -849,8 +896,11 @@ code {
   padding: 2px 4px;
 }
 
-.layer-panel--active .layer-panel__title {
-  color: var(--layer-accent);
+/* Both titles are plain ink. Layer 2's own colour is a deliberately muted
+   sibling of the part's, which as text just reads as a dirty black — so the
+   badge and the knobs carry the colour and the titles stay neutral. */
+.layer-panel__title {
+  color: var(--c-ink);
 }
 
 .layer-panel--active {
@@ -1113,8 +1163,8 @@ button.dial-row__badge:hover {
  * bridge between them says so far more directly than a word in a corner.
  */
 .layer-grid--linked {
-  background: color-mix(in srgb, var(--c-accent) 7%, transparent);
-  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--c-accent) 42%, transparent);
+  background: color-mix(in srgb, var(--tint) 7%, transparent);
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--tint) 42%, transparent);
 }
 
 .layer-grid--linked .layer-panel {
@@ -1138,7 +1188,7 @@ button.dial-row__badge:hover {
   top: 50%;
   height: 3px;
   transform: translateY(-50%);
-  background: color-mix(in srgb, var(--c-accent) 55%, transparent);
+  background: color-mix(in srgb, var(--tint) 55%, transparent);
 }
 
 /* Square, not a pill: it is a toggle, and it sits between the two panels it
@@ -1154,7 +1204,7 @@ button.dial-row__badge:hover {
   height: 62px;
   padding: 6px 4px;
   border-radius: var(--r-md);
-  background: var(--c-raise);
+  background: color-mix(in srgb, var(--tint) 16%, var(--c-raise));
   box-shadow: var(--shadow-raise);
   color: var(--c-ink-dim);
   font-size: calc(9px * var(--fs, 1));
@@ -1168,14 +1218,14 @@ button.dial-row__badge:hover {
 }
 
 .layer-link__chip:hover:not(:disabled) {
-  background: linear-gradient(var(--hover-soft), var(--hover-soft)), var(--c-raise);
+  background: color-mix(in srgb, var(--tint) 32%, var(--c-raise));
   color: var(--c-ink);
 }
 
 .layer-link__chip[aria-pressed='true'] {
-  background: var(--c-accent);
-  color: var(--c-on-accent);
-  box-shadow: 0 0 calc(9px * var(--glow-strength)) var(--c-accent-glow);
+  background: var(--tint);
+  color: var(--tint-ink);
+  box-shadow: 0 0 calc(9px * var(--glow-strength)) color-mix(in srgb, var(--tint) 50%, transparent);
 }
 
 .layer-link__chip:disabled {

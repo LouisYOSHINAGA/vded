@@ -75,6 +75,12 @@ export function PresetPanel() {
       <div className="panel__head">
         <h2 className="panel__title">{t('presets.title')}</h2>
         <span className="tag">{presets.length}</span>
+        {/* Which kit is on screen right now. It lived in the top bar, but it is
+            only ever consulted alongside the library itself. */}
+        <span className="presets__current" title={t('top.presetTitle')}>
+          <span className="cluster__label">{t('presets.editing')}</span>
+          <span className="value-readout">{patchName || 'UNTITLED'}</span>
+        </span>
         <div className="panel__spacer" />
         <button
           type="button"

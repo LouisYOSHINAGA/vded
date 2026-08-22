@@ -136,7 +136,15 @@ export function PartEditor() {
       </div>
 
       <div className="panel__body part-editor__body">
-        <div className={`layer-grid${layerLink ? ' layer-grid--linked' : ''}`}>
+        <div
+          className={`layer-grid${layerLink ? ' layer-grid--linked' : ''}`}
+          style={
+            {
+              '--tint': `var(--c-part-${partIndex + 1})`,
+              '--tint-ink': `var(--c-on-part-${partIndex + 1})`,
+            } as React.CSSProperties
+          }
+        >
           <LayerPanel partIndex={partIndex} layerIndex={0} />
           {/* The link control lives between the two panels it joins, and is
               always present, so turning it on never reflows the layout. */}

@@ -536,9 +536,9 @@ function VelocityScaler({ part }: { part: number }) {
 
   return (
     <div className="vel-scaler">
-      <div className="vel-scaler__body">
-        {/* Vertical, so the slider runs the same direction as the faders it
-            scales: pushing it up makes the row louder. */}
+      {/* The slider is a fader like the ones it scales — same height, same
+          direction, and its own caption directly underneath. */}
+      <div className="vel-scaler__track">
         <input
           className="vel-scaler__range"
           type="range"
@@ -550,35 +550,35 @@ function VelocityScaler({ part }: { part: number }) {
           onChange={(e) => setFactor(Number(e.target.value))}
           onDoubleClick={() => setFactor(1)}
         />
-        <div className="vel-scaler__side">
-          <span className="vel-scaler__value">
-            <span aria-hidden="true">×</span>
-            <input
-              className="vel-scaler__field"
-              type="text"
-              inputMode="decimal"
-              value={draft ?? factor.toFixed(2)}
-              aria-label={t('seq.scaleAria')}
-              onChange={(e) => setDraft(e.target.value)}
-              onFocus={(e) => e.currentTarget.select()}
-              onBlur={() => commitDraft()}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') e.currentTarget.blur()
-                if (e.key === 'Escape') setDraft(null)
-              }}
-            />
-          </span>
-          <button
-            type="button"
-            className="btn btn--sm"
-            onClick={() => scaleVelocities(part, factor)}
-            title={t('seq.applyTitle')}
-          >
-            {t('seq.apply')}
-          </button>
-        </div>
+        <span className="vel-scaler__caption legend">{t('seq.scale')}</span>
       </div>
-      <span className="vel-scaler__caption legend">{t('seq.scale')}</span>
+      <div className="vel-scaler__side">
+        <span className="vel-scaler__value">
+          <span aria-hidden="true">×</span>
+          <input
+            className="vel-scaler__field"
+            type="text"
+            inputMode="decimal"
+            value={draft ?? factor.toFixed(2)}
+            aria-label={t('seq.scaleAria')}
+            onChange={(e) => setDraft(e.target.value)}
+            onFocus={(e) => e.currentTarget.select()}
+            onBlur={() => commitDraft()}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') e.currentTarget.blur()
+              if (e.key === 'Escape') setDraft(null)
+            }}
+          />
+        </span>
+        <button
+          type="button"
+          className="btn btn--sm vel-scaler__apply"
+          onClick={() => scaleVelocities(part, factor)}
+          title={t('seq.applyTitle')}
+        >
+          {t('seq.apply')}
+        </button>
+      </div>
     </div>
   )
 }

@@ -62,10 +62,10 @@ export function LayerMatrix() {
           <thead>
             <tr>
               <th className="matrix__th matrix__th--part">{t('matrix.part')}</th>
-              <th className="matrix__th">{t('matrix.layer')}</th>
-              <th className="matrix__th matrix__th--wide">{t('part.source')}</th>
-              <th className="matrix__th">Mod</th>
-              <th className="matrix__th">EG</th>
+              <th className="matrix__th matrix__th--layer">{t('matrix.layer')}</th>
+              <th className="matrix__th matrix__th--sel">{t('part.source')}</th>
+              <th className="matrix__th matrix__th--sel">Mod</th>
+              <th className="matrix__th matrix__th--sel">EG</th>
               {LAYER_COLUMNS.map((column) => (
                 <th key={column.key} className="matrix__th matrix__th--num">
                   {column.label}
