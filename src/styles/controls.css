@@ -62,12 +62,17 @@
   stroke-linecap: round;
 }
 
+/*
+ * The halo's translucency lives in the stroke colour, not in `opacity`.
+ * `opacity` gives the path its own paint layer, and Chromium composites such a
+ * layer at the wrong scale under CSS `zoom` — which drew the arc outside the
+ * dial once the UI was scaled down.
+ */
 .knob__glow {
   fill: none;
-  stroke: var(--knob-accent);
+  stroke: color-mix(in srgb, var(--knob-accent) calc(16% * var(--glow-strength, 1)), transparent);
   stroke-width: 12;
   stroke-linecap: round;
-  opacity: calc(0.16 * var(--glow-strength, 1));
 }
 
 .knob__cap {

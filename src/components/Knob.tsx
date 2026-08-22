@@ -1,4 +1,5 @@
 import { useCallback, useId, useRef, useState } from 'react'
+import { useAppState } from '../state/store'
 import { NumberField } from './NumberField'
 
 export interface KnobProps {
@@ -60,7 +61,13 @@ export function Knob({
   unit,
   layout = 'stack',
 }: KnobProps) {
-  const px = SIZES[size]
+  const zoom = useAppState((s) => s.settings.appearance.zoom)
+  // Snap the dial so that its *scaled* size is a whole number of pixels. The
+  // app is scaled with CSS `zoom`, and a fractional SVG viewport (34 x 0.7 =
+  // 23.8px) is where Chromium's rounding goes wrong: the viewBox is mapped from
+  // the rounded box while the strokes are placed from the unrounded one, which
+  // pushes the value arc off the ring.
+  const px = zoom > 0 ? Math.round(SIZES[size] * zoom) / zoom : SIZES[size]
   const [dragging, setDragging] = useState(false)
   const drag = useRef<{ startY: number; startValue: number } | null>(null)
   const id = useId()
@@ -165,7 +172,9 @@ export function Knob({
         onContextMenu={reset}
         onKeyDown={onKeyDown}
       >
-        <svg viewBox="0 0 100 100" aria-hidden="true">
+        {/* Keyed on the UI scale so the SVG is re-created when it changes:
+            Chromium otherwise reuses the subtree's raster at the old scale. */}
+        <svg viewBox="0 0 100 100" aria-hidden="true" key={zoom}>
           <path className="knob__track" d={arcPath(50, 50, 40, START, START + ARC)} />
           {/* The glow is a wider translucent copy of the fill rather than a CSS
               drop-shadow: a filter's blur radius is a screen length, so it kept
