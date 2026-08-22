@@ -480,6 +480,10 @@ export function resetDialOrder(): void {
   setUi({ dialOrder: [0, 1, 2, 3, 4, 5] })
 }
 
+export function setMemo(memo: string): void {
+  store.set((s) => ({ ...s, memo }))
+}
+
 export function setTransport(patch: Partial<AppState['transport']>): void {
   store.patchSlice('transport', patch)
 }

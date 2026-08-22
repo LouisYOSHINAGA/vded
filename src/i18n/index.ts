@@ -105,10 +105,12 @@ const EN: Dict = {
   'seq.applied': 'Scaled PART {part} velocities by ×{f}',
 
   'tabs.label': 'Editor',
+  'tabs.reorderTitle': 'Drag to reorder (Alt + arrow keys from the keyboard)',
   'tab.part': 'Part edit',
   'tab.matrix': 'All layers',
   'tab.dials': 'Dials',
   'tab.presets': 'Presets',
+  'tab.memo': 'Memo',
   'tab.func': 'Func',
   'tab.map': 'MIDI map',
 
@@ -159,6 +161,11 @@ const EN: Dict = {
   'dials.reorderAria': 'Reorder PART {n}',
   'dials.reorderTitle': 'Drag to reorder, or use the arrow keys',
 
+  'memo.title': 'Memo',
+  'memo.help':
+    'A scratchpad saved with the workspace: what this kit is for, which physical knob you moved, anything the machine cannot remember for you.',
+  'memo.placeholder': 'Notes about this kit, the session, the hardware…',
+  'memo.count': '{n} characters',
   'wg.title': 'Wave guide',
   'wg.help': 'One resonator shared by every part. Each part feeds it through WG SEND.',
   'wg.model': 'Model',
@@ -397,10 +404,12 @@ const JA: Dict = {
   'seq.applied': 'PART {part} の velocity を ×{f} しました',
 
   'tabs.label': '編集',
+  'tabs.reorderTitle': 'ドラッグで並べ替え（キーボードは Alt + 矢印キー）',
   'tab.part': 'Part edit',
   'tab.matrix': 'All layers',
   'tab.dials': 'Dials',
   'tab.presets': 'Presets',
+  'tab.memo': 'Memo',
   'tab.func': 'Func',
   'tab.map': 'MIDI map',
 
@@ -450,6 +459,11 @@ const JA: Dict = {
   'dials.reorderAria': 'PART {n} を並べ替え',
   'dials.reorderTitle': 'ドラッグ、または矢印キーで並べ替え',
 
+  'memo.title': 'Memo',
+  'memo.help':
+    'ワークスペースと一緒に保存される自由記述の覚書です。このキットの用途、実機のどのツマミを回したか、機械が覚えていられないことを書いておく場所です。',
+  'memo.placeholder': 'このキットのこと、作業のこと、実機の設定のこと…',
+  'memo.count': '{n} 文字',
   'wg.title': 'Wave guide',
   'wg.help': '全 PART 共通の共鳴器です。送り量は各 PART の WG SEND で決めます。',
   'wg.model': 'Model',

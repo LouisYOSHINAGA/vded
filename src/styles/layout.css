@@ -172,6 +172,15 @@
   background: var(--hover-strong);
 }
 
+.tabs__item--dragging {
+  opacity: 0.4;
+}
+
+.tabs__item--over {
+  box-shadow: inset 3px 0 0 var(--c-accent), inset 0 1px 0 var(--c-line-soft),
+    inset 1px 0 0 var(--c-line-soft), inset -1px 0 0 var(--c-line-soft);
+}
+
 .tabs__item[aria-selected='true'] {
   background: var(--c-panel-2);
   color: var(--c-ink);

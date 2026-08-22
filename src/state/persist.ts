@@ -4,7 +4,8 @@ import { CUSTOM_SLOTS, THEME_SEEDS, makeCustomSlots } from '../data/appearance'
 import { DEFAULT_CC_TABLE } from '../midi/ccmap'
 import { makeEmptyPattern, makeInitPatch } from './defaults'
 import type { AppState } from './store'
-import { makeInitialState, store } from './store'
+import type { EditorTab } from './store'
+import { DEFAULT_TAB_ORDER, makeInitialState, store } from './store'
 import type { ThemeSeed } from '../theme/palette'
 import type { Preset } from './types'
 import { PART_COUNT } from './types'
@@ -16,6 +17,7 @@ interface Persisted {
   schema: number
   patch: AppState['patch']
   pattern: AppState['pattern']
+  memo: string
   presets: Preset[]
   settings: AppState['settings']
   mixer: AppState['mixer']
@@ -27,6 +29,7 @@ interface Persisted {
     | 'editorTab'
     | 'seqRailWidth'
     | 'dialOrder'
+    | 'tabOrder'
   >
   transport: Pick<AppState['transport'], 'bpm' | 'swing' | 'gateMs' | 'sendClock'>
 }
@@ -41,6 +44,7 @@ export function loadWorkspace(): Partial<AppState> | null {
     return {
       patch: data.patch ?? makeInitPatch(),
       pattern: data.pattern ?? makeEmptyPattern(),
+      memo: typeof data.memo === 'string' ? data.memo : '',
       presets: Array.isArray(data.presets) ? data.presets : [],
       settings: {
         ...base.settings,
@@ -54,6 +58,7 @@ export function loadWorkspace(): Partial<AppState> | null {
         ...base.ui,
         ...data.ui,
         dialOrder: validOrder(data.ui?.dialOrder) ?? base.ui.dialOrder,
+        tabOrder: validTabOrder(data.ui?.tabOrder) ?? base.ui.tabOrder,
         sendAllProgress: null,
       },
       transport: { ...base.transport, ...data.transport, playing: false, currentStep: -1 },
@@ -83,6 +88,17 @@ function migrateAppearance(base: Appearance, saved: Partial<Appearance> | undefi
   }
 }
 
+/**
+ * A saved tab order must still name every tab exactly once — otherwise a build
+ * that adds or removes a tab would leave one unreachable.
+ */
+function validTabOrder(order: EditorTab[] | undefined): EditorTab[] | null {
+  if (!Array.isArray(order) || order.length !== DEFAULT_TAB_ORDER.length) return null
+  const seen = new Set(order)
+  if (seen.size !== order.length) return null
+  return DEFAULT_TAB_ORDER.every((tab) => seen.has(tab)) ? order : null
+}
+
 /** A saved order is only usable if it is still a permutation of every part. */
 function validOrder(order: number[] | undefined): number[] | null {
   if (!Array.isArray(order) || order.length !== PART_COUNT) return null
@@ -96,6 +112,7 @@ function serialize(state: AppState): string {
     schema: SCHEMA,
     patch: state.patch,
     pattern: state.pattern,
+    memo: state.memo,
     presets: state.presets,
     settings: state.settings,
     mixer: state.mixer,
@@ -106,6 +123,7 @@ function serialize(state: AppState): string {
       editorTab: state.ui.editorTab,
       seqRailWidth: state.ui.seqRailWidth,
       dialOrder: state.ui.dialOrder,
+      tabOrder: state.ui.tabOrder,
     },
     transport: {
       bpm: state.transport.bpm,
@@ -135,6 +153,8 @@ function persistedSlices(state: AppState): unknown[] {
     state.ui.editorTab,
     state.ui.seqRailWidth,
     state.ui.dialOrder,
+    state.ui.tabOrder,
+    state.memo,
     state.transport.bpm,
     state.transport.swing,
     state.transport.gateMs,

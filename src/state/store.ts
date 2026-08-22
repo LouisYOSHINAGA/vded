@@ -7,7 +7,18 @@ import { makeEmptyPattern, makeInitPatch } from './defaults'
 import type { Pattern, Patch, Preset } from './types'
 import { PART_COUNT } from './types'
 
-export type EditorTab = 'part' | 'matrix' | 'dials' | 'presets' | 'func' | 'map'
+export type EditorTab = 'part' | 'matrix' | 'dials' | 'presets' | 'memo' | 'func' | 'map'
+
+/** The order the tab strip shows, oftenest-used first. Drag-reorderable. */
+export const DEFAULT_TAB_ORDER: EditorTab[] = [
+  'part',
+  'matrix',
+  'dials',
+  'presets',
+  'memo',
+  'func',
+  'map',
+]
 
 export interface TransportState {
   playing: boolean
@@ -49,6 +60,8 @@ export interface UiState {
   /** Edit both layers at once and use the combined "1-2" CC. */
   layerLink: boolean
   editorTab: EditorTab
+  /** Tab strip order; a permutation of DEFAULT_TAB_ORDER. */
+  tabOrder: EditorTab[]
   /** Width of the sequencer's part rail, in pixels. */
   seqRailWidth: number
   /** Part indices in the order the Dials tab shows them; drag-reorderable. */
@@ -60,6 +73,8 @@ export interface UiState {
 export interface AppState {
   patch: Patch
   pattern: Pattern
+  /** Free-text scratchpad, saved with the workspace. */
+  memo: string
   transport: TransportState
   mixer: MixerState
   settings: SettingsState
@@ -73,6 +88,7 @@ export function makeInitialState(): AppState {
   return {
     patch: makeInitPatch(),
     pattern: makeEmptyPattern(),
+    memo: '',
     transport: {
       playing: false,
       bpm: 120,
@@ -101,6 +117,7 @@ export function makeInitialState(): AppState {
       selectedLayer: 0,
       layerLink: false,
       editorTab: 'part',
+      tabOrder: [...DEFAULT_TAB_ORDER],
       seqRailWidth: 216,
       dialOrder: [0, 1, 2, 3, 4, 5],
       sendAllProgress: null,

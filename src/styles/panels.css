@@ -1257,3 +1257,29 @@ button.dial-row__badge:hover {
     transform: translateX(-50%);
   }
 }
+
+/* ---------------- Memo ---------------- */
+
+.memo__area {
+  display: block;
+  width: 100%;
+  min-height: 340px;
+  padding: 12px 14px;
+  border: none;
+  border-radius: var(--r-md);
+  background: var(--c-void);
+  box-shadow: inset 0 0 0 1px var(--c-line-soft);
+  color: var(--c-ink);
+  font-family: var(--font-mono);
+  font-size: calc(13px * var(--fs, 1));
+  line-height: 1.65;
+  resize: vertical;
+}
+
+.memo__area:focus-visible {
+  box-shadow: inset 0 0 0 1px var(--c-accent);
+}
+
+.memo__area::placeholder {
+  color: var(--c-ink-faint);
+}
