@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { useT } from '../i18n'
 import { midiEngine } from '../midi/engine'
 import { useMidiSnapshot } from '../hooks/useMidiSnapshot'
@@ -6,10 +7,16 @@ import { useMidiSnapshot } from '../hooks/useMidiSnapshot'
  * Live view of what leaves the MIDI port. Always open: the log is capped and
  * rendering a few rows costs nothing next to the value of seeing, at any
  * moment, exactly what the machine was told.
+ *
+ * The header sits outside the scroller rather than sticking to the top of it,
+ * so rows are clipped at the bottom edge of the labels instead of sliding
+ * behind them. The two share one fixed column layout, and the body's
+ * horizontal scroll is mirrored onto the header.
  */
 export function MonitorPanel() {
   const t = useT()
   const midi = useMidiSnapshot()
+  const head = useRef<HTMLDivElement>(null)
 
   return (
     <section className="panel monitor-panel">
@@ -30,29 +37,38 @@ export function MonitorPanel() {
       </div>
       <div className="panel__body monitor">
         {midi.error && <div className="banner banner--error">{midi.error}</div>}
-        {/* A table, not a sentence per line: CC numbers and values are only
-            worth reading when they line up in columns. */}
-        <div className="monitor__scroll">
+        <div className="monitor__head" ref={head}>
           <table className="monitor__table">
             <thead>
               <tr>
-                <th scope="col">{t('monitor.colType')}</th>
-                <th scope="col">{t('monitor.colCh')}</th>
-                <th scope="col">{t('monitor.colNum')}</th>
-                <th scope="col">{t('monitor.colValue')}</th>
+                <th scope="col" className="monitor__col--ch">
+                  {t('monitor.colCh')}
+                </th>
+                <th scope="col" className="monitor__col--cc">
+                  {t('monitor.colCc')}
+                </th>
+                <th scope="col" className="monitor__col--val">
+                  {t('monitor.colValue')}
+                </th>
                 <th scope="col">{t('monitor.colTarget')}</th>
               </tr>
             </thead>
+          </table>
+        </div>
+        <div
+          className="monitor__scroll"
+          onScroll={(e) => {
+            if (head.current) head.current.scrollLeft = e.currentTarget.scrollLeft
+          }}
+        >
+          <table className="monitor__table">
             <tbody>
               {midi.log.map((entry) => (
                 <tr key={entry.id} className="monitor__row">
-                  <td className="monitor__kind">{entry.kind}</td>
-                  <td>{entry.channel ?? ''}</td>
-                  <td>{entry.number ?? ''}</td>
-                  <td className="monitor__value">{entry.value ?? ''}</td>
-                  <td className="monitor__target" title={entry.target}>
-                    {entry.target}
-                  </td>
+                  <td className="monitor__col--ch">{entry.channel ?? '—'}</td>
+                  <td className="monitor__col--cc">{entry.cc ?? '—'}</td>
+                  <td className="monitor__col--val monitor__value">{entry.value ?? '—'}</td>
+                  <td className="monitor__target">{entry.target}</td>
                 </tr>
               ))}
             </tbody>

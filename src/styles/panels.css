@@ -646,11 +646,16 @@
 }
 
 /*
- * The scroller lives inside the body, not on the panel: a sticky header inside
- * a scroller that started above the panel title would ride up over it. It fills
- * whatever height the viewport leaves — nothing sits below it — and `resize`
- * hands the drag handle to whoever wants a different split.
+ * The labels live outside the scroller, so a row is clipped at the bottom of
+ * the header rather than sliding underneath it. Both tables use the same fixed
+ * column widths, and the body mirrors its horizontal scroll onto the header.
  */
+.monitor__head {
+  overflow: hidden;
+  /* Reserve the body's scrollbar so the two stay in register. */
+  scrollbar-gutter: stable;
+}
+
 .monitor__scroll {
   height: 46vh;
   min-height: 96px;
@@ -658,15 +663,13 @@
   overflow: auto;
   overscroll-behavior: contain;
   resize: vertical;
+  scrollbar-gutter: stable;
 }
 
-/*
- * `separate` rather than `collapse`: a collapsed border belongs to the table,
- * not the cell, so a sticky header drawn with one lets rows show through above
- * it as they scroll under.
- */
 .monitor__table {
   width: 100%;
+  min-width: 260px;
+  table-layout: fixed;
   border-collapse: separate;
   border-spacing: 0;
   font-family: var(--font-mono);
@@ -676,12 +679,8 @@
   text-align: center;
 }
 
-.monitor__table thead th {
-  position: sticky;
-  top: 0;
-  z-index: 1;
+.monitor__head th {
   padding: 4px 6px;
-  background: var(--c-panel);
   border-bottom: 1px solid var(--c-line-soft);
   font-family: var(--font-ui);
   font-size: calc(10.5px * var(--fs, 1));
@@ -689,7 +688,18 @@
   letter-spacing: var(--track-legend);
   text-transform: uppercase;
   color: var(--c-ink-faint);
-  text-align: center;
+}
+
+.monitor__col--ch {
+  width: 44px;
+}
+
+.monitor__col--cc {
+  width: 48px;
+}
+
+.monitor__col--val {
+  width: 54px;
 }
 
 .monitor__table td {
@@ -701,20 +711,15 @@
   background: color-mix(in srgb, var(--c-ink) 4%, transparent);
 }
 
-.monitor__kind {
-  color: var(--c-ink-dim);
-}
-
 .monitor__value {
   font-weight: 700;
 }
 
+/* Never truncated: the row scrolls sideways instead, so a long parameter name
+   stays readable. */
 .monitor__target {
-  width: 100%;
-  max-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
   color: var(--c-ink-faint);
+  overflow: visible;
 }
 
 .monitor__empty {

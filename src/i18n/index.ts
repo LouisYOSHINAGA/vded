@@ -203,9 +203,8 @@ const EN: Dict = {
   'monitor.clear': 'Clear',
   'monitor.empty': 'Nothing sent or received yet.',
   'monitor.queue': 'queue {n}',
-  'monitor.colType': 'Type',
   'monitor.colCh': 'Ch',
-  'monitor.colNum': 'No.',
+  'monitor.colCc': 'CC',
   'monitor.colValue': 'Value',
   'monitor.colTarget': 'Target',
 
@@ -495,9 +494,8 @@ const JA: Dict = {
   'monitor.clear': 'Clear',
   'monitor.empty': 'まだ送受信はありません。',
   'monitor.queue': 'queue {n}',
-  'monitor.colType': '種別',
   'monitor.colCh': 'Ch',
-  'monitor.colNum': 'No.',
+  'monitor.colCc': 'CC',
   'monitor.colValue': '値',
   'monitor.colTarget': '対象',
 

@@ -4,6 +4,7 @@ import { setLang } from '../i18n'
 import { buildThemeVars } from './palette'
 
 let applied: string[] = []
+let lastZoom: number | null = null
 
 /** Writes the derived palette onto the document element. */
 export function applyAppearance(appearance: Appearance): void {
@@ -27,5 +28,21 @@ export function applyAppearance(appearance: Appearance): void {
   root.dataset.font = appearance.font
   root.style.setProperty('--ui-zoom', String(appearance.zoom))
   root.style.setProperty('--fs', String(appearance.fontScale ?? 1))
+  if (lastZoom !== null && lastZoom !== appearance.zoom) repaint()
+  lastZoom = appearance.zoom
   root.style.colorScheme = seed.mode
+}
+
+/**
+ * Chromium can leave a subtree painted at the old scale after a CSS `zoom`
+ * change — the SVG dials in particular keep their previous size until something
+ * else invalidates them. Detaching and restoring the app forces a clean repaint.
+ */
+function repaint(): void {
+  const app = document.querySelector<HTMLElement>('.app')
+  if (!app) return
+  const previous = app.style.display
+  app.style.display = 'none'
+  void app.offsetHeight
+  app.style.display = previous
 }

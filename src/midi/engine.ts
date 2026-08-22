@@ -30,11 +30,9 @@ export type MidiStatus = 'unsupported' | 'idle' | 'requesting' | 'ready' | 'deni
 export interface LogEntry {
   id: number
   time: number
-  /** CC or PANIC — the two kinds of message the editor sends. */
-  kind: string
   channel: number | null
-  /** CC number, or note number for note messages. */
-  number: number | null
+  /** CC number. Null for anything that is not a control change. */
+  cc: number | null
   value: number | null
   /** What the message controls: a parameter name, or free text. */
   target: string
@@ -211,11 +209,10 @@ export class MidiEngine {
       }
     }
     this.log({
-      kind: 'PANIC',
       channel: null,
-      number: null,
+      cc: null,
       value: null,
-      target: `note off · ch ${channels.join(',')} · note ${unique.join(',')}`,
+      target: `PANIC — note off · ch ${channels.join(',')} · note ${unique.join(',')}`,
     })
   }
 
@@ -270,9 +267,8 @@ export class MidiEngine {
           break
         }
         this.log({
-          kind: 'CC',
           channel: message.channel,
-          number: message.cc,
+          cc: message.cc,
           value: message.value,
           target: message.label,
         })

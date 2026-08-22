@@ -427,6 +427,11 @@ button {
   pointer-events: none;
 }
 
+/* Pinned reads as a held-open panel, not a passing tooltip. */
+.infotip__bubble--pinned {
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3), inset 0 0 0 1px var(--c-accent);
+}
+
 .infotip__bubble--left {
   left: -6px;
 }
