@@ -5,6 +5,7 @@ import {
   clearPartSteps,
   randomizePattern,
   scaleVelocities,
+  setPartName,
   setPatternLength,
   setStep,
   setStepVelocity,
@@ -23,6 +24,7 @@ import { Icon } from './Icon'
 import { InfoTip } from './InfoTip'
 import { Knob } from './Knob'
 import { NumberField } from './NumberField'
+import { SwapLabel } from './SwapLabel'
 
 /** Velocity a fresh step gets, and the value a double click returns to. */
 const DEFAULT_VELOCITY = 100
@@ -102,7 +104,10 @@ export function Sequencer() {
           aria-label={transport.playing ? t('seq.stop') : t('seq.play')}
         >
           <Icon name={transport.playing ? 'stop' : 'play'} size={19} />
-          {transport.playing ? t('seq.stop') : t('seq.play')}
+          <SwapLabel
+            options={[t('seq.play'), t('seq.stop')]}
+            value={transport.playing ? t('seq.stop') : t('seq.play')}
+          />
         </button>
         <div className="panel__spacer" />
         <div className="transport">
@@ -230,7 +235,10 @@ function MuteAllButton() {
       onClick={toggleMuteAll}
       title={allMuted ? t('seq.unmuteAllTitle') : t('seq.muteAllTitle')}
     >
-      {allMuted ? t('seq.unmuteAll') : t('seq.muteAll')}
+      <SwapLabel
+        options={[t('seq.muteAll'), t('seq.unmuteAll')]}
+        value={allMuted ? t('seq.unmuteAll') : t('seq.muteAll')}
+      />
       {!allMuted && (anyMuted || anySolo) && <span className="btn__dot" aria-hidden="true" />}
     </button>
   )
@@ -289,6 +297,8 @@ function PartRow({ part, selected, currentStep, onCellDown, onCellEnter }: PartR
   const solo = useAppState((s) => s.mixer.solos[part])
   const anySolo = useAppState((s) => s.mixer.solos.some(Boolean))
   const audible = anySolo ? solo : !muted
+  const [renaming, setRenaming] = useState(false)
+  const [draft, setDraft] = useState(name)
   const tintStyle = {
     ['--tint' as string]: partTint(part),
     ['--tint-ink' as string]: partInk(part),
@@ -302,15 +312,48 @@ function PartRow({ part, selected, currentStep, onCellDown, onCellEnter }: PartR
         }`}
         style={tintStyle}
       >
+        {/* Number: click selects, double click opens the part editor.
+            Name: double click renames in place. */}
         <button
           type="button"
-          className="seq-rail__select"
+          className="seq-rail__num"
           onClick={() => setUi({ selectedPart: part })}
-          title={t('seq.selectPart', { n: part + 1 })}
+          onDoubleClick={() => setUi({ selectedPart: part, editorTab: 'part' })}
+          title={t('matrix.openPart', { n: part + 1 })}
         >
-          <span className="seq-rail__num">{part + 1}</span>
-          <span className="seq-rail__name">{name}</span>
+          {part + 1}
         </button>
+        {renaming ? (
+          <input
+            className="text-input seq-rail__rename"
+            value={draft}
+            maxLength={14}
+            autoFocus
+            aria-label={t('part.nameAria')}
+            onChange={(e) => setDraft(e.target.value)}
+            onBlur={() => {
+              setPartName(part, draft.trim() || name)
+              setRenaming(false)
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') e.currentTarget.blur()
+              if (e.key === 'Escape') setRenaming(false)
+            }}
+          />
+        ) : (
+          <button
+            type="button"
+            className="seq-rail__select"
+            onClick={() => setUi({ selectedPart: part })}
+            onDoubleClick={() => {
+              setDraft(name)
+              setRenaming(true)
+            }}
+            title={t('seq.selectPartTitle', { n: part + 1 })}
+          >
+            <span className="seq-rail__name">{name}</span>
+          </button>
+        )}
         <div className="seq-rail__buttons">
           <button
             type="button"

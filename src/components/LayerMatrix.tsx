@@ -130,8 +130,9 @@ function MatrixPart({
                 <button
                   type="button"
                   className="matrix__partbtn"
-                  onClick={() => setUi({ selectedPart: part, editorTab: 'part' })}
-                  title={t('matrix.openPart', { n: part + 1 })}
+                  onClick={() => setUi({ selectedPart: part })}
+                  onDoubleClick={() => setUi({ selectedPart: part, editorTab: 'part' })}
+                  title={t('matrix.partBtnTitle', { n: part + 1 })}
                 >
                   <span className="matrix__partnum">{part + 1}</span>
                   <span className="matrix__partname">{partData.name}</span>

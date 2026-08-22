@@ -206,8 +206,9 @@ function DialPart({
         <button
           type="button"
           className="dial-part__pick"
-          onClick={() => setUi({ selectedPart: part, editorTab: 'part' })}
-          title={t('matrix.openPart', { n: part + 1 })}
+          onClick={() => setUi({ selectedPart: part })}
+          onDoubleClick={() => setUi({ selectedPart: part, editorTab: 'part' })}
+          title={t('matrix.partBtnTitle', { n: part + 1 })}
         >
           <span className="dial-part__num">{part + 1}</span>
           <span className="dial-part__name">{data.name}</span>

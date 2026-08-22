@@ -15,6 +15,7 @@ import { useAppState } from '../state/store'
 import { isHex } from '../theme/color'
 import type { ThemeSeed } from '../theme/palette'
 import { seedWarnings } from '../theme/palette'
+import { SwapLabel } from './SwapLabel'
 
 /** Skin / font / scale picker, including a full editor for a custom palette. */
 export function AppearanceMenu() {
@@ -143,7 +144,10 @@ export function AppearanceMenu() {
                     setEditing((value) => !value)
                   }}
                 >
-                  {editing ? t('appearance.close') : t('appearance.edit')}
+                  <SwapLabel
+                    options={[t('appearance.edit'), t('appearance.close')]}
+                    value={editing ? t('appearance.close') : t('appearance.edit')}
+                  />
                 </button>
               </div>
               <div className="appearance__themes">

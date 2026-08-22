@@ -438,3 +438,19 @@ button {
 .infotip__bubble strong {
   color: var(--c-ink);
 }
+
+/* ---------------- Swapping labels ---------------- */
+
+.swap-label {
+  display: inline-grid;
+  justify-items: center;
+}
+
+.swap-label__item {
+  grid-area: 1 / 1;
+  white-space: nowrap;
+}
+
+.swap-label__item[data-on='false'] {
+  visibility: hidden;
+}
