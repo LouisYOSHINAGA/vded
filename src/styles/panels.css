@@ -1048,14 +1048,43 @@ code {
 }
 
 .dial-row__id {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
   width: 222px;
   flex: none;
-  padding: 3px 4px;
+  padding: 3px 4px 3px 10px;
   border-radius: var(--r-sm);
   text-align: left;
+}
+
+/*
+ * The same bracket the all-layer table draws: the L1 row draws its upper half
+ * and the L2 row the lower, so the two always meet however tall the rows are.
+ * The 9px overhang bridges the hairline between them.
+ */
+.dial-row--linked .dial-row__id::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 7px;
+  border-left: 2px solid color-mix(in srgb, var(--tint) 65%, transparent);
+  pointer-events: none;
+}
+
+.dial-row--linked-top .dial-row__id::before {
+  top: 50%;
+  bottom: -9px;
+  border-top: 2px solid color-mix(in srgb, var(--tint) 65%, transparent);
+  border-radius: 3px 0 0 0;
+}
+
+.dial-row--linked-bottom .dial-row__id::before {
+  top: -9px;
+  bottom: 50%;
+  border-bottom: 2px solid color-mix(in srgb, var(--tint) 65%, transparent);
+  border-radius: 0 0 0 3px;
 }
 
 .dial-row__badge {
@@ -1073,8 +1102,20 @@ code {
   font-weight: 700;
 }
 
-button.dial-row__badge:hover {
+button.dial-row__badge:hover:not(:disabled) {
   filter: brightness(1.12);
+}
+
+/* Unlinked badges are outlined rather than filled, so the linked pair reads as
+   the pressed state of the control it is. */
+button.dial-row__badge[aria-pressed='false'] {
+  background: color-mix(in srgb, var(--layer-accent) 20%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--layer-accent) 55%, transparent);
+  color: var(--layer-accent);
+}
+
+button.dial-row__badge:disabled {
+  cursor: not-allowed;
 }
 
 .dial-row__selects {

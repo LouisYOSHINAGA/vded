@@ -146,7 +146,6 @@ const EN: Dict = {
     'Every part and both of its layers. Drag a cell to change it, double click to type. The L1 / L2 badges link and unlink that part; the part name opens it in Part edit.',
   'matrix.part': 'Part',
   'matrix.layer': 'Layer',
-  'matrix.openLayer': 'Open PART {part} LAYER {layer} in Part edit',
   'matrix.linkTitle': 'Link PART {n}: edit both layers together',
   'matrix.unlinkTitle': 'Unlink PART {n}: edit each layer on its own',
   'matrix.linked': 'L1 and L2 are linked — editing one changes both',
@@ -156,7 +155,7 @@ const EN: Dict = {
 
   'dials.title': 'All layers · dials',
   'dials.help':
-    'Every part and both of its layers as dials. Use the All layers tab to compare exact numbers. The L1 / L2 badges open that layer in Part edit.',
+    'Every part and both of its layers as dials. Use the All layers tab to compare exact numbers. The L1 / L2 badges link and unlink that part; the part name opens it in Part edit.',
   'dials.part': 'Part',
   'dials.resetOrder': 'Reset order',
   'dials.resetOrderTitle': 'Back to PART 1–6, the order printed on the hardware',
@@ -446,7 +445,6 @@ const JA: Dict = {
     '全 PART の LAYER 1 / 2 を一覧します。セルはドラッグで変更、ダブルクリックで直接入力。L1 / L2 のバッジで LINK の接続／解除、PART 名のダブルクリックで Part edit を開きます。',
   'matrix.part': 'Part',
   'matrix.layer': 'Layer',
-  'matrix.openLayer': 'PART {part} LAYER {layer} を Part edit で開く',
   'matrix.linkTitle': 'PART {n} を LINK: 両レイヤをまとめて編集',
   'matrix.unlinkTitle': 'PART {n} の LINK を解除: レイヤごとに編集',
   'matrix.linked': 'L1 と L2 はリンク中 — 片方の編集が両方に反映されます',
@@ -456,7 +454,7 @@ const JA: Dict = {
 
   'dials.title': 'All layers · dials',
   'dials.help':
-    '全 PART の LAYER 1 / 2 をダイヤルで一覧します。正確な数値を比べるときは All layers タブへ。L1 / L2 のバッジでその LAYER を Part edit で開きます。',
+    '全 PART の LAYER 1 / 2 をダイヤルで一覧します。正確な数値を比べるときは All layers タブへ。L1 / L2 のバッジで LINK の接続／解除、PART 名のダブルクリックで Part edit を開きます。',
   'dials.part': 'Part',
   'dials.resetOrder': '並び順を戻す',
   'dials.resetOrderTitle': '実機と同じ PART 1〜6 の並びに戻します',

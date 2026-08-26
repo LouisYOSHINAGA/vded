@@ -3,6 +3,7 @@ import { isPartParamAvailable, partCc } from '../midi/ccmap'
 import {
   midiConfig,
   moveDialPart,
+  setLayerLink,
   resetDialOrder,
   sendPart,
   setLayerParam,
@@ -150,6 +151,11 @@ function DialPart({
   const data = useAppState((s) => s.patch.parts[part])
   const selected = useAppState((s) => s.ui.selectedPart === part)
   const mode = useAppState((s) => s.settings.mode)
+  const ownLink = useAppState((s) => s.ui.layerLink[part])
+  // Single channel drives both layers from one CC whatever the setting says,
+  // so it reads as linked and the badges cannot turn it off.
+  const canUnlink = mode !== 'single'
+  const linked = !canUnlink || ownLink
   const tint = `var(--c-part-${part + 1})`
   // Only the grip starts a drag: the block is full of dials with their own
   // pointer handling. A ref, not state, because the browser decides whether a
@@ -225,7 +231,9 @@ function DialPart({
         return (
           <div
             key={layerIndex}
-            className={`dial-row${shadowed ? ' dial-row--shadowed' : ''}`}
+            className={`dial-row${shadowed ? ' dial-row--shadowed' : ''}${
+              linked ? ` dial-row--linked dial-row--linked-${layerIndex === 0 ? 'top' : 'bottom'}` : ''
+            }`}
             style={{
               ['--layer-accent' as string]: accent,
               ['--layer-ink' as string]:
@@ -235,17 +243,19 @@ function DialPart({
             }}
           >
             <div className="dial-row__id">
+              {/* The badges are the link control, as in All layers: pressing
+                  either one joins or separates this part's two layers. */}
               <button
                 type="button"
                 className="dial-row__badge"
-                onClick={() =>
-                  setUi({
-                    selectedPart: part,
-                    selectedLayer: layerIndex as 0 | 1,
-                    editorTab: 'part',
-                  })
+                aria-pressed={linked}
+                disabled={!canUnlink}
+                onClick={() => setLayerLink(part, !ownLink)}
+                title={
+                  canUnlink
+                    ? t(linked ? 'matrix.unlinkTitle' : 'matrix.linkTitle', { n: part + 1 })
+                    : t('part.linkSingleTitle')
                 }
-                title={t('matrix.openLayer', { part: part + 1, layer: layerIndex + 1 })}
               >
                 L{layerIndex + 1}
               </button>
