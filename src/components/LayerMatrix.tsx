@@ -2,6 +2,7 @@ import type React from 'react'
 import { isPartParamAvailable } from '../midi/ccmap'
 import {
   sendPart,
+  setLayerLink,
   setLayerParam,
   setLayerSelect,
   setPartParam,
@@ -107,6 +108,10 @@ function MatrixPart({
   const t = useT()
   const partData = useAppState((s) => s.patch.parts[part])
   const selected = useAppState((s) => s.ui.selectedPart === part)
+  // The part's own flag, not the `linked` prop — that one is forced true in
+  // single-channel mode, where the link cannot be turned off at all.
+  const ownLink = useAppState((s) => s.ui.layerLink[part])
+  const canUnlink = mode !== 'single'
 
   return (
     <>
@@ -149,17 +154,20 @@ function MatrixPart({
               style={{ ['--cell-accent' as string]: accent }}
               title={linked ? t('matrix.linked') : undefined}
             >
+              {/* The badges are the link control: pressing either one joins or
+                  separates this part's two layers. Part edit is reached from
+                  the part name instead. */}
               <button
                 type="button"
                 className="matrix__layerbtn"
-                onClick={() =>
-                  setUi({
-                    selectedPart: part,
-                    selectedLayer: layerIndex as 0 | 1,
-                    editorTab: 'part',
-                  })
+                aria-pressed={linked}
+                disabled={!canUnlink}
+                onClick={() => setLayerLink(part, !ownLink)}
+                title={
+                  canUnlink
+                    ? t(linked ? 'matrix.unlinkTitle' : 'matrix.linkTitle', { n: part + 1 })
+                    : t('part.linkSingleTitle')
                 }
-                title={t('matrix.openLayer', { part: part + 1, layer: layerIndex + 1 })}
               >
                 L{layerIndex + 1}
               </button>

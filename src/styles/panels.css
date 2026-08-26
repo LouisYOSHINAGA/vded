@@ -338,8 +338,18 @@
   text-align: center;
 }
 
-.matrix__layerbtn:hover {
+.matrix__layerbtn:hover:not(:disabled) {
   background: color-mix(in srgb, var(--cell-accent) 40%, transparent);
+}
+
+/* Linked badges read as pressed — they are the link's on/off control. */
+.matrix__layerbtn[aria-pressed='true'] {
+  background: var(--cell-accent);
+  color: var(--c-panel);
+}
+
+.matrix__layerbtn:disabled {
+  cursor: not-allowed;
 }
 
 .matrix__partcell {
