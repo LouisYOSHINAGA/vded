@@ -40,12 +40,19 @@ export function midiConfig(state: AppState = store.get()): MidiConfig {
 }
 
 /**
- * Which layer a write actually addresses. Single-channel mode has no per-layer
- * CCs at all, and LINK deliberately drives both from one message.
+ * Which layer a write to `partIndex` actually addresses. Single-channel mode has
+ * no per-layer CCs at all, and LINK — which is set per part — deliberately
+ * drives both layers from one message.
  */
-export function resolveTarget(state: AppState, layer: 0 | 1): LayerTarget {
+export function resolveTarget(state: AppState, partIndex: number, layer: 0 | 1): LayerTarget {
   if (state.settings.mode === 'single') return 'both'
-  return state.ui.layerLink ? 'both' : layer
+  return state.ui.layerLink[partIndex] ? 'both' : layer
+}
+
+/** Turns LINK on or off for one part, leaving the other five alone. */
+export function setLayerLink(partIndex: number, linked: boolean): void {
+  const layerLink = store.get().ui.layerLink.map((v, i) => (i === partIndex ? linked : v))
+  setUi({ layerLink })
 }
 
 function updatePart(state: AppState, index: number, updater: (part: Part) => Part): AppState {
@@ -75,7 +82,7 @@ export function setLayerParam(
   value: number,
 ): void {
   const state = store.get()
-  const target = resolveTarget(state, layer)
+  const target = resolveTarget(state, partIndex, layer)
   store.set((s) => updatePart(s, partIndex, (part) => updateLayers(part, target, (l) => ({ ...l, [key]: value }))))
   emitLayer(partIndex, target, key, value)
 }
@@ -87,7 +94,7 @@ export function setLayerSelect(
   value: number,
 ): void {
   const state = store.get()
-  const target = resolveTarget(state, layer)
+  const target = resolveTarget(state, partIndex, layer)
   store.set((s) =>
     updatePart(s, partIndex, (part) =>
       updateLayers(part, target, (l) => ({
@@ -165,7 +172,7 @@ function randomByte(max = 127): number {
 
 export function randomizeLayer(partIndex: number, layer: 0 | 1): void {
   const state = store.get()
-  const target = resolveTarget(state, layer)
+  const target = resolveTarget(state, partIndex, layer)
   store.set((s) =>
     updatePart(s, partIndex, (part) =>
       updateLayers(part, target, (existing) =>

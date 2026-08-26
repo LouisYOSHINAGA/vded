@@ -57,8 +57,11 @@ export interface SettingsState {
 export interface UiState {
   selectedPart: number
   selectedLayer: 0 | 1
-  /** Edit both layers at once and use the combined "1-2" CC. */
-  layerLink: boolean
+  /**
+   * Per part: edit both of its layers at once and send the combined "1-2" CC.
+   * Linking one part must not link the others — each has its own sound.
+   */
+  layerLink: boolean[]
   editorTab: EditorTab
   /** Tab strip order; a permutation of DEFAULT_TAB_ORDER. */
   tabOrder: EditorTab[]
@@ -115,7 +118,7 @@ export function makeInitialState(): AppState {
     ui: {
       selectedPart: 0,
       selectedLayer: 0,
-      layerLink: false,
+      layerLink: Array.from({ length: PART_COUNT }, () => false),
       editorTab: 'part',
       tabOrder: [...DEFAULT_TAB_ORDER],
       seqRailWidth: 216,

@@ -59,6 +59,7 @@ export function loadWorkspace(): Partial<AppState> | null {
         ...data.ui,
         dialOrder: validOrder(data.ui?.dialOrder) ?? base.ui.dialOrder,
         tabOrder: validTabOrder(data.ui?.tabOrder) ?? base.ui.tabOrder,
+        layerLink: migrateLayerLink(data.ui?.layerLink),
         sendAllProgress: null,
       },
       transport: { ...base.transport, ...data.transport, playing: false, currentStep: -1 },
@@ -86,6 +87,16 @@ function migrateAppearance(base: Appearance, saved: Partial<Appearance> | undefi
     fontScale: merged.fontScale ?? 1,
     theme: merged.theme in THEME_SEEDS || merged.theme === 'custom' ? merged.theme : base.theme,
   }
+}
+
+/**
+ * LINK used to be one flag for the whole kit. A saved boolean would now link
+ * every part at once, which is the opposite of what it meant, so it is dropped.
+ */
+function migrateLayerLink(saved: boolean[] | boolean | undefined): boolean[] {
+  const off = Array.from({ length: PART_COUNT }, () => false)
+  if (!Array.isArray(saved) || saved.length !== PART_COUNT) return off
+  return saved.map(Boolean)
 }
 
 /**

@@ -81,7 +81,12 @@ export function LayerMatrix() {
           </thead>
           <tbody>
             {Array.from({ length: PART_COUNT }, (_, part) => (
-              <MatrixPart key={part} part={part} mode={mode} linked={layerLink} />
+              <MatrixPart
+                key={part}
+                part={part}
+                mode={mode}
+                linked={mode === 'single' || layerLink[part]}
+              />
             ))}
           </tbody>
         </table>

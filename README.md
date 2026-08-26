@@ -145,7 +145,10 @@ VDED は **MIDI IN を使いません**。volca drum は音色を送り返さな
   同時に編集し、`L1+2` の CC 1 通で送信します。ボタンは常に同じ位置にあるので、
   切り替えてもパネルの幅は変わりません（ALL LAYERS タブでも L1 / L2 が括弧で結ばれます）。
   ボタンと枠の色は選択中の PART の色です。
+  **LINK は PART ごとの設定**で、ある PART で ON にしても他の 5 つには影響しません。
   なお LINK はこれ以降の編集を連動させるもので、押した時点の値を揃えるものではありません。
+  single channel mode では 1 つの CC が必ず両レイヤに効くため、全 PART が LINK 状態として
+  表示されます（各 PART の設定自体は書き換えないので、split に戻すと元の状態に戻ります）。
 - **PART PROCESSING** — WG SEND / PAN / BIT RED / FOLD / DRIVE / DRY GAIN。
   実機では EDIT ページの隠しパラメータにあたります。
 
@@ -284,7 +287,7 @@ CUSTOM は **8 枠**あり、それぞれ別の配色を持てます。枠を押
 | `Space` | 再生 / 停止 |
 | `1`–`6` | パート選択 |
 | `Shift` + `1`–`6` | そのパートを試聴 |
-| `L` | LINK L1+2 の切り替え |
+| `L` | 選択中の PART の LINK L1+2 を切り替え |
 | `Ctrl` / `Cmd` + `S` | SEND ALL PARAMETERS |
 | `?` | ショートカット一覧 |
 

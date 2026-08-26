@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { sequencer } from '../sequencer/engine'
-import { sendAll, setUi, triggerPart } from '../state/actions'
+import { sendAll, setLayerLink, setUi, triggerPart } from '../state/actions'
 import { store } from '../state/store'
 import { PART_COUNT } from '../state/types'
 
@@ -37,7 +37,8 @@ export function useShortcuts(): void {
       }
       if (event.key === 'l' || event.key === 'L') {
         event.preventDefault()
-        setUi({ layerLink: !store.get().ui.layerLink })
+        const part = store.get().ui.selectedPart
+        setLayerLink(part, !store.get().ui.layerLink[part])
       }
     }
     window.addEventListener('keydown', onKey)

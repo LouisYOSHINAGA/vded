@@ -3,7 +3,7 @@ import { useT } from '../i18n'
 import type { ChannelMode } from '../midi/ccmap'
 import { midiEngine } from '../midi/engine'
 import { useMidiSnapshot } from '../hooks/useMidiSnapshot'
-import { setSettings, setUi } from '../state/actions'
+import { setSettings } from '../state/actions'
 import { useAppState } from '../state/store'
 import { PART_COUNT } from '../state/types'
 import { Icon } from './Icon'
@@ -96,8 +96,10 @@ export function DeviceBar() {
           onChange={(e) => {
             const next = e.target.value as ChannelMode
             const clamped = next === 'split' ? Math.min(baseChannel, 16 - PART_COUNT + 1) : baseChannel
+            // Single channel is inherently linked — one CC drives both layers —
+            // so it is shown that way rather than switching every part's own
+            // LINK on and leaving it on when split comes back.
             setSettings({ mode: next, baseChannel: clamped })
-            if (next === 'single') setUi({ layerLink: true })
           }}
         >
           <option value="split">Split</option>

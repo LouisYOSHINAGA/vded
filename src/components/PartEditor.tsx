@@ -11,6 +11,7 @@ import {
   setLayerParam,
   setLayerSelect,
   setPartName,
+  setLayerLink,
   setPartParam,
   setUi,
   triggerPart,
@@ -53,9 +54,11 @@ export function PartEditor() {
   const t = useT()
   const partIndex = useAppState((s) => s.ui.selectedPart)
   const part = useAppState((s) => s.patch.parts[s.ui.selectedPart])
-  const layerLink = useAppState((s) => s.ui.layerLink)
+  const layerLink = useAppState((s) => s.ui.layerLink[s.ui.selectedPart])
   const mode = useAppState((s) => s.settings.mode)
   const singleMode = mode === 'single'
+  // Single channel has no per-layer CC, so it always behaves as linked.
+  const linked = singleMode || layerLink
 
   return (
     <section className="panel part-editor">
@@ -137,7 +140,7 @@ export function PartEditor() {
 
       <div className="panel__body part-editor__body">
         <div
-          className={`layer-grid${layerLink ? ' layer-grid--linked' : ''}`}
+          className={`layer-grid${linked ? ' layer-grid--linked' : ''}`}
           style={
             {
               '--tint': `var(--c-part-${partIndex + 1})`,
@@ -152,9 +155,9 @@ export function PartEditor() {
             <button
               type="button"
               className="layer-link__chip"
-              aria-pressed={layerLink}
+              aria-pressed={linked}
               disabled={singleMode}
-              onClick={() => setUi({ layerLink: !layerLink })}
+              onClick={() => setLayerLink(partIndex, !layerLink)}
               title={singleMode ? t('part.linkSingleTitle') : t('part.linkTitle')}
             >
               <Icon name="link" size={15} />
@@ -177,7 +180,7 @@ function LayerPanel({ partIndex, layerIndex }: { partIndex: number; layerIndex: 
   const mode = useAppState((s) => s.settings.mode)
   const accent = layerAccent(partIndex, layerIndex)
   const shadowed = mode === 'single' && layerIndex === 1
-  const target = resolveTarget(store.get(), layerIndex)
+  const target = resolveTarget(store.get(), partIndex, layerIndex)
 
   return (
     <div
