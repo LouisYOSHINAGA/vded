@@ -224,7 +224,7 @@ volca drum は **システムエクスクルーシブに対応していません
 - プリセットは実機メモリではなくエディタ側に保存されます
 - 画面の状態を実機に反映する唯一の方法が、全パラメータの CC 一括送信です
 
-**SEND ALL PARAMETERS** は split channel で 124 通、single channel で 58 通の CC を、
+**SEND ALL PARAMETERS** は split channel で 130 通、single channel で 58 通の CC を、
 取りこぼさない間隔で順に送信します。プリセットを読み込んだ直後や、実機を触ってしまって
 画面と食い違ったときに押してください。パート単位なら PART EDIT の `SEND PART` が使えます。
 
@@ -305,8 +305,9 @@ CC マップの根拠、SELECT の値エンコード、single / split の差、�
   MIDI から操作できません。実機のパネルで行ってください。
 - 実機のノブを回しても VDED には反映されません（volca drum は CC を送信しません）。
   画面と実機がずれたら SEND ALL で揃えます。
-- `PITCH MOD QUANT`（CC53）は公式チャートに記載がないため、既定では送信しません。
-  MIDI MAP タブで有効化できます。
+- `PITCH MOD QUANT`（CC53）は公式チャートに記載がなく、番号は有志の解析によるものです。
+  他のパラメータと同じように操作でき、SEND ALL の対象にも入ります。手元の個体で番号が
+  違うようなら MIDI MAP タブで差し替えてください。
 
 ## ライセンス
 

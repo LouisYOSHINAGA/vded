@@ -165,8 +165,6 @@ export interface MidiConfig {
   /** Split: channel of part 1 (1..11). Single: the shared channel (1..16). */
   baseChannel: number
   ccTable: CcTable
-  /** Send the community-sourced PITCH MOD QUANT CC (not in the official chart). */
-  sendPitchModQuantize: boolean
 }
 
 export interface CcMessage {
@@ -331,7 +329,6 @@ export function buildFullDump(patch: Patch, config: MidiConfig): CcMessage[] {
       }
     }
     for (const key of ALL_PART_KEYS) {
-      if (key === 'pitchModQuantize' && !config.sendPitchModQuantize) continue
       if (!isPartParamAvailable(config.mode, key)) continue
       const msg = partMessage(config, part, key, partParamValue(partData, key))
       if (msg) out.push(msg)

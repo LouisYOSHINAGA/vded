@@ -76,7 +76,6 @@ export function MidiMapPanel() {
   const t = useT()
   const mode = useAppState((s) => s.settings.mode)
   const table = useAppState((s) => s.settings.ccTable)
-  const sendQuant = useAppState((s) => s.settings.sendPitchModQuantize)
   const liveSend = useAppState((s) => s.settings.liveSend)
   const ccInterval = useAppState((s) => s.settings.ccIntervalMs)
   const dumpInterval = useAppState((s) => s.settings.dumpIntervalMs)
@@ -109,14 +108,6 @@ export function MidiMapPanel() {
           <label className="checkbox">
             <input type="checkbox" checked={liveSend} onChange={(e) => setSettings({ liveSend: e.target.checked })} />
             <span className="legend">{t('map.liveSend')}</span>
-          </label>
-          <label className="checkbox" title={t('map.sendQuantTitle')}>
-            <input
-              type="checkbox"
-              checked={sendQuant}
-              onChange={(e) => setSettings({ sendPitchModQuantize: e.target.checked })}
-            />
-            <span className="legend">{t('map.sendQuant')}</span>
           </label>
           <label className="row" style={{ gap: 5 }} title={t('map.ccIntervalTitle')}>
             <span className="legend">{t('map.ccInterval')}</span>

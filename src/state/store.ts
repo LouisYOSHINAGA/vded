@@ -45,7 +45,6 @@ export interface SettingsState {
   /** Split: channel of part 1. Single: the shared channel. */
   baseChannel: number
   ccTable: CcTable
-  sendPitchModQuantize: boolean
   /** Push every knob move to the machine as it happens. */
   liveSend: boolean
   ccIntervalMs: number
@@ -109,7 +108,6 @@ export function makeInitialState(): AppState {
       mode: 'split',
       baseChannel: 1,
       ccTable: DEFAULT_CC_TABLE,
-      sendPitchModQuantize: false,
       liveSend: true,
       ccIntervalMs: 1.6,
       dumpIntervalMs: 4,

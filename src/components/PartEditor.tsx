@@ -298,7 +298,6 @@ function PartProcessing({ partIndex }: { partIndex: number }) {
   const t = useT()
   const part = useAppState((s) => s.patch.parts[partIndex])
   const mode = useAppState((s) => s.settings.mode)
-  const sendQuant = useAppState((s) => s.settings.sendPitchModQuantize)
 
   return (
     <div className="processing">
@@ -331,12 +330,16 @@ function PartProcessing({ partIndex }: { partIndex: number }) {
         })}
         <label
           className="checkbox processing__quant"
-          title={sendQuant ? t('part.quantTitle') : t('part.quantOffTitle')}
+          title={
+            isPartParamAvailable(mode, 'pitchModQuantize')
+              ? t('part.quantTitle')
+              : t('matrix.unavailable', { name: 'Pitch mod quant' })
+          }
         >
           <input
             type="checkbox"
             checked={part.pitchModQuantize}
-            disabled={!isPartParamAvailable(mode, 'pitchModQuantize') || !sendQuant}
+            disabled={!isPartParamAvailable(mode, 'pitchModQuantize')}
             onChange={(e) => setPartParam(partIndex, 'pitchModQuantize', e.target.checked)}
           />
           <span className="legend">Pitch mod quant</span>

@@ -89,7 +89,7 @@ VDED が送信する MIDI メッセージの根拠をまとめる。実装は `s
 | DRY GAIN | 52 | 同上 |
 | PAN | 10 | 同上。標準 CC10 |
 | WAVE GUIDE SEND | 103 | |
-| PITCH MOD QUANTIZE | 53 | `CROSS` のみ。公式表未確認のため既定で送信しない |
+| PITCH MOD QUANTIZE | 53 | `CROSS` のみ。公式表には記載がなく、番号は有志の解析による |
 
 グローバル（どのチャンネルでも受信）: `116` MODEL / `117` DECAY / `118` BODY / `119` TUNE
 

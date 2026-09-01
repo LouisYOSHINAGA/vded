@@ -35,7 +35,6 @@ export function midiConfig(state: AppState = store.get()): MidiConfig {
     mode: state.settings.mode,
     baseChannel: state.settings.baseChannel,
     ccTable: state.settings.ccTable,
-    sendPitchModQuantize: state.settings.sendPitchModQuantize,
   }
 }
 

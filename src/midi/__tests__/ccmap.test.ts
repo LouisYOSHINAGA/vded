@@ -18,7 +18,6 @@ const split: MidiConfig = {
   mode: 'split',
   baseChannel: 1,
   ccTable: DEFAULT_CC_TABLE,
-  sendPitchModQuantize: false,
 }
 
 const single: MidiConfig = { ...split, mode: 'single' }
@@ -122,7 +121,7 @@ describe('full dump', () => {
   it('covers both layers, the part block and the waveguide in split mode', () => {
     const messages = buildFullDump(makeInitPatch(), split)
     // 6 parts x (2 layers x 7 layer CCs + 6 part CCs) + 4 waveguide CCs
-    expect(messages).toHaveLength(6 * (14 + 6) + 4)
+    expect(messages).toHaveLength(6 * (14 + 7) + 4)
     expect(messages.every((m) => m.value >= 0 && m.value <= 127)).toBe(true)
     expect(messages.every((m) => m.cc >= 0 && m.cc <= 127)).toBe(true)
     expect(messages.every((m) => m.channel >= 1 && m.channel <= 16)).toBe(true)
@@ -135,10 +134,9 @@ describe('full dump', () => {
     expect(messages.every((m) => m.channel === 1)).toBe(true)
   })
 
-  it('adds PITCH MOD QUANT only when explicitly enabled', () => {
-    const withQuant = buildFullDump(makeInitPatch(), { ...split, sendPitchModQuantize: true })
-    expect(withQuant).toHaveLength(6 * (14 + 7) + 4)
-    expect(withQuant.filter((m) => m.cc === 53)).toHaveLength(6)
+  it('includes PITCH MOD QUANT for every part', () => {
+    const messages = buildFullDump(makeInitPatch(), split)
+    expect(messages.filter((m) => m.cc === 53)).toHaveLength(6)
   })
 
   it('sends layer 1 values when single mode collapses the layers', () => {
@@ -152,7 +150,8 @@ describe('full dump', () => {
 
   it('scopes a part dump to that part alone', () => {
     const messages = buildPartDump(makeInitPatch(), split, 2)
-    expect(messages).toHaveLength(20)
+    // 2 layers x 7 layer CCs + 7 part CCs
+    expect(messages).toHaveLength(21)
     expect(messages.every((m) => m.channel === 3)).toBe(true)
   })
 

@@ -139,7 +139,6 @@ const EN: Dict = {
   'part.processingHelp':
     'Shared by both layers. These sit on the hidden EDIT page on the machine.',
   'part.quantTitle': 'Sends PITCH MOD QUANT (CC53)',
-  'part.quantOffTitle': 'Not in the official chart — enable sending on the MIDI map tab',
 
   'matrix.title': 'All layers',
   'matrix.help':
@@ -225,8 +224,6 @@ const EN: Dict = {
   'map.reset': 'Reset to default',
   'map.resetDone': 'CC map reset to defaults',
   'map.liveSend': 'Send knob moves immediately',
-  'map.sendQuant': 'Send Pitch mod quant (CC53)',
-  'map.sendQuantTitle': 'Adds CC53, which the official chart does not list',
   'map.ccInterval': 'CC interval',
   'map.ccIntervalTitle': 'Gap between CCs while turning a knob',
   'map.dumpInterval': 'Bulk interval',
@@ -438,7 +435,6 @@ const JA: Dict = {
   'part.processing': 'Part processing',
   'part.processingHelp': 'LAYER 1 / 2 共通。実機では EDIT ページの隠しパラメータです。',
   'part.quantTitle': 'PITCH MOD QUANT (CC53) を送信します',
-  'part.quantOffTitle': '公式資料に記載のない CC です。MIDI map タブで送信を有効化してください',
 
   'matrix.title': 'All layers',
   'matrix.help':
@@ -524,8 +520,6 @@ const JA: Dict = {
   'map.reset': 'Reset to default',
   'map.resetDone': 'CC 表を既定値に戻しました',
   'map.liveSend': 'ノブ操作を即座に送信',
-  'map.sendQuant': 'Pitch mod quant (CC53) を送信',
-  'map.sendQuantTitle': '公式資料に記載のない CC53 を送信対象に加えます',
   'map.ccInterval': 'CC 間隔',
   'map.ccIntervalTitle': 'ノブ操作時の CC 送出間隔',
   'map.dumpInterval': '一括送信 間隔',
