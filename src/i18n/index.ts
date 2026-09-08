@@ -179,6 +179,8 @@ const EN: Dict = {
 
   'presets.title': 'Presets',
   'presets.editing': 'Editing',
+  'presets.reorderAria': 'Reorder {name}',
+  'presets.reorderTitle': 'Drag to reorder, or use the arrow keys',
   'presets.save': 'Save',
   'presets.nameAria': 'Preset name',
   'presets.namePlaceholder': 'Preset name',
@@ -475,6 +477,8 @@ const JA: Dict = {
 
   'presets.title': 'Presets',
   'presets.editing': '編集中',
+  'presets.reorderAria': '{name} を並べ替え',
+  'presets.reorderTitle': 'ドラッグ、または矢印キーで並べ替え',
   'presets.save': 'Save',
   'presets.nameAria': 'PRESET 名',
   'presets.namePlaceholder': 'PRESET 名',

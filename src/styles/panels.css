@@ -571,13 +571,45 @@
   box-shadow: inset 0 0 0 1px var(--c-line);
 }
 
+.preset--dragging {
+  opacity: 0.45;
+}
+
+/* Which side of the target the drop would land on. */
+.preset--over {
+  box-shadow: inset 4px 0 0 var(--c-accent), inset 0 0 0 1px var(--c-accent);
+}
+
+.preset__grip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  align-self: stretch;
+  flex: none;
+  border-radius: var(--r-md) 0 0 var(--r-md);
+  color: var(--c-ink-faint);
+  cursor: grab;
+  touch-action: none;
+}
+
+.preset__grip:hover,
+.preset__grip:focus-visible {
+  background: var(--hover-soft);
+  color: var(--c-ink-dim);
+}
+
+.preset__grip:active {
+  cursor: grabbing;
+}
+
 .preset__main {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: 6px 8px;
+  padding: 6px 8px 6px 4px;
   text-align: left;
 }
 

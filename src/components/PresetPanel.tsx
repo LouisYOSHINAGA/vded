@@ -4,6 +4,7 @@ import {
   importPresets,
   loadPreset,
   makePresetFile,
+  movePreset,
   overwritePreset,
   parsePresetFile,
   renamePreset,
@@ -42,6 +43,17 @@ export function PresetPanel() {
   const [sendOnLoad, setSendOnLoad] = useState(true)
   const [query, setQuery] = useState('')
   const fileInput = useRef<HTMLInputElement>(null)
+  // The preset being dragged, and the one it would land in front of.
+  const [dragging, setDragging] = useState<string | null>(null)
+  const [over, setOver] = useState<string | null>(null)
+
+  // Dropping lands the preset on the side it came from, as in the other lists.
+  const landing = (moved: string, target: string): string | null => {
+    const order = presets.map((preset) => preset.id)
+    return order.indexOf(moved) < order.indexOf(target)
+      ? (order[order.indexOf(target) + 1] ?? null)
+      : target
+  }
 
   const filtered = query
     ? presets.filter((preset) => preset.name.toLowerCase().includes(query.toLowerCase()))
@@ -158,7 +170,17 @@ export function PresetPanel() {
           />
         )}
 
-        <ul className="presets__list">
+        <ul
+          className="presets__list"
+          onDragOver={(e) => {
+            if (dragging) e.preventDefault()
+          }}
+          onDrop={() => {
+            if (dragging && over && over !== dragging) movePreset(dragging, landing(dragging, over))
+            setDragging(null)
+            setOver(null)
+          }}
+        >
           {filtered.map((preset) => (
             <PresetRow
               key={preset.id}
@@ -166,6 +188,20 @@ export function PresetPanel() {
               withPattern={withPattern}
               withAppearance={withAppearance}
               sendOnLoad={sendOnLoad}
+              dragging={dragging === preset.id}
+              over={over === preset.id && dragging !== null && dragging !== preset.id}
+              onDragStart={() => setDragging(preset.id)}
+              onDragEnd={() => {
+                setDragging(null)
+                setOver(null)
+              }}
+              onDragOverRow={() => setOver(preset.id)}
+              onMove={(delta) => {
+                const order = presets.map((p) => p.id)
+                const to = order.indexOf(preset.id) + delta
+                if (to < 0 || to >= order.length) return
+                movePreset(preset.id, landing(preset.id, order[to]))
+              }}
             />
           ))}
           {filtered.length === 0 && (
@@ -194,18 +230,74 @@ function PresetRow({
   withPattern,
   withAppearance,
   sendOnLoad,
+  dragging,
+  over,
+  onDragStart,
+  onDragEnd,
+  onDragOverRow,
+  onMove,
 }: {
   preset: Preset
   withPattern: boolean
   withAppearance: boolean
   sendOnLoad: boolean
+  dragging: boolean
+  over: boolean
+  onDragStart: () => void
+  onDragEnd: () => void
+  onDragOverRow: () => void
+  onMove: (delta: number) => void
 }) {
   const t = useT()
   const [renaming, setRenaming] = useState(false)
   const [draft, setDraft] = useState(preset.name)
+  // Only the grip starts a drag, and a ref rather than state because the
+  // browser decides whether a drag begins in the same tick as the pointerdown.
+  const fromGrip = useRef(false)
 
   return (
-    <li className="preset">
+    <li
+      className={`preset${dragging ? ' preset--dragging' : ''}${over ? ' preset--over' : ''}`}
+      draggable
+      onDragStart={(e) => {
+        if (!fromGrip.current) {
+          e.preventDefault()
+          return
+        }
+        e.dataTransfer.effectAllowed = 'move'
+        e.dataTransfer.setData('text/plain', preset.id)
+        onDragStart()
+      }}
+      onDragEnd={() => {
+        fromGrip.current = false
+        onDragEnd()
+      }}
+      onDragOver={onDragOverRow}
+    >
+      <span
+        className="preset__grip"
+        role="button"
+        tabIndex={0}
+        aria-label={t('presets.reorderAria', { name: preset.name })}
+        title={t('presets.reorderTitle')}
+        onPointerDown={() => {
+          fromGrip.current = true
+        }}
+        onPointerUp={() => {
+          fromGrip.current = false
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+            e.preventDefault()
+            onMove(-1)
+          } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+            e.preventDefault()
+            onMove(1)
+          }
+        }}
+      >
+        <Icon name="grip" size={14} />
+      </span>
       {renaming ? (
         <input
           className="text-input preset__rename"

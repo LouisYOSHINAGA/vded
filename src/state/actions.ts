@@ -486,6 +486,22 @@ export function resetDialOrder(): void {
   setUi({ dialOrder: [0, 1, 2, 3, 4, 5] })
 }
 
+/**
+ * Moves one preset so it lands immediately before `beforeId`, or last when that
+ * is null. Positions are resolved by id, so this stays correct while the list
+ * is filtered by the search box and only some of it is on screen.
+ */
+export function movePreset(id: string, beforeId: string | null): void {
+  store.set((s) => {
+    const moved = s.presets.find((preset) => preset.id === id)
+    if (!moved || id === beforeId) return s
+    const rest = s.presets.filter((preset) => preset.id !== id)
+    const at = beforeId === null ? -1 : rest.findIndex((preset) => preset.id === beforeId)
+    const index = at < 0 ? rest.length : at
+    return { ...s, presets: [...rest.slice(0, index), moved, ...rest.slice(index)] }
+  })
+}
+
 export function setMemo(memo: string): void {
   store.set((s) => ({ ...s, memo }))
 }
