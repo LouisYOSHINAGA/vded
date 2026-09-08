@@ -669,15 +669,6 @@
   text-align: center;
 }
 
-.presets__footer {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 6px;
-  padding-top: 8px;
-  border-top: 1px solid var(--c-line-soft);
-}
-
 /* ---------------- Monitor ---------------- */
 
 .monitor {

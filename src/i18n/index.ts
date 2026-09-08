@@ -200,8 +200,6 @@ const EN: Dict = {
   'presets.renameAria': 'Rename preset',
   'presets.delete': 'Delete',
   'presets.deleteConfirm': 'Delete “{name}”?',
-  'presets.init': 'Init all parts',
-  'presets.initTitle': 'Reset all six parts and the wave guide — the per-part Init is in Part edit',
   'presets.storageHelp':
     'The volca drum cannot report its sound back, so presets live in this browser only. Use Export / Import to move them as JSON.',
   'presets.imported': 'Loaded {n} preset(s)',
@@ -245,6 +243,8 @@ const EN: Dict = {
   'func.randomizePattern': 'Randomize pattern',
   'func.toggleModel': 'Toggle WG model',
   'func.initPart': 'Init part',
+  'func.initAll': 'Init all parts',
+  'func.initAllTitle': 'Reset all six parts and the wave guide back to the initial patch',
   'func.target': 'Target: PART {part} / LAYER {layer}. Pick a part in the sequencer or the Part edit tabs.',
   'func.realtimeSection': 'MIDI realtime',
   'func.start': 'Start',
@@ -498,8 +498,6 @@ const JA: Dict = {
   'presets.renameAria': 'PRESET 名を変更',
   'presets.delete': '削除',
   'presets.deleteConfirm': '「{name}」を削除しますか？',
-  'presets.init': 'Init all parts',
-  'presets.initTitle': '全 PART と WAVE GUIDE を初期化します（PART 単位の初期化は PART EDIT の INIT）',
   'presets.storageHelp':
     'volca drum は音色を返せないため、PRESET はこのブラウザ内にのみ保存されます。Export / Import で JSON としてやり取りできます。',
   'presets.imported': '{n} 件の PRESET を読み込みました',
@@ -543,6 +541,8 @@ const JA: Dict = {
   'func.randomizePattern': 'Randomize pattern',
   'func.toggleModel': 'Toggle WG model',
   'func.initPart': 'Init part',
+  'func.initAll': 'Init all parts',
+  'func.initAllTitle': '全 PART と WAVE GUIDE を初期状態に戻します',
   'func.target':
     '対象は PART {part} / LAYER {layer}。PART はシーケンサか Part edit タブで選びます。',
   'func.realtimeSection': 'MIDI realtime',

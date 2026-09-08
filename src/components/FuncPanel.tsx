@@ -6,6 +6,7 @@ import {
   panic,
   randomizeLayer,
   randomizePattern,
+  resetPatch,
   sendAll,
   setPartNote,
   setWaveGuideParam,
@@ -59,6 +60,11 @@ export function FuncPanel() {
             </button>
             <button type="button" className="btn" onClick={() => initPart(selectedPart)}>
               {t('func.initPart')}
+            </button>
+            {/* The whole-kit reset lives next to the per-part one, so the two
+                scopes are read side by side rather than a tab apart. */}
+            <button type="button" className="btn" onClick={resetPatch} title={t('func.initAllTitle')}>
+              {t('func.initAll')}
             </button>
             <button type="button" className="btn btn--accent" onClick={sendAll}>
               {t('top.sendAll')}

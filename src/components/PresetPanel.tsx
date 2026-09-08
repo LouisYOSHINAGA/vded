@@ -8,7 +8,6 @@ import {
   overwritePreset,
   parsePresetFile,
   renamePreset,
-  resetPatch,
   savePreset,
 } from '../state/actions'
 import { useT } from '../i18n'
@@ -87,6 +86,7 @@ export function PresetPanel() {
       <div className="panel__head">
         <h2 className="panel__title">{t('presets.title')}</h2>
         <span className="tag">{presets.length}</span>
+        <InfoTip label={t('presets.title')}>{t('presets.storageHelp')}</InfoTip>
         {/* Which kit is on screen right now. It lived in the top bar, but it is
             only ever consulted alongside the library itself. */}
         <span className="presets__current" title={t('top.presetTitle')}>
@@ -208,18 +208,6 @@ export function PresetPanel() {
             <li className="presets__empty hint">{t('presets.empty')}</li>
           )}
         </ul>
-
-        <div className="presets__footer">
-          <button
-            type="button"
-            className="btn btn--ghost btn--sm"
-            onClick={resetPatch}
-            title={t('presets.initTitle')}
-          >
-            {t('presets.init')}
-          </button>
-          <InfoTip label={t('presets.title')}>{t('presets.storageHelp')}</InfoTip>
-        </div>
       </div>
     </section>
   )
