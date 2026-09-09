@@ -177,16 +177,14 @@ export function MidiMapPanel() {
 
               <section className="ccmap__group">
                 <h3 className="func__heading">{t('map.partParams')}</h3>
-                {/* Every row here is shared by both layers, so the note is a
-                    caption rather than the same sentence seven times over. */}
-                <p className="hint ccmap__note">{t('map.sharedNote')}</p>
                 <table className="ccmap__table ccmap__table--narrow">
                   <tbody>
                     {SPLIT_PART_ROWS.map((key) => (
                       <tr key={key}>
-                        <td className="ccmap__name">
+                        {/* The only row whose number is not in the official
+                            chart, so the caveat rides along as a tooltip. */}
+                        <td className="ccmap__name" title={key === 'pitchModQuantize' ? t('map.quantNote') : undefined}>
                           {PART_PARAM_LABELS[key]}
-                          {key === 'pitchModQuantize' && <span className="ccmap__mark">*</span>}
                         </td>
                         <td>
                           <CcInput
@@ -204,7 +202,6 @@ export function MidiMapPanel() {
                     ))}
                   </tbody>
                 </table>
-                <p className="hint ccmap__note">* {t('map.quantNote')}</p>
               </section>
             </>
           ) : (
@@ -269,10 +266,7 @@ export function MidiMapPanel() {
               <tbody>
                 {(['wgModel', 'wgDecay', 'wgBody', 'wgTune'] as const).map((key) => (
                   <tr key={key}>
-                    <td className="ccmap__name">
-                      {key.replace('wg', '').toUpperCase()}
-                      {key === 'wgModel' && <span className="ccmap__mark">*</span>}
-                    </td>
+                    <td className="ccmap__name">{key.replace('wg', '').toUpperCase()}</td>
                     <td>
                       <CcInput
                         value={table.global[key]}
@@ -289,7 +283,6 @@ export function MidiMapPanel() {
                 ))}
               </tbody>
             </table>
-            <p className="hint ccmap__note">* {t('map.modelNote')}</p>
           </section>
         </div>
 

@@ -232,9 +232,7 @@ const EN: Dict = {
   'map.partParams': 'Part parameter',
   'map.perPart': 'Per-part CC (all parts share one channel)',
   'map.global': 'Wave guide (global)',
-  'map.sharedNote': 'Shared by both layers',
   'map.quantNote': 'Not in the official chart',
-  'map.modelNote': '0 = TUBE / 64 = STRING',
 
   'func.title': 'Func',
   'func.help': 'What the FUNC button does on the machine, and how VDED covers it.',
@@ -530,9 +528,7 @@ const JA: Dict = {
   'map.partParams': 'Part parameter',
   'map.perPart': 'PART 別 CC（全 PART が 1 チャンネルを共有）',
   'map.global': 'Wave guide（全体共通）',
-  'map.sharedNote': 'LAYER 1 / 2 共通',
   'map.quantNote': '公式資料に記載なし',
-  'map.modelNote': '0 = TUBE / 64 = STRING',
 
   'func.title': 'Func',
   'func.help': '実機の FUNC ボタンで使える機能と、その VDED での代替。',

@@ -915,13 +915,10 @@
   align-self: stretch;
 }
 
-.ccmap__note {
-  margin: 0;
-}
 
-.ccmap__mark {
-  margin-left: 3px;
-  color: var(--c-accent);
+.ccmap__table th:not(:first-child),
+.ccmap__table td:not(.ccmap__name) {
+  text-align: center;
 }
 
 .ccmap__name {
