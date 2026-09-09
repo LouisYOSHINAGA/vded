@@ -137,147 +137,161 @@ export function MidiMapPanel() {
           </label>
         </div>
 
-        {mode === 'split' ? (
-          <>
+        <div className="ccmap__grid">
+          {mode === 'split' ? (
+            <>
+              <section className="ccmap__group">
                 <h3 className="func__heading">{t('map.layerParams', { range: channelRange })}</h3>
-            <table className="ccmap__table">
-              <thead>
-                <tr>
-                  <th>Parameter</th>
-                  <th>Layer 1</th>
-                  <th>Layer 2</th>
-                  <th>Layer 1+2</th>
-                </tr>
-              </thead>
-              <tbody>
-                {SPLIT_LAYER_ROWS.map((key) => (
-                  <tr key={key}>
-                    <td className="ccmap__name">{LAYER_PARAM_LABELS[key]}</td>
-                    {[0, 1, 2].map((slot) => (
-                      <td key={slot}>
-                        <CcInput
-                          value={table.split.layer[key][slot]}
-                          isDefault={table.split.layer[key][slot] === DEFAULT_CC_TABLE.split.layer[key][slot]}
-                          ariaLabel={`${LAYER_PARAM_LABELS[key]} layer slot ${slot + 1} CC`}
-                          onChange={(v) =>
-                            editTable((next) => {
-                              next.split.layer[key][slot] = v
-                            })
-                          }
-                        />
-                      </td>
+                <table className="ccmap__table">
+                  <thead>
+                    <tr>
+                      <th>Parameter</th>
+                      <th>Layer 1</th>
+                      <th>Layer 2</th>
+                      <th>Layer 1+2</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {SPLIT_LAYER_ROWS.map((key) => (
+                      <tr key={key}>
+                        <td className="ccmap__name">{LAYER_PARAM_LABELS[key]}</td>
+                        {[0, 1, 2].map((slot) => (
+                          <td key={slot}>
+                            <CcInput
+                              value={table.split.layer[key][slot]}
+                              isDefault={table.split.layer[key][slot] === DEFAULT_CC_TABLE.split.layer[key][slot]}
+                              ariaLabel={`${LAYER_PARAM_LABELS[key]} layer slot ${slot + 1} CC`}
+                              onChange={(v) =>
+                                editTable((next) => {
+                                  next.split.layer[key][slot] = v
+                                })
+                              }
+                            />
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </section>
+
+              <section className="ccmap__group">
+                <h3 className="func__heading">{t('map.partParams')}</h3>
+                {/* Every row here is shared by both layers, so the note is a
+                    caption rather than the same sentence seven times over. */}
+                <p className="hint ccmap__note">{t('map.sharedNote')}</p>
+                <table className="ccmap__table ccmap__table--narrow">
+                  <tbody>
+                    {SPLIT_PART_ROWS.map((key) => (
+                      <tr key={key}>
+                        <td className="ccmap__name">
+                          {PART_PARAM_LABELS[key]}
+                          {key === 'pitchModQuantize' && <span className="ccmap__mark">*</span>}
+                        </td>
+                        <td>
+                          <CcInput
+                            value={table.split.part[key]}
+                            isDefault={table.split.part[key] === DEFAULT_CC_TABLE.split.part[key]}
+                            ariaLabel={`${PART_PARAM_LABELS[key]} CC`}
+                            onChange={(v) =>
+                              editTable((next) => {
+                                next.split.part[key] = v
+                              })
+                            }
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <p className="hint ccmap__note">* {t('map.quantNote')}</p>
+              </section>
+            </>
+          ) : (
+            <section className="ccmap__group">
+              <h3 className="func__heading">{t('map.perPart')}</h3>
+              <table className="ccmap__table">
+                <thead>
+                  <tr>
+                    <th>Parameter</th>
+                    {Array.from({ length: PART_COUNT }, (_, i) => (
+                      <th key={i}>P{i + 1}</th>
                     ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {SINGLE_LAYER_ROWS.map((key) => (
+                    <tr key={key}>
+                      <td className="ccmap__name">{LAYER_PARAM_LABELS[key]} 1-2</td>
+                      {Array.from({ length: PART_COUNT }, (_, part) => (
+                        <td key={part}>
+                          <CcInput
+                            value={table.single.layer[part][key]}
+                            isDefault={table.single.layer[part][key] === DEFAULT_CC_TABLE.single.layer[part][key]}
+                            ariaLabel={`part ${part + 1} ${LAYER_PARAM_LABELS[key]} CC`}
+                            onChange={(v) =>
+                              editTable((next) => {
+                                next.single.layer[part][key] = v
+                              })
+                            }
+                          />
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                  {(['send', 'pan'] as const).map((key) => (
+                    <tr key={key}>
+                      <td className="ccmap__name">{PART_PARAM_LABELS[key]}</td>
+                      {Array.from({ length: PART_COUNT }, (_, part) => (
+                        <td key={part}>
+                          <CcInput
+                            value={table.single.part[part][key]}
+                            isDefault={table.single.part[part][key] === DEFAULT_CC_TABLE.single.part[part][key]}
+                            ariaLabel={`part ${part + 1} ${PART_PARAM_LABELS[key]} CC`}
+                            onChange={(v) =>
+                              editTable((next) => {
+                                next.single.part[part][key] = v
+                              })
+                            }
+                          />
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </section>
+          )}
 
-            <h3 className="func__heading">{t('map.partParams')}</h3>
+          <section className="ccmap__group">
+            <h3 className="func__heading">{t('map.global')}</h3>
             <table className="ccmap__table ccmap__table--narrow">
               <tbody>
-                {SPLIT_PART_ROWS.map((key) => (
+                {(['wgModel', 'wgDecay', 'wgBody', 'wgTune'] as const).map((key) => (
                   <tr key={key}>
-                    <td className="ccmap__name">{PART_PARAM_LABELS[key]}</td>
+                    <td className="ccmap__name">
+                      {key.replace('wg', '').toUpperCase()}
+                      {key === 'wgModel' && <span className="ccmap__mark">*</span>}
+                    </td>
                     <td>
                       <CcInput
-                        value={table.split.part[key]}
-                        isDefault={table.split.part[key] === DEFAULT_CC_TABLE.split.part[key]}
-                        ariaLabel={`${PART_PARAM_LABELS[key]} CC`}
+                        value={table.global[key]}
+                        isDefault={table.global[key] === DEFAULT_CC_TABLE.global[key]}
+                        ariaLabel={`${key} CC`}
                         onChange={(v) =>
                           editTable((next) => {
-                            next.split.part[key] = v
+                            next.global[key] = v
                           })
                         }
                       />
                     </td>
-                    <td className="hint">
-                      {key === 'pitchModQuantize' ? t('map.quantNote') : t('map.sharedNote')}
-                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          </>
-        ) : (
-          <>
-            <h3 className="func__heading">{t('map.perPart')}</h3>
-            <table className="ccmap__table">
-              <thead>
-                <tr>
-                  <th>Parameter</th>
-                  {Array.from({ length: PART_COUNT }, (_, i) => (
-                    <th key={i}>P{i + 1}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {SINGLE_LAYER_ROWS.map((key) => (
-                  <tr key={key}>
-                    <td className="ccmap__name">{LAYER_PARAM_LABELS[key]} 1-2</td>
-                    {Array.from({ length: PART_COUNT }, (_, part) => (
-                      <td key={part}>
-                        <CcInput
-                          value={table.single.layer[part][key]}
-                          isDefault={table.single.layer[part][key] === DEFAULT_CC_TABLE.single.layer[part][key]}
-                          ariaLabel={`part ${part + 1} ${LAYER_PARAM_LABELS[key]} CC`}
-                          onChange={(v) =>
-                            editTable((next) => {
-                              next.single.layer[part][key] = v
-                            })
-                          }
-                        />
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-                {(['send', 'pan'] as const).map((key) => (
-                  <tr key={key}>
-                    <td className="ccmap__name">{PART_PARAM_LABELS[key]}</td>
-                    {Array.from({ length: PART_COUNT }, (_, part) => (
-                      <td key={part}>
-                        <CcInput
-                          value={table.single.part[part][key]}
-                          isDefault={table.single.part[part][key] === DEFAULT_CC_TABLE.single.part[part][key]}
-                          ariaLabel={`part ${part + 1} ${PART_PARAM_LABELS[key]} CC`}
-                          onChange={(v) =>
-                            editTable((next) => {
-                              next.single.part[part][key] = v
-                            })
-                          }
-                        />
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-          </>
-        )}
-
-        <h3 className="func__heading">{t('map.global')}</h3>
-        <table className="ccmap__table ccmap__table--narrow">
-          <tbody>
-            {(['wgModel', 'wgDecay', 'wgBody', 'wgTune'] as const).map((key) => (
-              <tr key={key}>
-                <td className="ccmap__name">{key.replace('wg', '').toUpperCase()}</td>
-                <td>
-                  <CcInput
-                    value={table.global[key]}
-                    isDefault={table.global[key] === DEFAULT_CC_TABLE.global[key]}
-                    ariaLabel={`${key} CC`}
-                    onChange={(v) =>
-                      editTable((next) => {
-                        next.global[key] = v
-                      })
-                    }
-                  />
-                </td>
-                <td className="hint">{key === 'wgModel' ? t('map.modelNote') : ''}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+            <p className="hint ccmap__note">* {t('map.modelNote')}</p>
+          </section>
+        </div>
 
       </div>
     </section>

@@ -892,6 +892,38 @@
   width: auto;
 }
 
+/*
+ * The tables are all narrow and the panel is wide, so they sit side by side
+ * and wrap only when the column really runs out — three stacked tables made
+ * the tab scroll for no reason.
+ */
+.ccmap__grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--gap-lg) 32px;
+}
+
+.ccmap__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-sm);
+  min-width: 0;
+}
+
+.ccmap__group .ccmap__table {
+  align-self: stretch;
+}
+
+.ccmap__note {
+  margin: 0;
+}
+
+.ccmap__mark {
+  margin-left: 3px;
+  color: var(--c-accent);
+}
+
 .ccmap__name {
   padding-right: 18px;
   color: var(--c-ink) !important;
