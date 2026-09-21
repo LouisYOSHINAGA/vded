@@ -49,6 +49,22 @@ function pageOf(step: number): number {
   return Math.floor(step / STEPS_PER_PAGE)
 }
 
+/**
+ * How far behind the playhead a cell turns over to the next page. One beat:
+ * by the time the playhead is on step 5, cell 1 is already showing step 17.
+ */
+const LOOKAHEAD = 4
+
+/**
+ * Absolute step drawn in cell `i` of the visible page. Cells at or below
+ * `aheadMax` have been passed by the playhead and now show the same cell on
+ * the next page, so the coming bar rolls into view a beat at a time instead of
+ * arriving all at once at the page turn.
+ */
+function stepAt(cell: number, base: number, nextBase: number, aheadMax: number): number {
+  return cell <= aheadMax ? nextBase + cell : base + cell
+}
+
 function clampRail(width: number): number {
   return Math.max(120, Math.min(340, Math.round(width)))
 }
@@ -69,6 +85,15 @@ export function Sequencer() {
   const page = useAppState((s) => s.ui.seqPage)
   const follow = useAppState((s) => s.ui.followPlayhead)
   const base = page * STEPS_PER_PAGE
+  const pages = pageCountFor(pattern.length)
+  const nextBase = ((page + 1) % pages) * STEPS_PER_PAGE
+  // The roll-in only makes sense while the playhead is on this page, there is
+  // another page to roll in, and the view is following the transport at all.
+  const posInPage =
+    follow && transport.playing && currentStep >= 0 && pageOf(currentStep) === page
+      ? currentStep - base
+      : -1
+  const aheadMax = pages > 1 && posInPage >= LOOKAHEAD ? posInPage - LOOKAHEAD : -1
 
   // While running, the grid turns the page with the playhead unless FOLLOW is
   // off — which is what you want when editing one page while another plays.
@@ -164,16 +189,6 @@ export function Sequencer() {
             onChange={(gateMs) => setTransport({ gateMs })}
             title={t('seq.gateTitle')}
           />
-          <label className="transport__field" title={t('seq.lengthAria')}>
-            <span className="cluster__label">{t('seq.length')}</span>
-            <NumberField
-              ariaLabel={t('seq.lengthAria')}
-              value={pattern.length}
-              min={1}
-              max={MAX_STEPS}
-              onChange={setPatternLength}
-            />
-          </label>
           <button
             type="button"
             className={`btn btn--sm${transport.sendClock ? ' btn--on' : ' btn--ghost'}`}
@@ -205,18 +220,23 @@ export function Sequencer() {
             <RailHandle />
           </div>
           <div className="seq-ruler">
-            {beats(Array.from({ length: STEPS_PER_PAGE }, (_, i) => base + i)).map((beat, b) => (
+            {beats(Array.from({ length: STEPS_PER_PAGE }, (_, i) => i)).map((beat, b) => (
               <div className="seq-beat" key={b}>
-                {beat.map((i) => (
-                  <div
-                    key={i}
-                    className={`seq-ruler__tick${i >= pattern.length ? ' seq-ruler__tick--off' : ''}${
-                      i === currentStep ? ' seq-ruler__tick--now' : ''
-                    }`}
-                  >
-                    {i + 1}
-                  </div>
-                ))}
+                {beat.map((cell) => {
+                  const i = stepAt(cell, base, nextBase, aheadMax)
+                  return (
+                    <div
+                      key={cell}
+                      className={`seq-ruler__tick${
+                        i >= pattern.length ? ' seq-ruler__tick--off' : ''
+                      }${cell <= aheadMax ? ' seq-ruler__tick--ahead' : ''}${
+                        i === currentStep ? ' seq-ruler__tick--now' : ''
+                      }`}
+                    >
+                      {i + 1}
+                    </div>
+                  )
+                })}
               </div>
             ))}
           </div>
@@ -230,12 +250,20 @@ export function Sequencer() {
               onCellDown={onCellDown}
               onCellEnter={onCellEnter}
               currentStep={currentStep}
-              page={page}
+              base={base}
+              nextBase={nextBase}
+              aheadMax={aheadMax}
             />
           ))}
         </div>
 
-        <VelocityLane part={selectedPart} railWidth={railWidth} page={page} />
+        <VelocityLane
+          part={selectedPart}
+          railWidth={railWidth}
+          base={base}
+          nextBase={nextBase}
+          aheadMax={aheadMax}
+        />
       </div>
     </section>
   )
@@ -264,6 +292,18 @@ function PageBar() {
 
   return (
     <div className="seq-pages">
+      {/* Length and page are one idea — how long the pattern is, and which
+          sixteen of it you are looking at — so they sit together. */}
+      <label className="seq-pages__len-field" title={t('seq.lengthAria')}>
+        <span className="cluster__label">{t('seq.length')}</span>
+        <NumberField
+          ariaLabel={t('seq.lengthAria')}
+          value={length}
+          min={1}
+          max={MAX_STEPS}
+          onChange={setPatternLength}
+        />
+      </label>
       <span className="cluster__label">{t('seq.page')}</span>
       <div className="seq-pages__row" role="tablist" aria-label={t('seq.page')}>
         {Array.from({ length: PAGE_COUNT }, (_, n) => {
@@ -300,8 +340,8 @@ function PageBar() {
       >
         {t('seq.follow')}
       </button>
-      <span className="hint seq-pages__len">
-        {t('seq.pageRange', { from: page * STEPS_PER_PAGE + 1, to: (page + 1) * STEPS_PER_PAGE, len: length })}
+      <span className="hint seq-pages__range">
+        {t('seq.pageRange', { from: page * STEPS_PER_PAGE + 1, to: (page + 1) * STEPS_PER_PAGE })}
       </span>
     </div>
   )
@@ -369,17 +409,29 @@ interface PartRowProps {
   part: number
   selected: boolean
   currentStep: number
-  page: number
+  /** First step of the visible page, the page rolling in, and how far the
+      roll-in has got. */
+  base: number
+  nextBase: number
+  aheadMax: number
   onCellDown: (part: number, step: number, event: React.PointerEvent) => void
   onCellEnter: (part: number, step: number, event: React.PointerEvent) => void
 }
 
-function PartRow({ part, selected, currentStep, page, onCellDown, onCellEnter }: PartRowProps) {
+function PartRow({
+  part,
+  selected,
+  currentStep,
+  base,
+  nextBase,
+  aheadMax,
+  onCellDown,
+  onCellEnter,
+}: PartRowProps) {
   const t = useT()
   const name = useAppState((s) => s.patch.parts[part].name)
   const steps = useAppState((s) => s.pattern.steps[part])
   const length = useAppState((s) => s.pattern.length)
-  const base = page * STEPS_PER_PAGE
   const muted = useAppState((s) => s.mixer.mutes[part])
   const solo = useAppState((s) => s.mixer.solos[part])
   const anySolo = useAppState((s) => s.mixer.solos.some(Boolean))
@@ -479,17 +531,20 @@ function PartRow({ part, selected, currentStep, page, onCellDown, onCellEnter }:
         }`}
         style={tintStyle}
       >
-        {beats(steps.slice(base, base + STEPS_PER_PAGE)).map((beat, b) => (
+        {beats(Array.from({ length: STEPS_PER_PAGE }, (_, i) => i)).map((beat, b) => (
           <div className="seq-beat" key={b}>
-            {beat.map((step, j) => {
-              const i = base + b * 4 + j
+            {beat.map((cell) => {
+              const i = stepAt(cell, base, nextBase, aheadMax)
+              const step = steps[i]
               return (
                 <button
-                  key={i}
+                  key={cell}
                   type="button"
                   className={`step${step.on ? ` step--on ${velocityClass(step.velocity)}` : ''}${
                     i >= length ? ' step--outside' : ''
-                  }${i === currentStep ? ' step--now' : ''}`}
+                  }${cell <= aheadMax ? ' step--ahead' : ''}${
+                    i === currentStep ? ' step--now' : ''
+                  }`}
                   aria-label={`${t('seq.stepAria', { part: part + 1, step: i + 1 })} ${
                     step.on ? t('seq.stepVelocity', { v: step.velocity }) : t('seq.stepOff')
                   }`}
@@ -547,17 +602,20 @@ function PartRow({ part, selected, currentStep, page, onCellDown, onCellEnter }:
 function VelocityLane({
   part,
   railWidth,
-  page,
+  base,
+  nextBase,
+  aheadMax,
 }: {
   part: number
   railWidth: number
-  page: number
+  base: number
+  nextBase: number
+  aheadMax: number
 }) {
   const t = useT()
   const steps = useAppState((s) => s.pattern.steps[part])
   const length = useAppState((s) => s.pattern.length)
   const name = useAppState((s) => s.patch.parts[part].name)
-  const base = page * STEPS_PER_PAGE
   const drag = useRef<{ step: number; startY: number; startValue: number } | null>(null)
 
   const apply = (step: number, velocity: number) => {
@@ -586,17 +644,18 @@ function VelocityLane({
         <span className="vel-lane__part">{name}</span>
       </div>
       <div className="vel-lane__row">
-        {beats(steps.slice(base, base + STEPS_PER_PAGE)).map((beat, b) => (
+        {beats(Array.from({ length: STEPS_PER_PAGE }, (_, i) => i)).map((beat, b) => (
           <div className="seq-beat" key={b}>
-            {beat.map((step, j) => {
-              const i = base + b * 4 + j
+            {beat.map((cell) => {
+              const i = stepAt(cell, base, nextBase, aheadMax)
+              const step = steps[i]
               const label = t('seq.velocityAria', { part: part + 1, step: i + 1 })
               return (
                 <div
-                  key={i}
+                  key={cell}
                   className={`vel-fader${step.on ? '' : ' vel-fader--off'}${
                     i >= length ? ' vel-fader--outside' : ''
-                  }`}
+                  }${cell <= aheadMax ? ' vel-fader--ahead' : ''}`}
                   role="slider"
                   tabIndex={0}
                   aria-label={label}

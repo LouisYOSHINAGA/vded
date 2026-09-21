@@ -172,8 +172,15 @@
 .seq-pages {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 16px;
   margin-bottom: 12px;
+}
+
+/* LEN and PAGE describe the same thing — how long the pattern is, and which
+   sixteen of it is on screen — so they sit closer to each other than to
+   anything else in the bar. */
+.seq-pages__len-field + .cluster__label {
+  margin-left: -6px;
 }
 
 .seq-pages__row {
@@ -206,8 +213,33 @@
   opacity: 0.75;
 }
 
-.seq-pages__len {
+.seq-pages__range {
   font-family: var(--font-mono);
+}
+
+.seq-pages__len-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.seq-pages__row + .btn {
+  margin-left: 2px;
+}
+
+/*
+ * A cell the playhead passed a beat ago already shows the next page, so the
+ * bar ahead arrives four steps at a time instead of all at once at the page
+ * turn. Dimmed, because it is not what is playing right now.
+ */
+.step--ahead,
+.vel-fader--ahead {
+  opacity: 0.55;
+}
+
+.seq-ruler__tick--ahead {
+  opacity: 0.55;
+  border-bottom-style: dashed;
 }
 
 /* ---------------- part rail ---------------- */
