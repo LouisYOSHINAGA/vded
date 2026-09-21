@@ -2,13 +2,13 @@
 import type { Appearance } from '../data/appearance'
 import { CUSTOM_SLOTS, THEME_SEEDS, makeCustomSlots } from '../data/appearance'
 import { DEFAULT_CC_TABLE } from '../midi/ccmap'
-import { makeEmptyPattern, makeInitPatch } from './defaults'
+import { makeInitPatch, normalizePattern } from './defaults'
 import type { AppState } from './store'
 import type { EditorTab } from './store'
 import { DEFAULT_TAB_ORDER, makeInitialState, store } from './store'
 import type { ThemeSeed } from '../theme/palette'
 import type { Preset } from './types'
-import { PART_COUNT } from './types'
+import { PAGE_COUNT, PART_COUNT, STEPS_PER_PAGE } from './types'
 
 const KEY = 'vded.workspace.v1'
 const SCHEMA = 1
@@ -28,6 +28,8 @@ interface Persisted {
     | 'layerLink'
     | 'editorTab'
     | 'seqRailWidth'
+    | 'seqPage'
+    | 'followPlayhead'
     | 'dialOrder'
     | 'tabOrder'
   >
@@ -41,9 +43,12 @@ export function loadWorkspace(): Partial<AppState> | null {
     const data = JSON.parse(raw) as Persisted
     if (data.schema !== SCHEMA) return null
     const base = makeInitialState()
+    // Saves written before pages existed hold sixteen-step rows; they are
+    // padded rather than discarded.
+    const pattern = normalizePattern(data.pattern)
     return {
       patch: data.patch ?? makeInitPatch(),
-      pattern: data.pattern ?? makeEmptyPattern(),
+      pattern,
       memo: typeof data.memo === 'string' ? data.memo : '',
       presets: Array.isArray(data.presets) ? data.presets : [],
       settings: {
@@ -60,6 +65,8 @@ export function loadWorkspace(): Partial<AppState> | null {
         dialOrder: validOrder(data.ui?.dialOrder) ?? base.ui.dialOrder,
         tabOrder: validTabOrder(data.ui?.tabOrder) ?? base.ui.tabOrder,
         layerLink: migrateLayerLink(data.ui?.layerLink),
+        seqPage: validPage(data.ui?.seqPage, pattern.length),
+        followPlayhead: data.ui?.followPlayhead ?? base.ui.followPlayhead,
         sendAllProgress: null,
       },
       transport: { ...base.transport, ...data.transport, playing: false, currentStep: -1 },
@@ -110,6 +117,13 @@ function validTabOrder(order: EditorTab[] | undefined): EditorTab[] | null {
   return DEFAULT_TAB_ORDER.every((tab) => seen.has(tab)) ? order : null
 }
 
+/** A saved page must still be inside both the page count and the pattern. */
+function validPage(page: number | undefined, length: number): number {
+  if (!Number.isInteger(page)) return 0
+  const last = Math.min(PAGE_COUNT, Math.ceil(length / STEPS_PER_PAGE)) - 1
+  return Math.max(0, Math.min(last, page as number))
+}
+
 /** A saved order is only usable if it is still a permutation of every part. */
 function validOrder(order: number[] | undefined): number[] | null {
   if (!Array.isArray(order) || order.length !== PART_COUNT) return null
@@ -133,6 +147,8 @@ function serialize(state: AppState): string {
       layerLink: state.ui.layerLink,
       editorTab: state.ui.editorTab,
       seqRailWidth: state.ui.seqRailWidth,
+      seqPage: state.ui.seqPage,
+      followPlayhead: state.ui.followPlayhead,
       dialOrder: state.ui.dialOrder,
       tabOrder: state.ui.tabOrder,
     },
@@ -163,6 +179,8 @@ function persistedSlices(state: AppState): unknown[] {
     state.ui.layerLink,
     state.ui.editorTab,
     state.ui.seqRailWidth,
+    state.ui.seqPage,
+    state.ui.followPlayhead,
     state.ui.dialOrder,
     state.ui.tabOrder,
     state.memo,

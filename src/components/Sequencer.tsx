@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useT } from '../i18n'
 import {
   clearAllSteps,
@@ -6,7 +6,9 @@ import {
   randomizePattern,
   scaleVelocities,
   setPartName,
+  pageCountFor,
   setPatternLength,
+  setSeqPage,
   setStep,
   setStepVelocity,
   setTransport,
@@ -19,7 +21,7 @@ import {
 } from '../state/actions'
 import { sequencer } from '../sequencer/engine'
 import { store, useAppState } from '../state/store'
-import { MAX_STEPS, PART_COUNT } from '../state/types'
+import { MAX_STEPS, PAGE_COUNT, PART_COUNT, STEPS_PER_PAGE } from '../state/types'
 import { Icon } from './Icon'
 import { InfoTip } from './InfoTip'
 import { Knob } from './Knob'
@@ -37,9 +39,14 @@ const DEFAULT_RAIL_WIDTH = 216
 const partTint = (part: number) => `var(--c-part-${part + 1})`
 const partInk = (part: number) => `var(--c-on-part-${part + 1})`
 
-/** Splits the sixteen steps into four beats. */
+/** Splits one page of sixteen steps into four beats. */
 function beats<T>(items: T[]): T[][] {
   return [0, 1, 2, 3].map((beat) => items.slice(beat * 4, beat * 4 + 4))
+}
+
+/** The page a step index falls on. */
+function pageOf(step: number): number {
+  return Math.floor(step / STEPS_PER_PAGE)
 }
 
 function clampRail(width: number): number {
@@ -59,6 +66,16 @@ export function Sequencer() {
   const selectedPart = useAppState((s) => s.ui.selectedPart)
   const transport = useAppState((s) => s.transport)
   const railWidth = useAppState((s) => s.ui.seqRailWidth)
+  const page = useAppState((s) => s.ui.seqPage)
+  const follow = useAppState((s) => s.ui.followPlayhead)
+  const base = page * STEPS_PER_PAGE
+
+  // While running, the grid turns the page with the playhead unless FOLLOW is
+  // off — which is what you want when editing one page while another plays.
+  useEffect(() => {
+    if (!follow || !transport.playing || currentStep < 0) return
+    setSeqPage(pageOf(currentStep))
+  }, [follow, transport.playing, currentStep])
 
   /** Paint mode captured on pointer-down so a drag writes one consistent value. */
   const paint = useRef<{ on: boolean } | null>(null)
@@ -178,16 +195,17 @@ export function Sequencer() {
       </div>
 
       <div className="panel__body sequencer__body">
+        <PageBar />
         <div
           className="seq-grid"
-          style={{ ['--steps' as string]: MAX_STEPS, ['--rail-w' as string]: `${railWidth}px` }}
+          style={{ ['--rail-w' as string]: `${railWidth}px` }}
         >
           <div className="seq-grid__corner legend">
             {t('seq.part')}
             <RailHandle />
           </div>
           <div className="seq-ruler">
-            {beats(Array.from({ length: MAX_STEPS }, (_, i) => i)).map((beat, b) => (
+            {beats(Array.from({ length: STEPS_PER_PAGE }, (_, i) => base + i)).map((beat, b) => (
               <div className="seq-beat" key={b}>
                 {beat.map((i) => (
                   <div
@@ -212,13 +230,80 @@ export function Sequencer() {
               onCellDown={onCellDown}
               onCellEnter={onCellEnter}
               currentStep={currentStep}
+              page={page}
             />
           ))}
         </div>
 
-        <VelocityLane part={selectedPart} railWidth={railWidth} />
+        <VelocityLane part={selectedPart} railWidth={railWidth} page={page} />
       </div>
     </section>
+  )
+}
+
+/**
+ * Page selector. Each button says three things at once: whether the page is
+ * inside the pattern length, whether anything is written on it, and whether
+ * the playhead is there right now — so you can see where the pattern lives
+ * without paging through it.
+ */
+function PageBar() {
+  const t = useT()
+  const length = useAppState((s) => s.pattern.length)
+  const steps = useAppState((s) => s.pattern.steps)
+  const page = useAppState((s) => s.ui.seqPage)
+  const follow = useAppState((s) => s.ui.followPlayhead)
+  const currentStep = useAppState((s) => s.transport.currentStep)
+  const playing = useAppState((s) => s.transport.playing)
+  const pages = pageCountFor(length)
+
+  const used = (n: number) =>
+    steps.some((row) =>
+      row.slice(n * STEPS_PER_PAGE, (n + 1) * STEPS_PER_PAGE).some((step) => step.on),
+    )
+
+  return (
+    <div className="seq-pages">
+      <span className="cluster__label">{t('seq.page')}</span>
+      <div className="seq-pages__row" role="tablist" aria-label={t('seq.page')}>
+        {Array.from({ length: PAGE_COUNT }, (_, n) => {
+          const outside = n >= pages
+          const here = playing && pageOf(currentStep) === n && currentStep >= 0
+          return (
+            <button
+              key={n}
+              type="button"
+              role="tab"
+              aria-selected={page === n}
+              className={`btn btn--sm seq-page${page === n ? ' btn--on' : ' btn--ghost'}${
+                outside ? ' seq-page--outside' : ''
+              }${here ? ' seq-page--now' : ''}`}
+              onClick={() => setSeqPage(n)}
+              title={
+                outside
+                  ? t('seq.pageOutsideTitle', { n: n + 1, len: (n + 1) * STEPS_PER_PAGE })
+                  : t('seq.pageTitle', { n: n + 1 })
+              }
+            >
+              {n + 1}
+              {used(n) && <span className="seq-page__dot" aria-hidden="true" />}
+            </button>
+          )
+        })}
+      </div>
+      <button
+        type="button"
+        className={`btn btn--sm${follow ? ' btn--on' : ' btn--ghost'}`}
+        onClick={() => setUi({ followPlayhead: !follow })}
+        aria-pressed={follow}
+        title={t('seq.followTitle')}
+      >
+        {t('seq.follow')}
+      </button>
+      <span className="hint seq-pages__len">
+        {t('seq.pageRange', { from: page * STEPS_PER_PAGE + 1, to: (page + 1) * STEPS_PER_PAGE, len: length })}
+      </span>
+    </div>
   )
 }
 
@@ -284,15 +369,17 @@ interface PartRowProps {
   part: number
   selected: boolean
   currentStep: number
+  page: number
   onCellDown: (part: number, step: number, event: React.PointerEvent) => void
   onCellEnter: (part: number, step: number, event: React.PointerEvent) => void
 }
 
-function PartRow({ part, selected, currentStep, onCellDown, onCellEnter }: PartRowProps) {
+function PartRow({ part, selected, currentStep, page, onCellDown, onCellEnter }: PartRowProps) {
   const t = useT()
   const name = useAppState((s) => s.patch.parts[part].name)
   const steps = useAppState((s) => s.pattern.steps[part])
   const length = useAppState((s) => s.pattern.length)
+  const base = page * STEPS_PER_PAGE
   const muted = useAppState((s) => s.mixer.mutes[part])
   const solo = useAppState((s) => s.mixer.solos[part])
   const anySolo = useAppState((s) => s.mixer.solos.some(Boolean))
@@ -392,10 +479,10 @@ function PartRow({ part, selected, currentStep, onCellDown, onCellEnter }: PartR
         }`}
         style={tintStyle}
       >
-        {beats(steps).map((beat, b) => (
+        {beats(steps.slice(base, base + STEPS_PER_PAGE)).map((beat, b) => (
           <div className="seq-beat" key={b}>
             {beat.map((step, j) => {
-              const i = b * 4 + j
+              const i = base + b * 4 + j
               return (
                 <button
                   key={i}
@@ -457,11 +544,20 @@ function PartRow({ part, selected, currentStep, onCellDown, onCellEnter }: PartR
   )
 }
 
-function VelocityLane({ part, railWidth }: { part: number; railWidth: number }) {
+function VelocityLane({
+  part,
+  railWidth,
+  page,
+}: {
+  part: number
+  railWidth: number
+  page: number
+}) {
   const t = useT()
   const steps = useAppState((s) => s.pattern.steps[part])
   const length = useAppState((s) => s.pattern.length)
   const name = useAppState((s) => s.patch.parts[part].name)
+  const base = page * STEPS_PER_PAGE
   const drag = useRef<{ step: number; startY: number; startValue: number } | null>(null)
 
   const apply = (step: number, velocity: number) => {
@@ -490,10 +586,10 @@ function VelocityLane({ part, railWidth }: { part: number; railWidth: number }) 
         <span className="vel-lane__part">{name}</span>
       </div>
       <div className="vel-lane__row">
-        {beats(steps).map((beat, b) => (
+        {beats(steps.slice(base, base + STEPS_PER_PAGE)).map((beat, b) => (
           <div className="seq-beat" key={b}>
             {beat.map((step, j) => {
-              const i = b * 4 + j
+              const i = base + b * 4 + j
               const label = t('seq.velocityAria', { part: part + 1, step: i + 1 })
               return (
                 <div

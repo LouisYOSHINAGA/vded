@@ -3,7 +3,14 @@ import type { Appearance } from '../data/appearance'
 
 export const PART_COUNT = 6
 export const LAYER_COUNT = 2
-export const MAX_STEPS = 16
+/** One page of the grid, as on any sixteen-step machine. */
+export const STEPS_PER_PAGE = 16
+/** Pages a pattern can span — four is the usual groovebox bar count. */
+export const PAGE_COUNT = 4
+/** The longest pattern: four pages of sixteen. */
+export const MAX_STEPS = STEPS_PER_PAGE * PAGE_COUNT
+/** A fresh pattern is one page long, which is what the machine itself plays. */
+export const DEFAULT_STEPS = STEPS_PER_PAGE
 
 /** SELECT is one CC that packs wave x mod x eg. These are its three axes. */
 export const WAVE_NAMES = ['SINE', 'SAW', 'NOISE HP', 'NOISE LP', 'NOISE BP'] as const
@@ -89,7 +96,7 @@ export interface Step {
 
 export interface Pattern {
   name: string
-  /** Steps actually played, 1..16. */
+  /** Steps actually played, 1..MAX_STEPS. The rows always hold MAX_STEPS. */
   length: number
   /** [part][step] */
   steps: Step[][]

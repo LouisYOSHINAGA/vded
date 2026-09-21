@@ -66,6 +66,10 @@ export interface UiState {
   tabOrder: EditorTab[]
   /** Width of the sequencer's part rail, in pixels. */
   seqRailWidth: number
+  /** Page of the step grid on screen, 0..PAGE_COUNT-1. */
+  seqPage: number
+  /** Let the visible page chase the playhead across pages while running. */
+  followPlayhead: boolean
   /** Part indices in the order the Dials tab shows them; drag-reorderable. */
   dialOrder: number[]
   /** Progress of a running SEND ALL, 0..1, or null when idle. */
@@ -120,6 +124,8 @@ export function makeInitialState(): AppState {
       editorTab: 'part',
       tabOrder: [...DEFAULT_TAB_ORDER],
       seqRailWidth: 216,
+      seqPage: 0,
+      followPlayhead: true,
       dialOrder: [0, 1, 2, 3, 4, 5],
       sendAllProgress: null,
     },

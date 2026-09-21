@@ -162,6 +162,54 @@
   border-bottom-color: var(--c-accent);
 }
 
+/* ---------------- pages ---------------- */
+
+/*
+ * One bar above the grid saying which sixteen of the sixty-four steps are on
+ * screen. The buttons carry three signals at once: selected, inside the
+ * pattern length, and holding the playhead.
+ */
+.seq-pages {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.seq-pages__row {
+  display: flex;
+  gap: 4px;
+}
+
+.seq-page {
+  min-width: 34px;
+  padding: 0 8px;
+  font-family: var(--font-mono);
+}
+
+/* A page past the length still opens — you can write ahead of the length —
+   but it reads as not playing. */
+.seq-page--outside {
+  opacity: 0.45;
+}
+
+.seq-page--now {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 1px;
+}
+
+.seq-page__dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.75;
+}
+
+.seq-pages__len {
+  font-family: var(--font-mono);
+}
+
 /* ---------------- part rail ---------------- */
 
 .seq-rail {

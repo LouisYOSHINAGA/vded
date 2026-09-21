@@ -1,5 +1,5 @@
 import type { Layer, Part, Pattern, Patch, Step, WaveGuide } from './types'
-import { MAX_STEPS, PART_COUNT } from './types'
+import { DEFAULT_STEPS, MAX_STEPS, PART_COUNT } from './types'
 
 export function makeLayer(overrides: Partial<Layer> = {}): Layer {
   return {
@@ -47,17 +47,22 @@ export function makeStep(): Step {
   return { on: false, velocity: 100 }
 }
 
-export function makeEmptyPattern(name = 'INIT PATTERN'): Pattern {
+/**
+ * Rows are always MAX_STEPS long whatever the length is, so extending a
+ * pattern never has to grow the arrays and never loses what a longer pattern
+ * had before it was shortened.
+ */
+export function makeEmptyPattern(name = 'INIT PATTERN', length = DEFAULT_STEPS): Pattern {
   return {
     name,
-    length: MAX_STEPS,
+    length,
     steps: Array.from({ length: PART_COUNT }, () =>
       Array.from({ length: MAX_STEPS }, () => makeStep()),
     ),
   }
 }
 
-/** Fills a pattern row from a 16-character string: 'X' accent, 'x' normal, '.' off. */
+/** Fills a pattern row from a step string: 'X' accent, 'x' normal, '.' off. */
 export function rowFromString(spec: string): Step[] {
   return Array.from({ length: MAX_STEPS }, (_, i) => {
     const c = spec[i] ?? '.'
@@ -74,4 +79,27 @@ export function patternFromStrings(name: string, rows: string[]): Pattern {
     pattern.steps[i] = rowFromString(row)
   })
   return pattern
+}
+
+/**
+ * Brings a pattern from anywhere — an old save, a preset file written before
+ * pages existed — up to the current shape: PART_COUNT rows of MAX_STEPS, and a
+ * length inside the range. Short rows keep what they had and gain empty steps.
+ */
+export function normalizePattern(pattern: Pattern | null | undefined): Pattern {
+  if (!pattern || !Array.isArray(pattern.steps)) return makeEmptyPattern()
+  const steps = Array.from({ length: PART_COUNT }, (_, part) => {
+    const row = Array.isArray(pattern.steps[part]) ? pattern.steps[part] : []
+    return Array.from({ length: MAX_STEPS }, (_, i) => {
+      const step = row[i]
+      if (!step || typeof step !== 'object') return makeStep()
+      return {
+        on: Boolean(step.on),
+        velocity: Math.max(1, Math.min(127, Math.round(Number(step.velocity) || 100))),
+      }
+    })
+  })
+  const saved = Math.round(Number(pattern.length))
+  const length = Number.isFinite(saved) ? Math.max(1, Math.min(MAX_STEPS, saved)) : DEFAULT_STEPS
+  return { name: typeof pattern.name === 'string' ? pattern.name : 'INIT PATTERN', length, steps }
 }

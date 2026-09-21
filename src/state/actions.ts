@@ -25,8 +25,8 @@ import type {
   Preset,
   WaveIndex,
 } from './types'
-import { MAX_STEPS, PART_COUNT } from './types'
-import { makeEmptyPattern, makeInitPatch, makeLayer, makePart } from './defaults'
+import { MAX_STEPS, PAGE_COUNT, PART_COUNT, STEPS_PER_PAGE } from './types'
+import { makeEmptyPattern, makeInitPatch, makeLayer, makePart, normalizePattern } from './defaults'
 import type { AppState } from './store'
 import { store, toast } from './store'
 
@@ -194,9 +194,12 @@ export function randomizeLayer(partIndex: number, layer: 0 | 1): void {
 
 export function randomizePattern(partIndex: number): void {
   store.set((s) => {
+    // Only the steps inside the length are dealt: scattering notes onto pages
+    // that do not play yet would ambush anyone who lengthens the pattern later.
     const steps = s.pattern.steps.map((row, i) =>
       i === partIndex
-        ? row.map(() => {
+        ? row.map((step, j) => {
+            if (j >= s.pattern.length) return step
             const on = Math.random() < 0.35
             return { on, velocity: on && Math.random() < 0.25 ? 127 : 96 }
           })
@@ -272,7 +275,7 @@ export function clearPartSteps(partIndex: number): void {
 }
 
 export function clearAllSteps(): void {
-  store.set((s) => ({ ...s, pattern: makeEmptyPattern(s.pattern.name) }))
+  store.set((s) => ({ ...s, pattern: makeEmptyPattern(s.pattern.name, s.pattern.length) }))
 }
 
 export function shiftPart(partIndex: number, delta: number): void {
@@ -294,7 +297,27 @@ export function shiftPart(partIndex: number, delta: number): void {
 
 export function setPatternLength(length: number): void {
   const clamped = Math.max(1, Math.min(MAX_STEPS, Math.round(length)))
-  store.set((s) => ({ ...s, pattern: { ...s.pattern, length: clamped } }))
+  store.set((s) => {
+    const lastPage = Math.floor((clamped - 1) / STEPS_PER_PAGE)
+    return {
+      ...s,
+      pattern: { ...s.pattern, length: clamped },
+      // Shortening the pattern can strand the view on a page that no longer
+      // plays, so it follows the end of the pattern back down.
+      ui: s.ui.seqPage > lastPage ? { ...s.ui, seqPage: lastPage } : s.ui,
+    }
+  })
+}
+
+export function setSeqPage(page: number): void {
+  const clamped = Math.max(0, Math.min(PAGE_COUNT - 1, Math.round(page)))
+  if (store.get().ui.seqPage === clamped) return
+  setUi({ seqPage: clamped })
+}
+
+/** Pages the pattern actually reaches, given its current length. */
+export function pageCountFor(length: number): number {
+  return Math.max(1, Math.ceil(length / STEPS_PER_PAGE))
 }
 
 export function toggleMute(partIndex: number): void {
@@ -568,7 +591,9 @@ export function loadPreset(
     ...s,
     patch: structuredClone(preset.patch),
     pattern:
-      options.withPattern && preset.pattern ? structuredClone(preset.pattern) : s.pattern,
+      options.withPattern && preset.pattern
+        ? normalizePattern(structuredClone(preset.pattern))
+        : s.pattern,
     settings:
       options.withAppearance && preset.appearance
         ? { ...s.settings, appearance: structuredClone(preset.appearance) }
