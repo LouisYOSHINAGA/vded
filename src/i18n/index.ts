@@ -77,7 +77,7 @@ const EN: Dict = {
   'seq.lag': 'Lag',
   'seq.lagOff': 'Off',
   'seq.lagTitle':
-    'Steps the playhead must be past a cell before that cell shows the next page. Off leaves the grid still until the page turns.',
+    'Steps the playhead must be past a cell before that cell shows the next page. Cells turn over a beat at a time, four together. Off leaves the grid still until the page turns.',
   'seq.clock': 'MIDI Clock',
   'seq.clockTitle': 'Send 24ppqn clock and start/stop (set MIDI Clock src to Auto on the machine)',
   'seq.clear': 'Clear',
@@ -384,7 +384,7 @@ const JA: Dict = {
   'seq.lag': 'Lag',
   'seq.lagOff': 'Off',
   'seq.lagTitle':
-    '再生位置が何ステップ通り過ぎたら、そのセルを次ページの表示に切り替えるか。Off ならページが切り替わるまで表示は動きません。',
+    '再生位置が何ステップ通り過ぎたら、そのセルを次ページの表示に切り替えるか。切り替えは 4 ステップ（1 拍）のブロック単位でまとめて行われます。Off ならページが切り替わるまで表示は動きません。',
   'seq.clock': 'MIDI Clock',
   'seq.clockTitle': '24ppqn クロックと START/STOP を送信（実機の MIDI Clock src を Auto に）',
   'seq.clear': 'Clear',

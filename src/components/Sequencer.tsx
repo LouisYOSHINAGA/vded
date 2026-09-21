@@ -45,14 +45,32 @@ const DEFAULT_RAIL_WIDTH = 216
 const partTint = (part: number) => `var(--c-part-${part + 1})`
 const partInk = (part: number) => `var(--c-on-part-${part + 1})`
 
+/** Steps in a beat — the grid's own grouping, and the roll-in's unit. */
+const BEAT = 4
+
 /** Splits one page of sixteen steps into four beats. */
 function beats<T>(items: T[]): T[][] {
-  return [0, 1, 2, 3].map((beat) => items.slice(beat * 4, beat * 4 + 4))
+  return [0, 1, 2, 3].map((beat) => items.slice(beat * BEAT, beat * BEAT + BEAT))
 }
 
 /** The page a step index falls on. */
 function pageOf(step: number): number {
   return Math.floor(step / STEPS_PER_PAGE)
+}
+
+/**
+ * Last cell showing the next page, given where the playhead is on this one.
+ *
+ * The lag says how far past a cell the playhead must be before that cell may
+ * turn over, but cells turn over a whole beat at a time rather than one by
+ * one: a block of four flips together once the lag has cleared all four of
+ * them. Four pads changing at once reads as one event, where a cell every
+ * step reads as the grid crawling.
+ */
+function rolledTo(posInPage: number, lag: number): number {
+  if (lag <= 0 || posInPage < lag) return -1
+  const cleared = posInPage - lag + 1
+  return Math.floor(cleared / BEAT) * BEAT - 1
 }
 
 /**
@@ -94,7 +112,7 @@ export function Sequencer() {
       ? currentStep - base
       : -1
   const lag = useAppState((s) => s.ui.seqLookahead)
-  const aheadMax = pages > 1 && lag > 0 && posInPage >= lag ? posInPage - lag : -1
+  const aheadMax = pages > 1 ? rolledTo(posInPage, lag) : -1
 
   // While running, the grid turns the page with the playhead unless FOLLOW is
   // off — which is what you want when editing one page while another plays.
