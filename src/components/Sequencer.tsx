@@ -21,7 +21,13 @@ import {
 } from '../state/actions'
 import { sequencer } from '../sequencer/engine'
 import { store, useAppState } from '../state/store'
-import { MAX_STEPS, PAGE_COUNT, PART_COUNT, STEPS_PER_PAGE } from '../state/types'
+import {
+  LOOKAHEAD_CHOICES,
+  MAX_STEPS,
+  PAGE_COUNT,
+  PART_COUNT,
+  STEPS_PER_PAGE,
+} from '../state/types'
 import { Icon } from './Icon'
 import { InfoTip } from './InfoTip'
 import { Knob } from './Knob'
@@ -48,12 +54,6 @@ function beats<T>(items: T[]): T[][] {
 function pageOf(step: number): number {
   return Math.floor(step / STEPS_PER_PAGE)
 }
-
-/**
- * How far behind the playhead a cell turns over to the next page. One beat:
- * by the time the playhead is on step 5, cell 1 is already showing step 17.
- */
-const LOOKAHEAD = 4
 
 /**
  * Absolute step drawn in cell `i` of the visible page. Cells at or below
@@ -93,7 +93,8 @@ export function Sequencer() {
     follow && transport.playing && currentStep >= 0 && pageOf(currentStep) === page
       ? currentStep - base
       : -1
-  const aheadMax = pages > 1 && posInPage >= LOOKAHEAD ? posInPage - LOOKAHEAD : -1
+  const lag = useAppState((s) => s.ui.seqLookahead)
+  const aheadMax = pages > 1 && lag > 0 && posInPage >= lag ? posInPage - lag : -1
 
   // While running, the grid turns the page with the playhead unless FOLLOW is
   // off — which is what you want when editing one page while another plays.
@@ -281,6 +282,7 @@ function PageBar() {
   const steps = useAppState((s) => s.pattern.steps)
   const page = useAppState((s) => s.ui.seqPage)
   const follow = useAppState((s) => s.ui.followPlayhead)
+  const lag = useAppState((s) => s.ui.seqLookahead)
   const currentStep = useAppState((s) => s.transport.currentStep)
   const playing = useAppState((s) => s.transport.playing)
   const pages = pageCountFor(length)
@@ -340,6 +342,22 @@ function PageBar() {
       >
         {t('seq.follow')}
       </button>
+      <label className="seq-pages__lag" title={t('seq.lagTitle')}>
+        <span className="cluster__label">{t('seq.lag')}</span>
+        <select
+          className="select btn--sm"
+          value={lag}
+          disabled={!follow}
+          aria-label={t('seq.lagTitle')}
+          onChange={(e) => setUi({ seqLookahead: Number(e.target.value) })}
+        >
+          {LOOKAHEAD_CHOICES.map((n) => (
+            <option key={n} value={n}>
+              {n === 0 ? t('seq.lagOff') : `${n}`}
+            </option>
+          ))}
+        </select>
+      </label>
       <span className="hint seq-pages__range">
         {t('seq.pageRange', { from: page * STEPS_PER_PAGE + 1, to: (page + 1) * STEPS_PER_PAGE })}
       </span>

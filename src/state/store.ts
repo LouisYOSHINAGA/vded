@@ -5,7 +5,7 @@ import type { CcTable, ChannelMode } from '../midi/ccmap'
 import { DEFAULT_CC_TABLE } from '../midi/ccmap'
 import { makeEmptyPattern, makeInitPatch } from './defaults'
 import type { Pattern, Patch, Preset } from './types'
-import { PART_COUNT } from './types'
+import { DEFAULT_LOOKAHEAD, PART_COUNT } from './types'
 
 export type EditorTab = 'part' | 'matrix' | 'dials' | 'presets' | 'memo' | 'func' | 'map'
 
@@ -70,6 +70,8 @@ export interface UiState {
   seqPage: number
   /** Let the visible page chase the playhead across pages while running. */
   followPlayhead: boolean
+  /** Steps the playhead must be past a cell before it shows the next page. */
+  seqLookahead: number
   /** Part indices in the order the Dials tab shows them; drag-reorderable. */
   dialOrder: number[]
   /** Progress of a running SEND ALL, 0..1, or null when idle. */
@@ -126,6 +128,7 @@ export function makeInitialState(): AppState {
       seqRailWidth: 216,
       seqPage: 0,
       followPlayhead: true,
+      seqLookahead: DEFAULT_LOOKAHEAD,
       dialOrder: [0, 1, 2, 3, 4, 5],
       sendAllProgress: null,
     },

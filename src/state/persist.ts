@@ -8,7 +8,7 @@ import type { EditorTab } from './store'
 import { DEFAULT_TAB_ORDER, makeInitialState, store } from './store'
 import type { ThemeSeed } from '../theme/palette'
 import type { Preset } from './types'
-import { PAGE_COUNT, PART_COUNT, STEPS_PER_PAGE } from './types'
+import { LOOKAHEAD_CHOICES, PAGE_COUNT, PART_COUNT, STEPS_PER_PAGE } from './types'
 
 const KEY = 'vded.workspace.v1'
 const SCHEMA = 1
@@ -30,6 +30,7 @@ interface Persisted {
     | 'seqRailWidth'
     | 'seqPage'
     | 'followPlayhead'
+    | 'seqLookahead'
     | 'dialOrder'
     | 'tabOrder'
   >
@@ -67,6 +68,11 @@ export function loadWorkspace(): Partial<AppState> | null {
         layerLink: migrateLayerLink(data.ui?.layerLink),
         seqPage: validPage(data.ui?.seqPage, pattern.length),
         followPlayhead: data.ui?.followPlayhead ?? base.ui.followPlayhead,
+        seqLookahead: LOOKAHEAD_CHOICES.includes(
+          data.ui?.seqLookahead as (typeof LOOKAHEAD_CHOICES)[number],
+        )
+          ? data.ui.seqLookahead
+          : base.ui.seqLookahead,
         sendAllProgress: null,
       },
       transport: { ...base.transport, ...data.transport, playing: false, currentStep: -1 },
@@ -149,6 +155,7 @@ function serialize(state: AppState): string {
       seqRailWidth: state.ui.seqRailWidth,
       seqPage: state.ui.seqPage,
       followPlayhead: state.ui.followPlayhead,
+      seqLookahead: state.ui.seqLookahead,
       dialOrder: state.ui.dialOrder,
       tabOrder: state.ui.tabOrder,
     },
@@ -181,6 +188,7 @@ function persistedSlices(state: AppState): unknown[] {
     state.ui.seqRailWidth,
     state.ui.seqPage,
     state.ui.followPlayhead,
+    state.ui.seqLookahead,
     state.ui.dialOrder,
     state.ui.tabOrder,
     state.memo,
