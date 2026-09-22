@@ -66,11 +66,17 @@ function pageOf(step: number): number {
  * one: a block of four flips together once the lag has cleared all four of
  * them. Four pads changing at once reads as one event, where a cell every
  * step reads as the grid crawling.
+ *
+ * The clock stops a beat before the page ends. A block that came due inside
+ * that last beat would redraw a step or two before the page turn redraws the
+ * whole grid anyway, and two redraws that close together read as a flicker
+ * rather than as two events — so it waits and arrives with the turn. That
+ * also keeps every change on screen at least a beat apart, whatever the lag.
  */
 function rolledTo(posInPage: number, lag: number): number {
   if (lag <= 0 || posInPage < lag) return -1
-  const cleared = posInPage - lag + 1
-  return Math.floor(cleared / BEAT) * BEAT - 1
+  const cleared = Math.min(posInPage, STEPS_PER_PAGE - BEAT) - lag + 1
+  return cleared < BEAT ? -1 : Math.floor(cleared / BEAT) * BEAT - 1
 }
 
 /**

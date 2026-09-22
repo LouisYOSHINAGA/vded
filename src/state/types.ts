@@ -15,9 +15,11 @@ export const DEFAULT_STEPS = STEPS_PER_PAGE
 /**
  * How far behind the playhead a cell turns over to show the next page, in
  * steps. 0 leaves the page still until the page turn itself; the others are
- * whole beats, so the roll-in lands on the grid's own grouping.
+ * whole beats, so the roll-in lands on the grid's own grouping. 12 is not
+ * offered: on a sixteen-step page nothing can come due before the last beat,
+ * where the roll-in defers to the page turn, so it would only repeat 0.
  */
-export const LOOKAHEAD_CHOICES = [0, 4, 8, 12] as const
+export const LOOKAHEAD_CHOICES = [0, 4, 8] as const
 export const DEFAULT_LOOKAHEAD = 8
 
 /** SELECT is one CC that packs wave x mod x eg. These are its three axes. */
