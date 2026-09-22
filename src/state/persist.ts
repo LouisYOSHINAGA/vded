@@ -8,7 +8,7 @@ import type { EditorTab } from './store'
 import { DEFAULT_TAB_ORDER, makeInitialState, store } from './store'
 import type { ThemeSeed } from '../theme/palette'
 import type { Preset } from './types'
-import { LOOKAHEAD_CHOICES, PAGE_COUNT, PART_COUNT, STEPS_PER_PAGE } from './types'
+import { PAGE_COUNT, PART_COUNT, STEPS_PER_PAGE } from './types'
 
 const KEY = 'vded.workspace.v1'
 const SCHEMA = 1
@@ -68,11 +68,7 @@ export function loadWorkspace(): Partial<AppState> | null {
         layerLink: migrateLayerLink(data.ui?.layerLink),
         seqPage: validPage(data.ui?.seqPage, pattern.length),
         followPlayhead: data.ui?.followPlayhead ?? base.ui.followPlayhead,
-        seqLookahead: LOOKAHEAD_CHOICES.includes(
-          data.ui?.seqLookahead as (typeof LOOKAHEAD_CHOICES)[number],
-        )
-          ? data.ui.seqLookahead
-          : base.ui.seqLookahead,
+        seqLookahead: migrateLookahead(data.ui?.seqLookahead, base.ui.seqLookahead),
         sendAllProgress: null,
       },
       transport: { ...base.transport, ...data.transport, playing: false, currentStep: -1 },
@@ -121,6 +117,16 @@ function validTabOrder(order: EditorTab[] | undefined): EditorTab[] | null {
   const seen = new Set(order)
   if (seen.size !== order.length) return null
   return DEFAULT_TAB_ORDER.every((tab) => seen.has(tab)) ? order : null
+}
+
+/**
+ * The roll-in used to carry its lag in steps (0, 4, 8, 12); it is a flag now,
+ * and any of the old numbers still says plainly whether it was on.
+ */
+function migrateLookahead(saved: boolean | number | undefined, fallback: boolean): boolean {
+  if (typeof saved === 'boolean') return saved
+  if (typeof saved === 'number') return saved > 0
+  return fallback
 }
 
 /** A saved page must still be inside both the page count and the pattern. */

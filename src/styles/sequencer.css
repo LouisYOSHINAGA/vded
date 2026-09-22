@@ -227,21 +227,10 @@
   margin-left: 2px;
 }
 
-/* The roll-in only happens while following, so its setting sits with FOLLOW
-   and greys out with it. */
-.seq-pages__lag {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-left: -8px;
-}
-
-.seq-pages__lag select {
-  min-width: 62px;
-}
-
-.seq-pages__lag:has(select:disabled) {
-  opacity: 0.45;
+/* The roll-in only happens while following, so LAG sits against FOLLOW and
+   greys out with it. */
+.seq-pages__row + .btn + .btn {
+  margin-left: -12px;
 }
 
 /*

@@ -75,9 +75,8 @@ const EN: Dict = {
   'seq.follow': 'Follow',
   'seq.followTitle': 'Follow the playhead: turn the page with it, and roll the next page in behind it',
   'seq.lag': 'Lag',
-  'seq.lagOff': 'Off',
   'seq.lagTitle':
-    'Steps the playhead must be past a cell before that cell shows the next page. Cells turn over a beat at a time, four together, and anything still due in the last beat arrives with the page turn instead. Off leaves the grid still until the page turns.',
+    'Roll the next page in a beat behind the playhead: once four cells are a beat past it they turn over together. Anything still due in the last beat of the page arrives with the page turn instead. Off leaves the grid still until the page turns.',
   'seq.clock': 'MIDI Clock',
   'seq.clockTitle': 'Send 24ppqn clock and start/stop (set MIDI Clock src to Auto on the machine)',
   'seq.clear': 'Clear',
@@ -382,9 +381,8 @@ const JA: Dict = {
   'seq.follow': 'Follow',
   'seq.followTitle': '再生位置に追従します（ページの自動切り替えと、次ページの順次先読み表示）',
   'seq.lag': 'Lag',
-  'seq.lagOff': 'Off',
   'seq.lagTitle':
-    '再生位置が何ステップ通り過ぎたら、そのセルを次ページの表示に切り替えるか。切り替えは 4 ステップ（1 拍）のブロック単位で行い、最後の 1 拍に入った分はページ送りにまとめられます。Off ならページが切り替わるまで表示は動きません。',
+    '再生位置の 1 拍（4 ステップ）後ろから次ページを先読み表示します。切り替えは 4 個まとめて行い、ページ最後の 1 拍に入った分はページ送りにまとめられます。OFF ならページが切り替わるまで表示は動きません。',
   'seq.clock': 'MIDI Clock',
   'seq.clockTitle': '24ppqn クロックと START/STOP を送信（実機の MIDI Clock src を Auto に）',
   'seq.clear': 'Clear',

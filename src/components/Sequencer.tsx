@@ -21,13 +21,7 @@ import {
 } from '../state/actions'
 import { sequencer } from '../sequencer/engine'
 import { store, useAppState } from '../state/store'
-import {
-  LOOKAHEAD_CHOICES,
-  MAX_STEPS,
-  PAGE_COUNT,
-  PART_COUNT,
-  STEPS_PER_PAGE,
-} from '../state/types'
+import { LOOKAHEAD_STEPS, MAX_STEPS, PAGE_COUNT, PART_COUNT, STEPS_PER_PAGE } from '../state/types'
 import { Icon } from './Icon'
 import { InfoTip } from './InfoTip'
 import { Knob } from './Knob'
@@ -118,7 +112,7 @@ export function Sequencer() {
       ? currentStep - base
       : -1
   const lag = useAppState((s) => s.ui.seqLookahead)
-  const aheadMax = pages > 1 ? rolledTo(posInPage, lag) : -1
+  const aheadMax = pages > 1 && lag ? rolledTo(posInPage, LOOKAHEAD_STEPS) : -1
 
   // While running, the grid turns the page with the playhead unless FOLLOW is
   // off — which is what you want when editing one page while another plays.
@@ -366,22 +360,16 @@ function PageBar() {
       >
         {t('seq.follow')}
       </button>
-      <label className="seq-pages__lag" title={t('seq.lagTitle')}>
-        <span className="cluster__label">{t('seq.lag')}</span>
-        <select
-          className="select btn--sm"
-          value={lag}
-          disabled={!follow}
-          aria-label={t('seq.lagTitle')}
-          onChange={(e) => setUi({ seqLookahead: Number(e.target.value) })}
-        >
-          {LOOKAHEAD_CHOICES.map((n) => (
-            <option key={n} value={n}>
-              {n === 0 ? t('seq.lagOff') : `${n}`}
-            </option>
-          ))}
-        </select>
-      </label>
+      <button
+        type="button"
+        className={`btn btn--sm${lag && follow ? ' btn--on' : ' btn--ghost'}`}
+        onClick={() => setUi({ seqLookahead: !lag })}
+        disabled={!follow}
+        aria-pressed={lag}
+        title={t('seq.lagTitle')}
+      >
+        {t('seq.lag')}
+      </button>
       <span className="hint seq-pages__range">
         {t('seq.pageRange', { from: page * STEPS_PER_PAGE + 1, to: (page + 1) * STEPS_PER_PAGE })}
       </span>
